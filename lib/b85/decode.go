@@ -53,29 +53,27 @@ func Decode(serial string) ([]byte, error) {
 			}
 		}
 
-		if charCount == 5 {
-			// Full group - extract bytes in big endian order (0123)
-			result = append(result,
-				byte((workingU32>>24)&0xFF),
-				byte((workingU32>>16)&0xFF),
-				byte((workingU32>>8)&0xFF),
-				byte((workingU32>>0)&0xFF),
-			)
-		} else {
-			// Partial group - extract bytes normally
-			byteCount := charCount - 1
-			if byteCount >= 1 {
-				result = append(result, byte((workingU32>>24)&0xFF))
-			}
-			if byteCount >= 2 {
-				result = append(result, byte((workingU32>>16)&0xFF))
-			}
-			if byteCount >= 3 {
-				result = append(result, byte((workingU32>>8)&0xFF))
-			}
+		// Extract bytes - same for both full and partial groups
+		byteCount := 4
+		if charCount < 5 {
+			byteCount = charCount - 1
+		}
+
+		if byteCount >= 1 {
+			result = append(result, byte((workingU32>>24)&0xFF))
+		}
+		if byteCount >= 2 {
+			result = append(result, byte((workingU32>>16)&0xFF))
+		}
+		if byteCount >= 3 {
+			result = append(result, byte((workingU32>>8)&0xFF))
+		}
+		if byteCount >= 4 {
+			result = append(result, byte((workingU32>>0)&0xFF))
 		}
 	}
 
+	// Reverse the bits in each byte
 	for i := range result {
 		result[i] = mirrorLookup[result[i]]
 	}

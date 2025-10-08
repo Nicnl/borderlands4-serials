@@ -16,12 +16,6 @@ func init() {
 	}
 }
 
-func reverseByteOrder(bytes []byte) []byte {
-	// Implement the byte order transformation that the JS code references
-	// Based on typical Base85 implementations, this likely swaps byte order
-	return []byte{bytes[3], bytes[2], bytes[1], bytes[0]}
-}
-
 func Decode(serial string) ([]byte, error) {
 	if len(serial) < 2 || serial[0] != '@' || serial[1] != 'U' {
 		return nil, fmt.Errorf("not a valid borderlands 4 item serial")
@@ -60,18 +54,15 @@ func Decode(serial string) ([]byte, error) {
 		}
 
 		if charCount == 5 {
-			// Full group - apply byte order transformation
-			standardBytes := []byte{
-				byte((workingU32 >> 24) & 0xFF),
-				byte((workingU32 >> 16) & 0xFF),
-				byte((workingU32 >> 8) & 0xFF),
-				byte((workingU32 >> 0) & 0xFF),
-			}
-
-			orderedBytes := reverseByteOrder(standardBytes)
-			result = append(result, orderedBytes[0], orderedBytes[1], orderedBytes[2], orderedBytes[3])
+			// Full group - extract bytes in big endian order (0123)
+			result = append(result,
+				byte((workingU32>>24)&0xFF),
+				byte((workingU32>>16)&0xFF),
+				byte((workingU32>>8)&0xFF),
+				byte((workingU32>>0)&0xFF),
+			)
 		} else {
-			// Partial group - NO byte order transformation, just extract bytes normally
+			// Partial group - extract bytes normally
 			byteCount := charCount - 1
 			if byteCount >= 1 {
 				result = append(result, byte((workingU32>>24)&0xFF))

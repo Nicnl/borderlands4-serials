@@ -8,7 +8,7 @@ import (
 func TestEncode(t *testing.T) {
 
 	for _, tt := range tests {
-		t.Run(tt.serial, func(t *testing.T) {
+		t.Run(tt.hex, func(t *testing.T) {
 			// Convert hex string to bytes
 			data, err := hex.DecodeString(tt.hex)
 			if err != nil {

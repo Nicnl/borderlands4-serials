@@ -74,7 +74,9 @@ func Decode(serial string) ([]byte, error) {
 	}
 
 	// Reverse the bits in each byte
+	// 76543210 -> 01234567
 	for i := range result {
+		// Using a lookup table for performance
 		result[i] = mirrorLookup[result[i]]
 	}
 

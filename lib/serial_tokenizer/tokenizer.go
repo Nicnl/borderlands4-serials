@@ -31,7 +31,10 @@ func (t *Tokenizer) Parse() error {
 
 	output := ""
 	defer func() {
+		fmt.Println("Data:")
 		fmt.Println(output)
+		fmt.Println("Remaining:")
+		fmt.Println(t.bs.AsString())
 	}()
 	for {
 

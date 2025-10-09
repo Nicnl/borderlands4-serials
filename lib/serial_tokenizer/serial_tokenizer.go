@@ -43,5 +43,6 @@ func (t *Tokenizer) nextToken() (byte, error) {
 		return TOK_VARBIT, nil
 	}
 
+	t.bs.Rewind(3)
 	return 0, fmt.Errorf("invalid token, got %d%d%d at position %d", bit1, bit2, bit3, t.bs.Pos())
 }

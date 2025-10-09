@@ -23,18 +23,29 @@ func binToBytes(s string) []byte {
 	return data
 }
 
-func TestSerialDecode1(t *testing.T) {
-	data, err := b85.Decode("@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf{00")
-	assert.NoError(t, err)
+func TestSerialTokenize(t *testing.T) {
+	var tests = []struct {
+		serial   string
+		expected string
+	}{
+		{
+			"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf{00",
+			"1",
+		},
+		{
+			"@Ugr$WBm/!Fz!X=5&qXxA;nj3OOD#<4R",
+			"1",
+		},
+	}
 
-	tok := NewTokenizer(data)
-	assert.NoError(t, tok.Parse())
-}
+	for _, tt := range tests {
+		t.Run(tt.serial, func(t *testing.T) {
+			data, err := b85.Decode(tt.serial)
+			assert.NoError(t, err)
 
-func TestSerialDecode2(t *testing.T) {
-	data, err := b85.Decode("@Ugr$WBm/!Fz!X=5&qXxA;nj3OOD#<4R")
-	assert.NoError(t, err)
-
-	tok := NewTokenizer(data)
-	assert.NoError(t, tok.Parse())
+			tok := NewTokenizer(data)
+			err = tok.Parse()
+			assert.NoError(t, err)
+		})
+	}
 }

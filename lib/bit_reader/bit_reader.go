@@ -39,3 +39,20 @@ func (br *BitReader) ReadN(n int) (uint32, bool) {
 func (br *BitReader) Pos() any {
 	return br.pos
 }
+
+func (br *BitReader) Rewind(n int) bool {
+	if n < 0 || br.pos-n < 0 {
+		return false
+	}
+	br.pos -= n
+	return true
+}
+
+func (br *BitReader) AsString() string {
+	result := ""
+	for i := br.pos; i < len(br.data)*8; i++ {
+		bit, _ := br.Read()
+		result += string('0' + bit)
+	}
+	return result
+}

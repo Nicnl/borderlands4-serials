@@ -52,7 +52,11 @@ func (t *Tokenizer) Parse() error {
 			}
 			output += fmt.Sprintf("%d", v)
 		case TOK_VARBIT:
-			return fmt.Errorf("VARBIT not implemented")
+			v, err := t.readVarBit()
+			if err != nil {
+				return err
+			}
+			output += fmt.Sprintf("%d", v)
 		default:
 			return fmt.Errorf("unknown token %d", token)
 		}

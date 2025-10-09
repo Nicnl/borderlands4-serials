@@ -1,6 +1,9 @@
 package b85
 
-import "fmt"
+import (
+	"borderlands_4_serials/lib/byte_mirror"
+	"fmt"
+)
 
 const b85Charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{/}~"
 
@@ -77,7 +80,7 @@ func Decode(serial string) ([]byte, error) {
 	// 76543210 -> 01234567
 	for i := range result {
 		// Using a lookup table for performance
-		result[i] = mirrorLookup[result[i]]
+		result[i] = byte_mirror.Uint8Mirror[result[i]]
 	}
 
 	return result, nil

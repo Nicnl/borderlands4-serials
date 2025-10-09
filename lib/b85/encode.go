@@ -1,5 +1,7 @@
 package b85
 
+import "borderlands_4_serials/lib/byte_mirror"
+
 func Encode(data []byte) string {
 	// Make a copy to avoid modifying the original
 	bytes := make([]byte, len(data))
@@ -8,7 +10,7 @@ func Encode(data []byte) string {
 	// Reverse the bits in each byte
 	// 76543210 -> 01234567
 	for i := range bytes {
-		bytes[i] = mirrorLookup[bytes[i]]
+		bytes[i] = byte_mirror.Uint8Mirror[bytes[i]]
 	}
 
 	result := make([]byte, 0)

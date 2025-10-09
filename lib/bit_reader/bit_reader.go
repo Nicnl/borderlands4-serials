@@ -9,7 +9,7 @@ func NewBitReader(data []byte) *BitReader {
 	return &BitReader{data: data, pos: 0}
 }
 
-func (br *BitReader) Pop() (byte, bool) {
+func (br *BitReader) Read() (byte, bool) {
 	if br.pos >= len(br.data)*8 {
 		return 0, false
 	}
@@ -19,7 +19,7 @@ func (br *BitReader) Pop() (byte, bool) {
 	return bit, true
 }
 
-func (br *BitReader) PopN(n int) (uint32, bool) {
+func (br *BitReader) ReadN(n int) (uint32, bool) {
 	if n <= 0 || n > 32 {
 		return 0, false
 	}
@@ -30,8 +30,12 @@ func (br *BitReader) PopN(n int) (uint32, bool) {
 
 	var value uint32 = 0
 	for i := 0; i < n; i++ {
-		bit, _ := br.Pop()
+		bit, _ := br.Read()
 		value = (value << 1) | uint32(bit)
 	}
 	return value, true
+}
+
+func (br *BitReader) Pos() any {
+	return br.pos
 }

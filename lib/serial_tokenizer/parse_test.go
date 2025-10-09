@@ -24,7 +24,7 @@ func binToBytes(s string) []byte {
 	return data
 }
 
-func TestSerialTokenize(t *testing.T) {
+func TestSerialTokenize1(t *testing.T) {
 	var tests = []struct {
 		name     string
 		serial   string
@@ -152,6 +152,68 @@ func TestSerialTokenize(t *testing.T) {
 			tok := NewTokenizer(data)
 			err = tok.Parse()
 			assert.NoError(t, err)
+		})
+	}
+}
+
+func TestSerialTokenize2(t *testing.T) {
+	var tests = []struct {
+		name     string
+		serial   string
+		expected string
+	}{
+		{
+			"1 arms    1 bottle",
+			"@Ug!pHG38o5YT`HzQ)h-nP",
+			"1",
+		},
+		{
+			"1 cat     1 bottle",
+			"@Ug!pHG38o5YZ7QZg)h-nP",
+			"1",
+		},
+		{
+			"1 skullR  1 bottle",
+			"@Ug!pHG38o5YOe&^9)h-nP",
+			"1",
+		},
+		{
+			"1 bullet  1 bottle",
+			"@Ug!pHG38o6@O)92A)h-nP",
+			"1",
+		},
+		{
+			"1 square  1 bottle",
+			"@Ug!pHG38o5YPb#KC)h-nP",
+			"1",
+		},
+		{
+			"1 skullG  1 bottle",
+			"@Ug!pHG38o5YMJlF2)h-nP",
+			"1",
+		},
+		{
+			"1 feet    1 bottle",
+			"@Ug!pHG38o4tO)92A)h-nP",
+			"1",
+		},
+		{
+			"1 empty   1 bottle",
+			"@Ug!pHG38o5Y4JxKV)h-nP",
+			"1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data, err := b85.Decode(tt.serial)
+			assert.NoError(t, err)
+
+			fmt.Println("Name:", tt.name)
+			fmt.Println("Serial:", tt.serial)
+			tok := NewTokenizer(data)
+			err = tok.Parse()
+			//assert.NoError(t, err)
 		})
 	}
 }

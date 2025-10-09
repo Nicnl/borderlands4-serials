@@ -38,19 +38,24 @@ func (t *Tokenizer) expect(msg string, bits ...byte) error {
 }
 
 func (t *Tokenizer) Parse() error {
-	if err := t.expect("magic", 0, 0, 1); err != nil {
-		return err
-	}
+	splitPositions := make([]int, 0)
 
 	output := ""
 	defer func() {
 		fmt.Println("Data:", output)
-		fmt.Println("Done:", t.bs.StringBefore())
+
+		// split done positions, from right to left or we'll mess up the indexes
+		doneString := t.bs.StringBefore()
+		for i := len(splitPositions) - 1; i >= 0; i-- {
+			pos := splitPositions[i]
+			doneString = doneString[:pos] + "  " + doneString[pos:]
+		}
+		fmt.Println("Done:", doneString)
 		fmt.Println("Fail:", t.bs.StringAfter())
 		fmt.Println()
 	}()
 	for {
-
+		splitPositions = append(splitPositions, t.bs.Pos())
 		token, err := t.nextToken()
 		if err != nil {
 			return err

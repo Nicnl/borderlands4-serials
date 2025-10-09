@@ -36,8 +36,16 @@ func (br *BitReader) ReadN(n int) (uint32, bool) {
 	return value, true
 }
 
-func (br *BitReader) Pos() any {
+func (br *BitReader) Pos() int {
 	return br.pos
+}
+
+func (br *BitReader) SetPos(n int) bool {
+	if n < 0 || n > len(br.data)*8 {
+		return false
+	}
+	br.pos = n
+	return true
 }
 
 func (br *BitReader) Rewind(n int) bool {

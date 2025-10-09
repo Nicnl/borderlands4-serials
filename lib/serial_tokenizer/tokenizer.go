@@ -27,7 +27,9 @@ func (t *Tokenizer) expect(msg string, bits ...byte) error {
 }
 
 func (t *Tokenizer) Parse() error {
-	t.expect("magic", 0, 0, 1)
+	if err := t.expect("magic", 0, 0, 1); err != nil {
+		return err
+	}
 
 	first101 := false
 	output := ""

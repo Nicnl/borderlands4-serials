@@ -26,15 +26,48 @@ func binToBytes(s string) []byte {
 
 func TestSerialTokenize(t *testing.T) {
 	var tests = []struct {
+		name     string
 		serial   string
 		expected string
 	}{
 		{
+			"ORIGINAL L50 Legendary Cooking Ambushing Truck",
 			"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf{00",
 			"1",
 		},
 		{
-			"@Ugr$WBm/!Fz!X=5&qXxA;nj3OOD#<4R",
+			"Knife 1 skill",
+			"@Ugr$WBm/$!m!X=5&qXq#",
+			"1",
+		},
+		{
+			"Knife 2 skill",
+			"@Ugr$WBm/$!m!X=5&qXxA;nj3Nj00",
+			"1",
+		},
+		{
+			"Knife 3 skill",
+			"@Ugr$WBm/$!m!X=5&qXxA;nj3OODgg",
+			"1",
+		},
+		{
+			"Knife 4 skill",
+			"@Ugr$WBm/$!m!X=5&qXxA;nj3OOD#<4R",
+			"1",
+		},
+		{
+			"Common Unseen Xiuhcoatl",
+			"@Ugy3L+2}TYgOyvyviz?KiBDJYGs9dOW2m",
+			"1",
+		},
+		{
+			"Green Unseen Xiuhcoatl",
+			"@Ugy3L+2}TMcjNb(cjVjck8WpL1s7>WTg+kRrl/uj",
+			"1",
+		},
+		{
+			"Purple Looming Xiuhcoatl",
+			"@Ugy3L+2}TYg4BQJUjVjck61AvE^+Sb3b!rZ(7U~=V",
 			"1",
 		},
 	}
@@ -44,6 +77,7 @@ func TestSerialTokenize(t *testing.T) {
 			data, err := b85.Decode(tt.serial)
 			assert.NoError(t, err)
 
+			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
 			tok := NewTokenizer(data)
 			err = tok.Parse()

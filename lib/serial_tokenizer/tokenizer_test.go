@@ -135,6 +135,11 @@ func TestSerialTokenize(t *testing.T) {
 			"@Ugy3L+2}TYgT#^cvMir`2hg#I5@}cgb=Ak-u2XzZ/4gm",
 			"1",
 		},
+		{
+			"test debug",
+			"@Ugy3L+2}TYg%$yC%i7Es",
+			"1",
+		},
 	}
 
 	for _, tt := range tests {

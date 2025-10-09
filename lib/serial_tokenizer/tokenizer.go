@@ -13,21 +13,21 @@ func NewTokenizer(data []byte) *Tokenizer {
 	return &Tokenizer{bs: bit_reader.NewBitReader(data)}
 }
 
-func (t *Tokenizer) expect(bit byte, msg string) error {
-	b, ok := t.bs.Read()
-	if !ok {
-		return fmt.Errorf("unexpected end of data")
-	}
-	if b != bit {
-		return fmt.Errorf(msg+" => expected bit %d, got %d", bit, b)
+func (t *Tokenizer) expect(msg string, bits ...byte) error {
+	for _, bit := range bits {
+		b, ok := t.bs.Read()
+		if !ok {
+			return fmt.Errorf("unexpected end of data")
+		}
+		if b != bit {
+			return fmt.Errorf(msg+" => expected bit %d, got %d", bit, b)
+		}
 	}
 	return nil
 }
 
 func (t *Tokenizer) Parse() error {
-	if err := t.expect(0, "header start"); err != nil {
-		return err
-	}
+	t.expect("magic", 0, 0, 1)
 
 	first101 := false
 	output := ""

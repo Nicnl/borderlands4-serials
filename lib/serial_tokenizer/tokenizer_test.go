@@ -2,6 +2,7 @@ package serial_tokenizer
 
 import (
 	"borderlands_4_serials/lib/b85"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -43,6 +44,7 @@ func TestSerialTokenize(t *testing.T) {
 			data, err := b85.Decode(tt.serial)
 			assert.NoError(t, err)
 
+			fmt.Println("Serial:", tt.serial)
 			tok := NewTokenizer(data)
 			err = tok.Parse()
 			assert.NoError(t, err)

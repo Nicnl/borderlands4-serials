@@ -48,7 +48,20 @@ func (br *BitReader) Rewind(n int) bool {
 	return true
 }
 
-func (br *BitReader) AsString() string {
+func (br *BitReader) StringBefore() string {
+	//As binary
+	oldPos := br.pos
+	br.Rewind(oldPos)
+	result := ""
+	for i := 0; i < oldPos; i++ {
+		bit, _ := br.Read()
+		result += string('0' + bit)
+	}
+	br.pos = oldPos
+	return result
+}
+
+func (br *BitReader) StringAfter() string {
 	result := ""
 	for i := br.pos; i < len(br.data)*8; i++ {
 		bit, _ := br.Read()

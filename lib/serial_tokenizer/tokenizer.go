@@ -31,10 +31,10 @@ func (t *Tokenizer) Parse() error {
 
 	output := ""
 	defer func() {
-		fmt.Println("Data:")
-		fmt.Println(output)
-		fmt.Println("Remaining:")
-		fmt.Println(t.bs.AsString())
+		fmt.Println("Data:", output)
+		fmt.Println("Done:", t.bs.StringBefore())
+		fmt.Println("Fail:", t.bs.StringAfter())
+		fmt.Println()
 	}()
 	for {
 

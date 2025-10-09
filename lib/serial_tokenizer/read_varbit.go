@@ -5,10 +5,10 @@ import (
 	"fmt"
 )
 
-func (t *Tokenizer) readVarBit() (uint32, uint32, error) {
+func (t *Tokenizer) readVarBit() (uint32, error) {
 	length, ok := t.bs.ReadN(5)
 	if !ok {
-		return 0, 0, fmt.Errorf("unexpected end of data while reading varbit length")
+		return 0, fmt.Errorf("unexpected end of data while reading varbit length")
 	}
 	length = uint32(byte_mirror.Uint5Mirror[byte(length)])
 
@@ -16,11 +16,11 @@ func (t *Tokenizer) readVarBit() (uint32, uint32, error) {
 	for i := uint32(0); i < length; i++ {
 		bit, ok := t.bs.Read()
 		if !ok {
-			return 0, 0, fmt.Errorf("unexpected end of data while reading varbit value")
+			return 0, fmt.Errorf("unexpected end of data while reading varbit value")
 		}
 
 		v |= uint32(bit) << i
 	}
 
-	return v, length, nil
+	return v, nil
 }

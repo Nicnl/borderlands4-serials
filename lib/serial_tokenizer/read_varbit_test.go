@@ -113,7 +113,7 @@ func TestVarBit(t *testing.T) {
 		t.Run(tt.bin, func(t *testing.T) {
 			data := binToBytes(tt.bin)
 			tok := NewTokenizer(data)
-			val, err := tok.readVarBit()
+			val, _, err := tok.readVarBit()
 			assert.NoError(t, err)
 			assert.Equal(t, tt.expected, val)
 			assert.Equal(t, tt.pos, tok.bs.Pos())

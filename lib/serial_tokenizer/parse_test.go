@@ -2,6 +2,7 @@ package serial_tokenizer
 
 import (
 	"borderlands_4_serials/lib/b85"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
@@ -150,8 +151,13 @@ func TestSerialTokenize(t *testing.T) {
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
 			tok := NewTokenizer(data)
-			err = tok.Parse()
+			output, err := tok.Parse()
 			assert.NoError(t, err)
+
+			prettyJson, err := json.MarshalIndent(output, "", "  ")
+			assert.NoError(t, err)
+			fmt.Println("Output:", string(prettyJson))
+			fmt.Println()
 		})
 	}
 }

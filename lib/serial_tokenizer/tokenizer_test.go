@@ -36,6 +36,21 @@ func TestSerialTokenize(t *testing.T) {
 			"1",
 		},
 		{
+			"BROKEN TRUCK 1",
+			"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!XN+",
+			"1",
+		},
+		{
+			"BROKEN TRUCK 2",
+			"@Ugy3L+2}TYg93=h!/NsC0/Nl@<RG/)a6EzQ&4/NX}1_1",
+			"1",
+		},
+		{
+			"BROKEN TRUCK 3",
+			"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!XN+",
+			"1",
+		},
+		{
 			"Knife 1 skill",
 			"@Ugr$WBm/$!m!X=5&qXq#",
 			"1",
@@ -70,10 +85,60 @@ func TestSerialTokenize(t *testing.T) {
 			"@Ugy3L+2}TYg4BQJUjVjck61AvE^+Sb3b!rZ(7U~=V",
 			"1",
 		},
+		{
+			"Top Square Simple 1",
+			"@Ugy3L+2}TYgOyvyviz?KiBDJYGs9dOW2m",
+			"1",
+		},
+		{
+			"Top Square Simple 2",
+			"@Ugy3L+2}TYgjMogxi7Hg07IhPq4>b?9sX3@zs9y*",
+			"1",
+		},
+		{
+			"Top Square Simple 3",
+			"@Ugy3L+2}TYg4BQJUjVjck61AvE^+Sb3b!rZ(7U~=V",
+			"1",
+		},
+		{
+			"Top Square Simple 4",
+			"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf{00",
+			"1",
+		},
+		{
+			"Top Square Simple 5",
+			"@Ugy3L+2}TYgT#^cvMir`2hg#I5@}cgb=Ak+@2XzZ/4gm",
+			"1",
+		},
+		{
+			"Side Long Smooth  1",
+			"@Ugy3L+2}TYgOyvyviz?KiBDJYKs9dOW2m",
+			"1",
+		},
+		{
+			"Side Long Smooth  2",
+			"@Ugy3L+2}TYgjMogxi7Hg07IhPq4>b?9sXeG%s9y*",
+			"1",
+		},
+		{
+			"Side Long Smooth  3",
+			"@Ugy3L+2}TYg4BQJUjVjck61AvE^+Sb3b!rc)7U~=V",
+			"1",
+		},
+		{
+			"Side Long Smooth  4",
+			"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l3q`a-qf{00",
+			"1",
+		},
+		{
+			"Side Long Smooth  5",
+			"@Ugy3L+2}TYgT#^cvMir`2hg#I5@}cgb=Ak-u2XzZ/4gm",
+			"1",
+		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.serial, func(t *testing.T) {
+		t.Run(tt.name, func(t *testing.T) {
 			data, err := b85.Decode(tt.serial)
 			assert.NoError(t, err)
 

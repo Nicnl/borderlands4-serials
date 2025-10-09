@@ -29,6 +29,7 @@ func (t *Tokenizer) Parse() error {
 		return err
 	}
 
+	first101 := false
 	output := ""
 	defer func() {
 		fmt.Println("Data:", output)
@@ -53,13 +54,22 @@ func (t *Tokenizer) Parse() error {
 			if err != nil {
 				return err
 			}
-			output += fmt.Sprintf("%d", v)
+			output += fmt.Sprintf(" %d", v)
 		case TOK_VARBIT:
 			v, err := t.readVarBit()
 			if err != nil {
 				return err
 			}
-			output += fmt.Sprintf("%d", v)
+			output += fmt.Sprintf(" %d", v)
+		case TOK_UNK1:
+			if !first101 {
+				first101 = true
+				output = ""
+			}
+
+			output += " <"
+		case TOK_UNK2:
+			output += " D"
 		default:
 			return fmt.Errorf("unknown token %d", token)
 		}

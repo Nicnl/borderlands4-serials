@@ -1,8 +1,11 @@
 package b85
 
 import (
+	"borderlands_4_serials/lib/bit_reader"
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var tests = []struct {
@@ -48,7 +51,6 @@ var tests = []struct {
 }
 
 func TestDecode(t *testing.T) {
-
 	for _, tt := range tests {
 		t.Run(tt.serial, func(t *testing.T) {
 			decoded, err := Decode(tt.serial)
@@ -59,5 +61,41 @@ func TestDecode(t *testing.T) {
 				t.Errorf("Decode() = %x, want %s", decoded, tt.hex)
 			}
 		})
+	}
+}
+
+func TestDecode2(t *testing.T) {
+	serials := []string{
+		"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf{00",
+		"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf`00",
+		"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$av=Z",
+		"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$G64",
+		"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l33L00",
+		"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!XN+",
+		"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}ce_00",
+		"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}ce^00",
+		"@Ugy3L+2}TYg%$yC%i7M2gZldO)@*w~",
+		"@Ugy3L+2}TYg%$yC%i7M2gZldO)@*n^",
+		"@Ugy3L+2}TYg%$yC%i7M2gZldNP00",
+		"@Ugy3L+2}TYg%$yC%i7M2gZldNO00",
+		"@Ugy3L+2}TYg%$yC%i7M2gZXy5",
+		"@Ugy3L+2}TYg%$yC%i7M2gE&%",
+		"@Ugy3L+2}TYg%$yC%i7M0~00",
+		"@Ugy3L+2}TYg%$yC%i7Es",
+		"@Ugy3L+2}TYg%$yC%i2w",
+		"@Ugy3L+2}TY8",
+		"@Ugy3L+2@aC}/NsC0/Nnmg",
+		"@Ugy3L+2}S?",
+		"@Ugy3L+2?hW",
+		"@Ugx~-",
+		"@Ugdh",
+	}
+
+	for _, serial := range serials {
+		data, err := Decode(serial)
+		assert.NoError(t, err)
+
+		bitStream := bit_reader.NewBitReader(data)
+		fmt.Println(bitStream.StringAfter())
 	}
 }

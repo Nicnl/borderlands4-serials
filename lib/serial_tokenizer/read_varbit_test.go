@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVarBit(t *testing.T) {
+func TestReadVarBit(t *testing.T) {
 	tests := []struct {
 		bin      string
 		expected uint32

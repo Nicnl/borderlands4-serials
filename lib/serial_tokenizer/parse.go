@@ -8,12 +8,11 @@ import (
 type Token byte
 
 const (
-	TOK_SEP1    Token = iota // "01" soft separator
-	TOK_SEP2                 // "00" hard separator
-	TOK_VARINT               // "100" ... nibble varint
-	TOK_VARBIT               // "110" ... varbit
-	TOK_KV_MODE              // "101" ... enter KV section
-	TOK_KV_ADD               // "111" ... new KV entry inside section
+	TOK_SEP1   Token = iota // "01" soft separator
+	TOK_SEP2                // "00" hard separator
+	TOK_VARINT              // "100" ... nibble varint
+	TOK_VARBIT              // "110" ... varbit
+	TOK_PART                // "101" ... enter KV section
 )
 
 type Tokenizer struct {
@@ -78,10 +77,8 @@ func (t *Tokenizer) Parse() error {
 				return err
 			}
 			output += fmt.Sprintf(" %d", v)
-		case TOK_KV_MODE:
-			output += " {"
-		case TOK_KV_ADD:
-			output += " +"
+		case TOK_PART:
+			return fmt.Errorf("todo: unimplemented")
 		default:
 			return fmt.Errorf("unknown token %d", token)
 		}

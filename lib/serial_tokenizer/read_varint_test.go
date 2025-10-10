@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVarint(t *testing.T) {
+func TestReadVarint(t *testing.T) {
 	var tests = []struct {
 		bin      string
 		expected uint16

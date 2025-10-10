@@ -1,10 +1,12 @@
 package byte_mirror
 
 var (
-	Uint4Mirror [16]byte
-	Uint5Mirror [32]byte
-	Uint8Mirror [256]byte
-	Uint3Mirror [8]byte
+	Uint4Mirror  [16]byte
+	Uint5Mirror  [32]byte
+	Uint7Mirror  [128]byte
+	Uint8Mirror  [256]byte
+	Uint3Mirror  [8]byte
+	Uint11Mirror [2048]uint32
 )
 
 func init() {
@@ -24,8 +26,20 @@ func init() {
 		Uint5Mirror[i] = (b&0x01)<<4 | (b&0x02)<<2 | (b & 0x04) | (b&0x08)>>2 | (b&0x10)>>4
 	}
 
+	for i := range Uint7Mirror {
+		b := byte(i)
+		Uint7Mirror[i] = (b&0x01)<<6 | (b&0x02)<<4 | (b&0x04)<<2 | (b & 0x08) |
+			(b&0x10)>>2 | (b&0x20)>>4 | (b&0x40)>>6
+	}
+
 	for i := range Uint3Mirror {
 		b := byte(i)
 		Uint3Mirror[i] = (b&0x01)<<2 | (b & 0x02) | (b&0x04)>>2
+	}
+
+	for i := range Uint11Mirror {
+		b := uint32(i)
+		Uint11Mirror[i] = (b&0x001)<<10 | (b&0x002)<<8 | (b&0x004)<<6 | (b&0x008)<<4 | (b&0x010)<<2 |
+			(b & 0x020) | (b&0x040)>>2 | (b&0x080)>>4 | (b&0x100)>>6 | (b&0x200)>>8 | (b&0x400)>>10
 	}
 }

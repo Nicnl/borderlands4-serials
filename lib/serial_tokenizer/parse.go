@@ -3,6 +3,7 @@ package serial_tokenizer
 import (
 	"borderlands_4_serials/lib/bit_reader"
 	"fmt"
+	"io"
 )
 
 type Token byte
@@ -36,53 +37,51 @@ func (t *Tokenizer) expect(msg string, bits ...byte) error {
 	return nil
 }
 
-func (t *Tokenizer) Parse() error {
+func (t *Tokenizer) Parse() (string, error) {
 	splitPositions := make([]int, 0)
 
-	output := ""
-	defer func() {
-		fmt.Println("Data:", output)
+	if err := t.expect("magic header", 0, 0, 1, 0, 0, 0, 0); err != nil {
+		return "", err
+	}
 
-		// split done positions, from right to left or we'll mess up the indexes
-		doneString := t.bs.StringBefore()
-		for i := len(splitPositions) - 1; i >= 0; i-- {
-			pos := splitPositions[i]
-			doneString = doneString[:pos] + "  " + doneString[pos:]
-		}
-		fmt.Println("Done:", doneString)
-		fmt.Println("Fail:", t.bs.StringAfter())
-		fmt.Println()
-	}()
+	debugOutput := ""
+
 	for {
 		splitPositions = append(splitPositions, t.bs.Pos())
 		token, err := t.nextToken()
-		if err != nil {
-			return err
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return "", err
 		}
 
 		switch token {
 		case TOK_SEP1:
-			output += "|"
+			debugOutput += "|"
 		case TOK_SEP2:
-			output += ","
+			debugOutput += ","
 		case TOK_VARINT:
 			v, err := t.readVarInt()
 			if err != nil {
-				return err
+				return "", err
 			}
-			output += fmt.Sprintf(" %d", v)
+			debugOutput += fmt.Sprintf(" %d", v)
 		case TOK_VARBIT:
 			v, err := t.readVarBit()
 			if err != nil {
-				return err
+				return "", err
 			}
-			output += fmt.Sprintf(" %d", v)
+			debugOutput += fmt.Sprintf(" %d", v)
 		case TOK_PART:
-			return fmt.Errorf("todo: unimplemented")
+			v, err := t.readPart()
+			if err != nil {
+				return "", err
+			}
+			debugOutput += fmt.Sprintf(" {%d}", v)
 		default:
-			return fmt.Errorf("unknown token %d", token)
+			return "", fmt.Errorf("unknown token %d", token)
 		}
 	}
 
-	return nil
+	return debugOutput, nil
 }

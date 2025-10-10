@@ -150,13 +150,14 @@ func TestSerialTokenize1(t *testing.T) {
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
 			tok := NewTokenizer(data)
-			err = tok.Parse()
+			debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
+			fmt.Println("Tokens:", debugOutput)
 		})
 	}
 }
 
-func TestSerialTokenize2(t *testing.T) {
+func TestSerialTokenizeVexClassMods(t *testing.T) {
 	var tests = []struct {
 		name     string
 		serial   string
@@ -212,8 +213,42 @@ func TestSerialTokenize2(t *testing.T) {
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
 			tok := NewTokenizer(data)
-			err = tok.Parse()
-			//assert.NoError(t, err)
+			debugOutput, err := tok.Parse()
+			assert.NoError(t, err)
+			fmt.Println("Tokens:", debugOutput)
+		})
+	}
+}
+
+func TestSerialTokenizeShieldFirmware(t *testing.T) {
+	var tests = []struct {
+		name     string
+		serial   string
+		expected string
+	}{
+		{
+			"shield 1",
+			"@Uge8^+m/)}}!c178NkyuCbwKf>IWYh",
+			"1",
+		},
+		{
+			"shield 2",
+			"@Uge8^+m/)}}!axR1DpKvM1BxF_41oav",
+			"1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data, err := b85.Decode(tt.serial)
+			assert.NoError(t, err)
+
+			fmt.Println("Name:", tt.name)
+			fmt.Println("Serial:", tt.serial)
+			tok := NewTokenizer(data)
+			debugOutput, err := tok.Parse()
+			assert.NoError(t, err)
+			fmt.Println("Tokens:", debugOutput)
 		})
 	}
 }

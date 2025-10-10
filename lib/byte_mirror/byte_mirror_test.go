@@ -63,3 +63,72 @@ func TestMirrorLookup_Uint5(t *testing.T) {
 
 	assert.Equal(t, byte(0b11011), Uint5Mirror[0b11011])
 }
+
+func TestMirrorLookup_Uint7(t *testing.T) {
+	assert.Equal(t, byte(0b0000000), Uint7Mirror[0b0000000])
+	assert.Equal(t, byte(0b1111111), Uint7Mirror[0b1111111])
+
+	assert.Equal(t, byte(0b1000000), Uint7Mirror[0b0000001])
+	assert.Equal(t, byte(0b0100000), Uint7Mirror[0b0000010])
+	assert.Equal(t, byte(0b0010000), Uint7Mirror[0b0000100])
+	assert.Equal(t, byte(0b0001000), Uint7Mirror[0b0001000])
+	assert.Equal(t, byte(0b0000100), Uint7Mirror[0b0010000])
+	assert.Equal(t, byte(0b0000010), Uint7Mirror[0b0100000])
+	assert.Equal(t, byte(0b0000001), Uint7Mirror[0b1000000])
+
+	assert.Equal(t, byte(0b1010101), Uint7Mirror[0b1010101])
+	assert.Equal(t, byte(0b0101010), Uint7Mirror[0b0101010])
+
+	assert.Equal(t, byte(0b1110001), Uint7Mirror[0b1000111])
+	assert.Equal(t, byte(0b1000111), Uint7Mirror[0b1110001])
+	assert.Equal(t, byte(0b1100110), Uint7Mirror[0b0110011])
+	assert.Equal(t, byte(0b0110011), Uint7Mirror[0b1100110])
+	assert.Equal(t, byte(0b1010101), Uint7Mirror[0b1010101])
+
+	assert.Equal(t, byte(0b0110101), Uint7Mirror[0b1010110])
+	assert.Equal(t, byte(0b0101011), Uint7Mirror[0b1101010])
+}
+
+func TestMirrorLookup_Uint3(t *testing.T) {
+	assert.Equal(t, byte(0b000), Uint3Mirror[0b000])
+	assert.Equal(t, byte(0b111), Uint3Mirror[0b111])
+
+	assert.Equal(t, byte(0b100), Uint3Mirror[0b001])
+	assert.Equal(t, byte(0b010), Uint3Mirror[0b010])
+	assert.Equal(t, byte(0b001), Uint3Mirror[0b100])
+
+	assert.Equal(t, byte(0b101), Uint3Mirror[0b101])
+	assert.Equal(t, byte(0b010), Uint3Mirror[0b010])
+}
+
+func TestMirrorLookup_Uint11(t *testing.T) {
+	assert.Equal(t, uint32(0b00000000000), Uint11Mirror[0b00000000000])
+	assert.Equal(t, uint32(0b11111111111), Uint11Mirror[0b11111111111])
+
+	assert.Equal(t, uint32(0b10000000000), Uint11Mirror[0b00000000001])
+	assert.Equal(t, uint32(0b01000000000), Uint11Mirror[0b00000000010])
+	assert.Equal(t, uint32(0b00100000000), Uint11Mirror[0b00000000100])
+	assert.Equal(t, uint32(0b00010000000), Uint11Mirror[0b00000001000])
+	assert.Equal(t, uint32(0b00001000000), Uint11Mirror[0b00000010000])
+	assert.Equal(t, uint32(0b00000100000), Uint11Mirror[0b00000100000])
+	assert.Equal(t, uint32(0b00000010000), Uint11Mirror[0b00001000000])
+	assert.Equal(t, uint32(0b00000001000), Uint11Mirror[0b00010000000])
+	assert.Equal(t, uint32(0b00000000100), Uint11Mirror[0b00100000000])
+	assert.Equal(t, uint32(0b00000000010), Uint11Mirror[0b01000000000])
+	assert.Equal(t, uint32(0b00000000001), Uint11Mirror[0b10000000000])
+
+	assert.Equal(t, uint32(0b10101010101), Uint11Mirror[0b10101010101])
+	assert.Equal(t, uint32(0b01010101010), Uint11Mirror[0b01010101010])
+
+	assert.Equal(t, uint32(0b11111000000), Uint11Mirror[0b00000011111])
+	assert.Equal(t, uint32(0b00000111111), Uint11Mirror[0b11111100000])
+	assert.Equal(t, uint32(0b11001100110), Uint11Mirror[0b01100110011])
+	assert.Equal(t, uint32(0b01100110011), Uint11Mirror[0b11001100110])
+	assert.Equal(t, uint32(0b10100110101), Uint11Mirror[0b10101100101])
+
+	assert.Equal(t, uint32(0b01101010110), Uint11Mirror[0b01101010110])
+	assert.Equal(t, uint32(0b01010101100), Uint11Mirror[0b00110101010])
+
+	assert.Equal(t, uint32(0b10010101001), Uint11Mirror[0b10010101001])
+	assert.Equal(t, uint32(0b10101010101), Uint11Mirror[0b10101010101])
+}

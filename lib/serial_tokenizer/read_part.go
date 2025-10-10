@@ -5,8 +5,8 @@ import (
 	"fmt"
 )
 
-func (t *Tokenizer) readPart() (uint16, error) {
-	var output uint16
+func (t *Tokenizer) readPart() (uint32, error) {
+	var output uint32
 
 	// First block of 4 bits
 	{
@@ -16,7 +16,7 @@ func (t *Tokenizer) readPart() (uint16, error) {
 		}
 		block = uint32(byte_mirror.Uint4Mirror[byte(block)])
 
-		output |= uint16(block)
+		output |= block
 	}
 
 	// Figure out the length of the next block
@@ -27,11 +27,11 @@ func (t *Tokenizer) readPart() (uint16, error) {
 			return 0, fmt.Errorf("unexpected end of data while reading part continuation bit")
 		}
 		if continuationBit == 1 {
-			remainingLength = 8
+			remainingLength = 7
 		}
 	}
 
-	// Read the remaining block
+	// Read the 2nd block
 	{
 		block, ok := t.bs.ReadN(remainingLength)
 		if !ok {
@@ -40,11 +40,30 @@ func (t *Tokenizer) readPart() (uint16, error) {
 
 		if remainingLength == 3 {
 			block = uint32(byte_mirror.Uint3Mirror[byte(block)])
+			output |= block << 4
+			return output, nil
 		} else {
-			block = uint32(byte_mirror.Uint8Mirror[byte(block)])
+			block = uint32(byte_mirror.Uint7Mirror[byte(block)])
+			output |= block << 4
 		}
+	}
 
-		output |= uint16(block) << 4
+	continuationBit, ok := t.bs.Read()
+	if !ok {
+		return 0, fmt.Errorf("unexpected end of data while reading part continuation bit")
+	}
+	if continuationBit == 0 {
+		return output, nil
+	}
+
+	// Next block is 11
+	{
+		block, ok := t.bs.ReadN(11)
+		if !ok {
+			return 0, fmt.Errorf("unexpected end of data while reading part value")
+		}
+		block = byte_mirror.Uint11Mirror[block]
+		output |= block << 11
 	}
 
 	return output, nil

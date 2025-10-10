@@ -37,7 +37,7 @@ func (t *Tokenizer) nextToken() (Token, error) {
 		return TOK_VARBIT, nil
 	}
 
-	if bit1 == 1 && bit2 == 1 && bit3 == 1 {
+	if bit1 == 1 && bit2 == 0 && bit3 == 1 {
 		return TOK_PART, nil
 	}
 

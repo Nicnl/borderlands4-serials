@@ -44,6 +44,10 @@ func (t *Tokenizer) Parse() (string, error) {
 		return "", err
 	}
 
+	defer func() {
+		fmt.Println("AFTER", t.bs.StringAfter())
+	}()
+
 	debugOutput := ""
 
 	for {

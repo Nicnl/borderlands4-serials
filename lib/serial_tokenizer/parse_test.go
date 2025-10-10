@@ -24,6 +24,13 @@ func binToBytes(s string) []byte {
 	return data
 }
 
+func TestSerialTokenize1MultiBitsTest(t *testing.T) {
+	for i := 8; i <= 32; i++ {
+		BITS = i
+		t.Run("size_"+fmt.Sprintf("%d", i), TestSerialTokenize1)
+	}
+}
+
 func TestSerialTokenize1(t *testing.T) {
 	var tests = []struct {
 		name     string
@@ -152,7 +159,9 @@ func TestSerialTokenize1(t *testing.T) {
 			tok := NewTokenizer(data)
 			debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
-			fmt.Println("Tokens:", debugOutput)
+			fmt.Println("Result:", debugOutput)
+			fmt.Println()
+			fmt.Println()
 		})
 	}
 }
@@ -215,7 +224,7 @@ func TestSerialTokenizeVexClassMods(t *testing.T) {
 			tok := NewTokenizer(data)
 			debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
-			fmt.Println("Tokens:", debugOutput)
+			fmt.Println("Result:", debugOutput)
 		})
 	}
 }
@@ -248,7 +257,7 @@ func TestSerialTokenizeShieldFirmware(t *testing.T) {
 			tok := NewTokenizer(data)
 			debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
-			fmt.Println("Tokens:", debugOutput)
+			fmt.Println("Result:", debugOutput)
 		})
 	}
 }

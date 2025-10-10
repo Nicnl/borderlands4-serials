@@ -43,3 +43,13 @@ func init() {
 			(b & 0x020) | (b&0x040)>>2 | (b&0x080)>>4 | (b&0x100)>>6 | (b&0x200)>>8 | (b&0x400)>>10
 	}
 }
+
+func GenericMirror(input uint32, bitCount int) uint32 {
+	var output uint32
+	for i := 0; i < bitCount; i++ {
+		if (input & (1 << i)) != 0 {
+			output |= 1 << (bitCount - 1 - i)
+		}
+	}
+	return output
+}

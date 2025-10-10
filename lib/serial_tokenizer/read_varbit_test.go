@@ -12,6 +12,7 @@ func TestReadVarBit(t *testing.T) {
 		expected uint32
 		pos      int
 	}{
+		{"10010001101001", 0, 5 + 1},
 		{"10000 0", 0, 5 + 1},
 		{"01000 00", 0, 5 + 2},
 		{"11000 000", 0, 5 + 3},

@@ -41,6 +41,10 @@ func (t *Tokenizer) nextToken() (Token, error) {
 		return TOK_PART, nil
 	}
 
+	if bit1 == 1 && bit2 == 1 && bit3 == 1 {
+		//return TOK_111, nil
+	}
+
 	t.bs.Rewind(3)
 	return 0, fmt.Errorf("invalid token, got %d%d%d at position %d", bit1, bit2, bit3, t.bs.Pos())
 }

@@ -14,6 +14,7 @@ const (
 	TOK_VARINT              // "100" ... nibble varint
 	TOK_VARBIT              // "110" ... varbit
 	TOK_PART                // "101" ... enter KV section
+	TOK_111                 // "101" ... enter KV section
 )
 
 type Tokenizer struct {
@@ -44,11 +45,12 @@ func (t *Tokenizer) Parse() (string, error) {
 		return "", err
 	}
 
-	defer func() {
-		fmt.Println("AFTER", t.bs.StringAfter())
-	}()
-
 	debugOutput := ""
+	defer func() {
+		if strAfter := t.bs.StringAfter(); strAfter != "" {
+			fmt.Println("AFTER", strAfter)
+		}
+	}()
 
 	for {
 		splitPositions = append(splitPositions, t.bs.Pos())
@@ -82,6 +84,8 @@ func (t *Tokenizer) Parse() (string, error) {
 				return "", err
 			}
 			debugOutput += fmt.Sprintf(" {%d}", v)
+		case TOK_111:
+			debugOutput += " <111>"
 		default:
 			return "", fmt.Errorf("unknown token %d", token)
 		}

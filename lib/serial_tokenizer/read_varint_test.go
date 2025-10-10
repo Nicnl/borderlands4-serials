@@ -12,6 +12,7 @@ func TestReadVarint(t *testing.T) {
 		expected uint16
 		pos      int
 	}{
+		{"0001110000", 1, 5},
 		{"10000", 1, 5},
 		{"01000", 2, 5},
 		{"00100", 4, 5},

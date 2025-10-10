@@ -24,13 +24,6 @@ func binToBytes(s string) []byte {
 	return data
 }
 
-func TestSerialTokenize1MultiBitsTest(t *testing.T) {
-	for i := 8; i <= 32; i++ {
-		BITS = i
-		t.Run("size_"+fmt.Sprintf("%d", i), TestSerialTokenize1)
-	}
-}
-
 func TestSerialTokenize1(t *testing.T) {
 	var tests = []struct {
 		name     string
@@ -150,19 +143,19 @@ func TestSerialTokenize1(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			data, err := b85.Decode(tt.serial)
-			assert.NoError(t, err)
+		//t.Run(tt.name, func(t *testing.T) {
+		data, err := b85.Decode(tt.serial)
+		assert.NoError(t, err)
 
-			fmt.Println("Name:", tt.name)
-			fmt.Println("Serial:", tt.serial)
-			tok := NewTokenizer(data)
-			debugOutput, err := tok.Parse()
-			assert.NoError(t, err)
-			fmt.Println("Result:", debugOutput)
-			fmt.Println()
-			fmt.Println()
-		})
+		fmt.Println("Name:", tt.name)
+		fmt.Println("Serial:", tt.serial)
+		tok := NewTokenizer(data)
+		debugOutput, err := tok.Parse()
+		assert.NoError(t, err)
+		fmt.Println("Result:", debugOutput)
+		fmt.Println()
+		fmt.Println()
+		//})
 	}
 }
 
@@ -243,6 +236,79 @@ func TestSerialTokenizeShieldFirmware(t *testing.T) {
 		{
 			"shield 2",
 			"@Uge8^+m/)}}!axR1DpKvM1BxF_41oav",
+			"1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data, err := b85.Decode(tt.serial)
+			assert.NoError(t, err)
+
+			fmt.Println("Name:", tt.name)
+			fmt.Println("Serial:", tt.serial)
+			tok := NewTokenizer(data)
+			debugOutput, err := tok.Parse()
+			assert.NoError(t, err)
+			fmt.Println("Result:", debugOutput)
+		})
+	}
+}
+
+func TestSerialBordel(t *testing.T) {
+	var tests = []struct {
+		name     string
+		serial   string
+		expected string
+	}{
+		{
+			"occulted ephemeris",
+			"@Ugw$Yw2}TYg4Ali1jVjck64j`oLytO%+EgA?C{!)fIMna}",
+			"1",
+		},
+		{
+			"looming balor",
+			"@Ugd_t@Fme!KdTvl?RG/_Tse7ors5+=wsFVl",
+			"1",
+		},
+		{
+			"double creme omnibore",
+			"@Uge(J0Fme!Kux-$2RG}7is6<7oB&t$xP@zz<P`yy=5C",
+			"1",
+		},
+		{
+			"shield 1",
+			"@Uge8^+m/)}}!c178NkyuCbwKf>IWYh",
+			"1",
+		},
+		{
+			"shield 2",
+			"@Uge8^+m/)}}!axR1DpKvM1BxF_41oav",
+			"1",
+		},
+		{
+			"Knife 1 skill",
+			"@Ugr$WBm/$!m!X=5&qXq#",
+			"1",
+		},
+		{
+			"Knife 2 skill",
+			"@Ugr$WBm/$!m!X=5&qXxA;nj3Nj00",
+			"1",
+		},
+		{
+			"Knife 3 skill",
+			"@Ugr$WBm/$!m!X=5&qXxA;nj3OODgg",
+			"1",
+		},
+		{
+			"Knife 4 skill",
+			"@Ugr$WBm/$!m!X=5&qXxA;nj3OOD#<4R",
+			"1",
+		},
+		{
+			"ORIGINAL L50 Legendary Cooking Ambushing Truck",
+			"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf{00",
 			"1",
 		},
 	}

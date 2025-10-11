@@ -38,6 +38,7 @@ func (t *Tokenizer) readVarintExtended() (uint32, error) {
 		return output, nil
 	}
 
+	// The game seems to only read three blocks
 	for range 3 {
 		// First bit
 		{

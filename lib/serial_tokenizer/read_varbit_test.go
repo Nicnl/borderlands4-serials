@@ -13,7 +13,7 @@ func TestReadVarBit(t *testing.T) {
 		pos      int
 	}{
 		// Special case: the game parser seems to allow a zero bit count
-		{"00000 0", 0, 5 + 1},
+		{"00000", 0, 5},
 
 		{"10000 0", 0, 5 + 1},
 		{"01000 00", 0, 5 + 2},

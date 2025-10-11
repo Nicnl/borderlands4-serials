@@ -18,11 +18,15 @@ const (
 )
 
 type Tokenizer struct {
-	bs *bit_reader.BitReader
+	bs             *bit_reader.BitReader
+	splitPositions []int
 }
 
 func NewTokenizer(data []byte) *Tokenizer {
-	return &Tokenizer{bs: bit_reader.NewBitReader(data)}
+	return &Tokenizer{
+		bs:             bit_reader.NewBitReader(data),
+		splitPositions: make([]int, 0),
+	}
 }
 
 func (t *Tokenizer) expect(msg string, bits ...byte) error {
@@ -38,9 +42,16 @@ func (t *Tokenizer) expect(msg string, bits ...byte) error {
 	return nil
 }
 
-func (t *Tokenizer) Parse() (string, error) {
-	splitPositions := make([]int, 0)
+func (t *Tokenizer) DoneString() string {
+	splitted := t.bs.StringBefore()
+	for i := len(t.splitPositions) - 1; i >= 0; i-- {
+		pos := t.splitPositions[i]
+		splitted = splitted[:pos] + "  " + splitted[pos:]
+	}
+	return splitted
+}
 
+func (t *Tokenizer) Parse() (string, error) {
 	if err := t.expect("magic header", 0, 0, 1, 0, 0, 0, 0); err != nil {
 		return "", err
 	}
@@ -48,20 +59,12 @@ func (t *Tokenizer) Parse() (string, error) {
 	debugOutput := ""
 	defer func() {
 		if strAfter := t.bs.StringAfter(); strAfter != "" || true {
-			doneString := t.bs.StringBefore()
-			for i := len(splitPositions) - 1; i >= 0; i-- {
-				pos := splitPositions[i]
-				doneString = doneString[:pos] + "  " + doneString[pos:]
-			}
-			fmt.Println("Done:", doneString)
-
 			fmt.Println("Debug", debugOutput)
 			fmt.Println("Data remaining", strAfter)
 		}
 	}()
 
 	for {
-		splitPositions = append(splitPositions, t.bs.Pos())
 		token, err := t.nextToken()
 		if err == io.EOF {
 			break

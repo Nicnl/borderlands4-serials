@@ -13,6 +13,7 @@ func (t *Tokenizer) readVarBit() (uint32, error) {
 	length = uint32(byte_mirror.Uint5Mirror[byte(length)])
 
 	if length == 0 {
+		return 0, nil
 		_, ok := t.bs.Read()
 		if !ok {
 			return 0, fmt.Errorf("unexpected end of data while reading varbit length")

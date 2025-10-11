@@ -16,8 +16,7 @@ func (t *Tokenizer) readVarintExtended() (uint32, error) {
 	if !ok {
 		return 0, fmt.Errorf("unexpected end of data while reading varint")
 	}
-	block32 = uint32(byte_mirror.Uint4Mirror[byte(block32)])
-	output |= block32 << dataRead
+	output |= uint32(byte_mirror.Uint4Mirror[byte(block32)]) << dataRead
 	dataRead += 4
 
 	// Obtain continuation bit in the middle of the first block
@@ -31,8 +30,7 @@ func (t *Tokenizer) readVarintExtended() (uint32, error) {
 	if !ok {
 		return 0, fmt.Errorf("unexpected end of data while reading varint")
 	}
-	extendedBits = uint32(byte_mirror.Uint3Mirror[byte(extendedBits)])
-	output |= extendedBits << dataRead
+	output |= uint32(byte_mirror.Uint3Mirror[byte(extendedBits)]) << dataRead
 	dataRead += 3
 
 	// If continuation bit is not set, we are done

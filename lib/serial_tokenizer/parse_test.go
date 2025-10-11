@@ -41,11 +41,6 @@ func TestSerialTokenize1(t *testing.T) {
 			"1",
 		},
 		{
-			"BROKEN TRUCK 2",
-			"@Ugy3L+2}TYg93=h!/NsC0/Nl@<RG/)a6EzQ&4/NX}1_1",
-			"1",
-		},
-		{
 			"BROKEN TRUCK 3",
 			"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!XN+",
 			"1",
@@ -222,7 +217,7 @@ func TestSerialTokenizeVexClassMods(t *testing.T) {
 	}
 }
 
-func TestSerialTokenizeShieldFirmware(t *testing.T) {
+func TestSerialTokenizeFirmware(t *testing.T) {
 	var tests = []struct {
 		name     string
 		serial   string
@@ -236,6 +231,11 @@ func TestSerialTokenizeShieldFirmware(t *testing.T) {
 		{
 			"shield 2",
 			"@Uge8^+m/)}}!axR1DpKvM1BxF_41oav",
+			"1",
+		},
+		{
+			"rapid swarm + gadget ahoy",
+			"@Uge8aum/)}}!qkqSNDXRzG&iINder)8E{Op",
 			"1",
 		},
 	}

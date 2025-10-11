@@ -142,12 +142,13 @@ func TestSerialTokenize1(t *testing.T) {
 			data, err := b85.Decode(tt.serial)
 			assert.NoError(t, err)
 
-			fmt.Println("Name:", tt.name)
-			fmt.Println("Serial:", tt.serial)
 			tok := NewTokenizer(data)
 			debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
+			fmt.Println("Name:", tt.name)
+			fmt.Println("Serial:", tt.serial)
 			fmt.Println("Result:", debugOutput)
+			fmt.Println("Bitstream:", tok.DoneString())
 			fmt.Println()
 			fmt.Println()
 		})
@@ -338,12 +339,13 @@ func TestSerialRandom(t *testing.T) {
 			data, err := b85.Decode(tt.serial)
 			assert.NoError(t, err)
 
-			fmt.Println("Name:", tt.name)
-			fmt.Println("Serial:", tt.serial)
 			tok := NewTokenizer(data)
 			debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
+			fmt.Println("Name:", tt.name)
+			fmt.Println("Serial:", tt.serial)
 			fmt.Println("Result:", debugOutput)
+			fmt.Println("Bitstream:", tok.DoneString())
 		})
 	}
 }

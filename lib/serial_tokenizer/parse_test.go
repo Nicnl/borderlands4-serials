@@ -143,7 +143,7 @@ func TestSerialTokenize1(t *testing.T) {
 			assert.NoError(t, err)
 
 			tok := NewTokenizer(data)
-			debugOutput, err := tok.Parse()
+			_, debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
@@ -211,7 +211,7 @@ func TestSerialTokenizeVexClassMods(t *testing.T) {
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
 			tok := NewTokenizer(data)
-			debugOutput, err := tok.Parse()
+			_, debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
 			fmt.Println("Result:", debugOutput)
 		})
@@ -254,7 +254,7 @@ func TestSerialTokenizeFirmware(t *testing.T) {
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
 			tok := NewTokenizer(data)
-			debugOutput, err := tok.Parse()
+			_, debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
 			fmt.Println("Result:", debugOutput)
 		})
@@ -340,7 +340,7 @@ func TestSerialRandom(t *testing.T) {
 			assert.NoError(t, err)
 
 			tok := NewTokenizer(data)
-			debugOutput, err := tok.Parse()
+			_, debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
@@ -511,9 +511,10 @@ func TestSerialProblematicSerials2(t *testing.T) {
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
 			tok := NewTokenizer(data)
-			debugOutput, err := tok.Parse()
+			foundLevel, debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
 			fmt.Println("Result:", debugOutput)
+			fmt.Println("foundLevel:", foundLevel)
 		})
 	}
 }

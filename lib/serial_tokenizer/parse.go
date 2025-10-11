@@ -51,9 +51,9 @@ func (t *Tokenizer) DoneString() string {
 	return splitted
 }
 
-func (t *Tokenizer) Parse() (string, error) {
+func (t *Tokenizer) Parse() (int, string, error) {
 	if err := t.expect("magic header", 0, 0, 1, 0, 0, 0, 0); err != nil {
-		return "", err
+		return -1, "", err
 	}
 
 	debugOutput := ""
@@ -64,12 +64,17 @@ func (t *Tokenizer) Parse() (string, error) {
 		}
 	}()
 
+	var (
+		foundLevel       = -1
+		currentParsedInt = 0
+	)
+
 	for {
 		token, err := t.nextToken()
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return "", err
+			return foundLevel, "", err
 		}
 
 		switch token {
@@ -80,27 +85,39 @@ func (t *Tokenizer) Parse() (string, error) {
 		case TOK_VARINT:
 			v, err := t.readVarint()
 			if err != nil {
-				return "", err
+				return foundLevel, "", err
 			}
 			debugOutput += fmt.Sprintf(" %d", v)
+			currentParsedInt++
+			if currentParsedInt == 4 {
+				foundLevel = int(v)
+			}
 		case TOK_VARBIT:
 			v, err := t.readVarBit()
 			if err != nil {
-				return "", err
+				return foundLevel, "", err
 			}
 			debugOutput += fmt.Sprintf(" %d", v)
+			currentParsedInt++
+			if currentParsedInt == 4 {
+				foundLevel = int(v)
+			}
 		case TOK_VARINT_EXTENDED:
 			v, err := t.readVarintExtended()
 			if err != nil {
-				return "", err
+				return foundLevel, "", err
 			}
 			debugOutput += fmt.Sprintf(" {%d}", v)
+			currentParsedInt++
+			if currentParsedInt == 4 {
+				foundLevel = int(v)
+			}
 		//case TOK_111:
 		//	debugOutput += " <111>"
 		default:
-			return "", fmt.Errorf("unknown token %d", token)
+			return foundLevel, "", fmt.Errorf("unknown token %d", token)
 		}
 	}
 
-	return debugOutput, nil
+	return foundLevel, debugOutput, nil
 }

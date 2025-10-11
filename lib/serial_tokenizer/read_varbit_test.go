@@ -12,6 +12,9 @@ func TestReadVarBit(t *testing.T) {
 		expected uint32
 		pos      int
 	}{
+		// Special case: the game parser seems to allow a zero bit count
+		{"00000 0", 0, 5 + 1},
+
 		{"10000 0", 0, 5 + 1},
 		{"01000 00", 0, 5 + 2},
 		{"11000 000", 0, 5 + 3},

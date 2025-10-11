@@ -47,7 +47,14 @@ func (t *Tokenizer) Parse() (string, error) {
 
 	debugOutput := ""
 	defer func() {
-		if strAfter := t.bs.StringAfter(); strAfter != "" {
+		if strAfter := t.bs.StringAfter(); strAfter != "" || true {
+			doneString := t.bs.StringBefore()
+			for i := len(splitPositions) - 1; i >= 0; i-- {
+				pos := splitPositions[i]
+				doneString = doneString[:pos] + "  " + doneString[pos:]
+			}
+			fmt.Println("Done:", doneString)
+
 			fmt.Println("Debug", debugOutput)
 			fmt.Println("Data remaining", strAfter)
 		}

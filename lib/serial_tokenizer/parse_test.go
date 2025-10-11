@@ -238,6 +238,11 @@ func TestSerialTokenizeFirmware(t *testing.T) {
 			"@Uge8aum/)}}!qkqSNDXRzG&iINder)8E{Op",
 			"1",
 		},
+		{
+			"waterfall grenade + airstrike",
+			"@Ugr$)Nm/)}}!YpV~ky;-O59uLV#F7vI",
+			"1",
+		},
 	}
 
 	for _, tt := range tests {
@@ -255,7 +260,7 @@ func TestSerialTokenizeFirmware(t *testing.T) {
 	}
 }
 
-func TestSerialBordel(t *testing.T) {
+func TestSerialRandom(t *testing.T) {
 	var tests = []struct {
 		name     string
 		serial   string

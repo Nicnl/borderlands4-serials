@@ -38,11 +38,7 @@ func (t *Tokenizer) nextToken() (Token, error) {
 	}
 
 	if bit1 == 1 && bit2 == 0 && bit3 == 1 {
-		return TOK_PART, nil
-	}
-
-	if bit1 == 1 && bit2 == 1 && bit3 == 1 {
-		//return TOK_111, nil
+		return TOK_VARINT_EXTENDED, nil
 	}
 
 	t.bs.Rewind(3)

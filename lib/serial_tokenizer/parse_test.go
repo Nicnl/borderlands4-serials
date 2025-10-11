@@ -143,19 +143,19 @@ func TestSerialTokenize1(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		//t.Run(tt.name, func(t *testing.T) {
-		data, err := b85.Decode(tt.serial)
-		assert.NoError(t, err)
+		t.Run(tt.name, func(t *testing.T) {
+			data, err := b85.Decode(tt.serial)
+			assert.NoError(t, err)
 
-		fmt.Println("Name:", tt.name)
-		fmt.Println("Serial:", tt.serial)
-		tok := NewTokenizer(data)
-		debugOutput, err := tok.Parse()
-		assert.NoError(t, err)
-		fmt.Println("Result:", debugOutput)
-		fmt.Println()
-		fmt.Println()
-		//})
+			fmt.Println("Name:", tt.name)
+			fmt.Println("Serial:", tt.serial)
+			tok := NewTokenizer(data)
+			debugOutput, err := tok.Parse()
+			assert.NoError(t, err)
+			fmt.Println("Result:", debugOutput)
+			fmt.Println()
+			fmt.Println()
+		})
 	}
 }
 

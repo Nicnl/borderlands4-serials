@@ -33,7 +33,7 @@ func TestByWalkingAnalysis(t *testing.T) {
 			//}
 
 			{
-				val, err := tok.readVarInt()
+				val, err := tok.readVarint()
 				if err == nil {
 					serialInts[s] = append(serialInts[s], int64(val))
 				}

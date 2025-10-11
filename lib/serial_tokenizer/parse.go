@@ -9,12 +9,12 @@ import (
 type Token byte
 
 const (
-	TOK_SEP1   Token = iota // "01" soft separator
-	TOK_SEP2                // "00" hard separator
-	TOK_VARINT              // "100" ... nibble varint
-	TOK_VARBIT              // "110" ... varbit
-	TOK_PART                // "101" ... enter KV section
-	TOK_111                 // "101" ... enter KV section
+	TOK_SEP1            Token = iota // "01" soft separator
+	TOK_SEP2                         // "00" hard separator
+	TOK_VARINT                       // "100" ... nibble varint
+	TOK_VARBIT                       // "110" ... varbit
+	TOK_VARINT_EXTENDED              // "101" ... enter KV section
+	TOK_111
 )
 
 type Tokenizer struct {
@@ -48,7 +48,8 @@ func (t *Tokenizer) Parse() (string, error) {
 	debugOutput := ""
 	defer func() {
 		if strAfter := t.bs.StringAfter(); strAfter != "" {
-			fmt.Println("AFTER", strAfter)
+			fmt.Println("Debug", debugOutput)
+			fmt.Println("Data remaining", strAfter)
 		}
 	}()
 
@@ -67,7 +68,7 @@ func (t *Tokenizer) Parse() (string, error) {
 		case TOK_SEP2:
 			debugOutput += ","
 		case TOK_VARINT:
-			v, err := t.readVarInt()
+			v, err := t.readVarint()
 			if err != nil {
 				return "", err
 			}
@@ -78,14 +79,14 @@ func (t *Tokenizer) Parse() (string, error) {
 				return "", err
 			}
 			debugOutput += fmt.Sprintf(" %d", v)
-		case TOK_PART:
-			v, err := t.readPart()
+		case TOK_VARINT_EXTENDED:
+			v, err := t.readVarintExtended()
 			if err != nil {
 				return "", err
 			}
 			debugOutput += fmt.Sprintf(" {%d}", v)
-		case TOK_111:
-			debugOutput += " <111>"
+		//case TOK_111:
+		//	debugOutput += " <111>"
 		default:
 			return "", fmt.Errorf("unknown token %d", token)
 		}

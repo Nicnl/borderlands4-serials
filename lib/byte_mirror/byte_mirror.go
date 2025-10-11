@@ -7,6 +7,7 @@ var (
 	Uint8Mirror  [256]byte
 	Uint3Mirror  [8]byte
 	Uint11Mirror [2048]uint32
+	Uint2Mirror  [4]byte
 )
 
 func init() {
@@ -41,6 +42,11 @@ func init() {
 		b := uint32(i)
 		Uint11Mirror[i] = (b&0x001)<<10 | (b&0x002)<<8 | (b&0x004)<<6 | (b&0x008)<<4 | (b&0x010)<<2 |
 			(b & 0x020) | (b&0x040)>>2 | (b&0x080)>>4 | (b&0x100)>>6 | (b&0x200)>>8 | (b&0x400)>>10
+	}
+
+	for i := range Uint2Mirror {
+		b := byte(i)
+		Uint2Mirror[i] = (b&0x01)<<1 | (b&0x02)>>1
 	}
 }
 

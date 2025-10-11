@@ -5,31 +5,30 @@ import (
 	"fmt"
 )
 
-func (t *Tokenizer) readVarInt() (uint16, error) {
+func (t *Tokenizer) readVarint() (uint32, error) {
 	var (
-		dataLeft = 4
-		value    uint32
-		block32  uint32
-		ok       bool
+		dataRead = 0
+		output   uint32
 	)
-	for dataLeft > 0 {
-		block32, ok = t.bs.ReadN(4)
+	for range 4 {
+		// Read standard block
+		block32, ok := t.bs.ReadN(4)
 		if !ok {
 			return 0, fmt.Errorf("unexpected end of data while reading varint")
 		}
-		dataLeft--
-
-		block := uint32(byte_mirror.Uint4Mirror[byte(block32)])
-		value |= block << (12 - 4*dataLeft)
+		block32 = uint32(byte_mirror.Uint4Mirror[byte(block32)])
+		output |= block32 << dataRead
+		dataRead += 4
 
 		cont, ok := t.bs.Read()
 		if !ok {
 			return 0, fmt.Errorf("unexpected end of data while reading varint")
 		}
+
 		if cont == 0 {
 			break
 		}
 	}
 
-	return uint16(value), nil
+	return output, nil
 }

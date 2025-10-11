@@ -1,75 +1,26 @@
 package serial_tokenizer
 
 import (
-	"borderlands_4_serials/lib/byte_mirror"
 	"fmt"
 )
 
-func (t *Tokenizer) readVarintExtended() (uint32, error) {
-	var (
-		dataRead = 0
-		output   uint32
-	)
+func (t *Tokenizer) readPart() (uint32, byte, error) {
+	index, err := t.readVarint()
+	if err != nil {
+		return 0, 0, err
+	}
 
-	// Read standard block
-	block32, ok := t.bs.ReadN(4)
+	flag, ok := t.bs.ReadN(3)
 	if !ok {
-		return 0, fmt.Errorf("unexpected end of data while reading varint")
-	}
-	output |= uint32(byte_mirror.Uint4Mirror[byte(block32)]) << dataRead
-	dataRead += 4
-
-	// Obtain continuation bit in the middle of the first block
-	cont, ok := t.bs.Read()
-	if !ok {
-		return 0, fmt.Errorf("unexpected end of data while reading varint")
+		return 0, 0, fmt.Errorf("unexpected end of data while reading part 101 flag")
 	}
 
-	// Read the 3 extended bits
-	extendedBits, ok := t.bs.ReadN(3)
-	if !ok {
-		return 0, fmt.Errorf("unexpected end of data while reading varint")
+	switch flag {
+	case 0b000, 0b010, 0b001:
+		return index, byte(flag), nil
+	case 0b101, 0b110, 0b111:
+		return 0, 0, fmt.Errorf("unsupported part 101 flag <:%03b> at position %d", flag, t.bs.Pos()-3)
+	default:
+		return 0, 0, fmt.Errorf("unknown part 101 flag <:%03b> at position %d", flag, t.bs.Pos()-3)
 	}
-	output |= uint32(byte_mirror.Uint3Mirror[byte(extendedBits)]) << dataRead
-	dataRead += 3
-
-	// If continuation bit is not set, we are done
-	if cont == 0 {
-		return output, nil
-	}
-
-	// The game seems to only read three blocks
-	for range 3 {
-		// First bit
-		{
-			cont, ok = t.bs.Read()
-			if !ok {
-				return 0, fmt.Errorf("unexpected end of data while reading varint")
-			}
-			output |= uint32(cont) << dataRead
-			dataRead += 1
-		}
-
-		// Continuation bit in position 2
-		cont, ok = t.bs.Read()
-		if !ok {
-			return 0, fmt.Errorf("unexpected end of data while reading varint")
-		}
-
-		// Third remaining bits
-		{
-			block32, ok = t.bs.ReadN(3)
-			if !ok {
-				return 0, fmt.Errorf("unexpected end of data while reading varint")
-			}
-			output |= uint32(byte_mirror.Uint3Mirror[byte(block32)]) << dataRead
-			dataRead += 3
-		}
-
-		if cont == 0 {
-			break
-		}
-	}
-
-	return output, nil
 }

@@ -199,26 +199,38 @@ func TestFilterExcludeCollapsesPerLevel(t *testing.T) {
 		if !found {
 			continue
 		}
-		output += fmt.Sprintln("Level:", level)
+		//output += fmt.Sprintln("Level:", level)
 		for _, serial := range serials {
 			//fmt.Sprintln("  ", serial.original, "=>", serial.collapsed)
 			data, err := b85.Decode(serial.original)
 			if err != nil {
 				panic(err)
 			}
+			bitstreamInjected := bit_reader.NewBitReader(data).StringAfter()
+
+			data, err = b85.Decode(serial.collapsed)
+			if err != nil {
+				panic(err)
+			}
+			bitstreamCollapsed := bit_reader.NewBitReader(data).StringAfter()
 
 			bitstreamPrefix := "001000010000011100000110000000011001000001"
 			bitstreamMarker := "001000100001100110011100110110000010100111001000101010100001010111000010101110110010001010110011110000101010011111000010101110111100001010100001100000101011001110000010101001110100001010110001110"
 
-			rawBitstream := bit_reader.NewBitReader(data).StringAfter()
-			if strings.HasPrefix(rawBitstream, bitstreamPrefix) {
-				markerpos := strings.Index(rawBitstream, bitstreamMarker)
+			collapsedMustContains := "0010001000011001100111001101100000101001110010001010101000010101110000101011101100100010101100111100001010100111110000101011101111000010101000011000001010110011100000101010011101000010101100011100001"
+			if !strings.Contains(bitstreamCollapsed, collapsedMustContains) {
+				continue
+			}
+
+			if strings.HasPrefix(bitstreamInjected, bitstreamPrefix) {
+				markerpos := strings.Index(bitstreamInjected, bitstreamMarker)
 				if markerpos != -1 {
 					// Strip the prefix
 					didStuff = true
-					bitstream := rawBitstream[len(bitstreamPrefix):markerpos]
+					bitstream := bitstreamInjected[len(bitstreamPrefix):markerpos]
 
-					output += fmt.Sprintln("  ", bitstream[0:3], bitstream[3:])
+					output += fmt.Sprintln(bitstream[0:3], bitstream[3:])
+					//output += serial.original + "\n"
 				}
 			}
 		}

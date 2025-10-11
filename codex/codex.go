@@ -26,11 +26,12 @@ type _codex struct {
 var Codex = &_codex{}
 
 type _problematicItem struct {
-	Type       string
-	Name       string
-	Serial     string
-	DoneString string
-	Error      string
+	Type        string
+	Name        string
+	Serial      string
+	DoneString  string
+	Error       string
+	DebugOutput string
 }
 
 func (c *_codex) Load(jsonPath string) ([]_problematicItem, error) {
@@ -65,16 +66,17 @@ func (c *_codex) Load(jsonPath string) ([]_problematicItem, error) {
 		}
 
 		tokenizer := serial_tokenizer.NewTokenizer(data)
-		decoded, err := tokenizer.Parse()
+		_, decoded, err := tokenizer.Parse()
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Tokenize error:", err)
 			nbFail++
 			problematicItems = append(problematicItems, _problematicItem{
-				Type:       item.Type,
-				Name:       item.Name,
-				Serial:     item.Serial,
-				DoneString: tokenizer.DoneString(),
-				Error:      err.Error(),
+				Type:        item.Type,
+				Name:        item.Name,
+				Serial:      item.Serial,
+				DoneString:  tokenizer.DoneString(),
+				Error:       err.Error(),
+				DebugOutput: decoded,
 			})
 			continue
 		}

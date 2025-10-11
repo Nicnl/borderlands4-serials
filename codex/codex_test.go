@@ -22,7 +22,7 @@ func TestCodex(t *testing.T) {
 		for _, item := range problematicItems {
 			t.Run(item.Type+"__"+item.Error+"__"+item.Name, func(t *testing.T) {
 				t.Fail()
-				fmt.Println("Problematic item:", item.Name, item.Type)
+				fmt.Println("Problematic item:", item.Name+" ("+item.Type+")")
 				fmt.Println("Serial:", item.Serial)
 				fmt.Println("Bits:", item.DoneString)
 				fmt.Println("Error:", item.Error)
@@ -37,10 +37,11 @@ func TestCodex(t *testing.T) {
 	if shortestProblem.Serial != "" {
 		t.Run("SHORTEST_FAIL", func(t *testing.T) {
 			t.Fail()
-			fmt.Println("Shortest problematic item:", shortestProblem.Name, shortestProblem.Type)
+			fmt.Println("Shortest problematic item:", shortestProblem.Name+" ("+shortestProblem.Type+")")
 			fmt.Println("Serial:", shortestProblem.Serial)
 			fmt.Println("Bits:", shortestProblem.DoneString)
 			fmt.Println("Error:", shortestProblem.Error)
+			fmt.Println("DebugOutput:", shortestProblem.DebugOutput)
 		})
 	}
 

@@ -36,6 +36,11 @@ func TestSerialTokenize1(t *testing.T) {
 			"1",
 		},
 		{
+			"ORIGINAL L50 Legendary Cooking Ambushing Truck SMALL",
+			"@Ugy3L+35F42=4?<-RG/)a6EzQ&4/NX}1~mtj3pEY_",
+			"1",
+		},
+		{
 			"BROKEN TRUCK 1",
 			"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!XN+",
 			"1",
@@ -257,6 +262,7 @@ func TestSerialTokenizeFirmware(t *testing.T) {
 			_, debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
 			fmt.Println("Result:", debugOutput)
+			fmt.Println("Bitstream:", tok.DoneString())
 		})
 	}
 }

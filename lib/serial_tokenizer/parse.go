@@ -74,7 +74,7 @@ func (t *Tokenizer) Parse() (int, string, error) {
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return foundLevel, "", err
+			return foundLevel, debugOutput, err
 		}
 
 		switch token {
@@ -85,7 +85,7 @@ func (t *Tokenizer) Parse() (int, string, error) {
 		case TOK_VARINT:
 			v, err := t.readVarint()
 			if err != nil {
-				return foundLevel, "", err
+				return foundLevel, debugOutput, err
 			}
 			debugOutput += fmt.Sprintf(" %d", v)
 			currentParsedInt++
@@ -95,7 +95,7 @@ func (t *Tokenizer) Parse() (int, string, error) {
 		case TOK_VARBIT:
 			v, err := t.readVarBit()
 			if err != nil {
-				return foundLevel, "", err
+				return foundLevel, debugOutput, err
 			}
 			debugOutput += fmt.Sprintf(" %d", v)
 			currentParsedInt++
@@ -103,11 +103,12 @@ func (t *Tokenizer) Parse() (int, string, error) {
 				foundLevel = int(v)
 			}
 		case TOK_VARINT_EXTENDED:
-			v, err := t.readVarintExtended()
+			v, flag, err := t.readPart()
 			if err != nil {
-				return foundLevel, "", err
+				return foundLevel, debugOutput, err
 			}
-			debugOutput += fmt.Sprintf(" {%d}", v)
+
+			debugOutput += fmt.Sprintf(" {%d:%03b}", v, flag)
 			currentParsedInt++
 			if currentParsedInt == 4 {
 				foundLevel = int(v)
@@ -115,7 +116,7 @@ func (t *Tokenizer) Parse() (int, string, error) {
 		//case TOK_111:
 		//	debugOutput += " <111>"
 		default:
-			return foundLevel, "", fmt.Errorf("unknown token %d", token)
+			return foundLevel, debugOutput, fmt.Errorf("unknown token %d", token)
 		}
 	}
 

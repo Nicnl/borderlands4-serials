@@ -26,6 +26,7 @@ type _codex struct {
 var Codex = &_codex{}
 
 type _problematicItem struct {
+	Type       string
 	Name       string
 	Serial     string
 	DoneString string
@@ -69,6 +70,7 @@ func (c *_codex) Load(jsonPath string) ([]_problematicItem, error) {
 			fmt.Fprint(os.Stderr, "Tokenize error:", err)
 			nbFail++
 			problematicItems = append(problematicItems, _problematicItem{
+				Type:       item.Type,
 				Name:       item.Name,
 				Serial:     item.Serial,
 				DoneString: tokenizer.DoneString(),

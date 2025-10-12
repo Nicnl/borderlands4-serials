@@ -25,7 +25,7 @@ type _codex struct {
 
 var Codex = &_codex{}
 
-type _problematicItem struct {
+type _loadedItem struct {
 	Type        string
 	Name        string
 	Serial      string
@@ -34,24 +34,24 @@ type _problematicItem struct {
 	DebugOutput string
 }
 
-func (c *_codex) Load(jsonPath string) ([]_problematicItem, error) {
+func (c *_codex) Load(jsonPath string) ([]_loadedItem, int64, error) {
 	rawJson, err := os.ReadFile(jsonPath)
 	if err != nil {
-		return nil, err
+		return nil, -1, err
 	}
 
 	var items []Item
 	err = json.Unmarshal(rawJson, &items)
 	if err != nil {
-		return nil, err
+		return nil, -1, err
 	}
 
 	var (
-		nbOk   int
-		nbFail int
+		nbOk   int64
+		nbFail int64
 	)
 
-	problematicItems := make([]_problematicItem, 0)
+	loadedItems := make([]_loadedItem, 0)
 	for _, item := range items {
 		item.Serial = strings.Trim(item.Serial, "\"")
 		item.Serial = strings.Trim(item.Serial, ",")
@@ -70,7 +70,7 @@ func (c *_codex) Load(jsonPath string) ([]_problematicItem, error) {
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Tokenize error:", err)
 			nbFail++
-			problematicItems = append(problematicItems, _problematicItem{
+			loadedItems = append(loadedItems, _loadedItem{
 				Type:        item.Type,
 				Name:        item.Name,
 				Serial:      item.Serial,
@@ -79,6 +79,15 @@ func (c *_codex) Load(jsonPath string) ([]_problematicItem, error) {
 				DebugOutput: decoded,
 			})
 			continue
+		} else {
+			loadedItems = append(loadedItems, _loadedItem{
+				Type:        item.Type,
+				Name:        item.Name,
+				Serial:      item.Serial,
+				DoneString:  tokenizer.DoneString(),
+				Error:       "",
+				DebugOutput: decoded,
+			})
 		}
 
 		item.Decoded = decoded
@@ -89,5 +98,5 @@ func (c *_codex) Load(jsonPath string) ([]_problematicItem, error) {
 	fmt.Println("nbOk:", nbOk)
 	fmt.Println("nbFail:", nbFail)
 
-	return problematicItems, nil
+	return loadedItems, nbFail, nil
 }

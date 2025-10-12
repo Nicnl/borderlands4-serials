@@ -59,8 +59,8 @@ func (t *Tokenizer) Parse() (int, string, error) {
 	debugOutput := ""
 	defer func() {
 		if strAfter := t.bs.StringAfter(); strAfter != "" || true {
-			fmt.Println("Debug", debugOutput)
-			fmt.Println("Data remaining", strAfter)
+			//fmt.Println("Debug", debugOutput)
+			//fmt.Println("Data remaining", strAfter)
 		}
 	}()
 
@@ -103,12 +103,17 @@ func (t *Tokenizer) Parse() (int, string, error) {
 				foundLevel = int(v)
 			}
 		case TOK_VARINT_EXTENDED:
-			v, flag, err := t.readPart()
+			v, flag, param, err := t.readPart()
 			if err != nil {
 				return foundLevel, debugOutput, err
 			}
 
-			debugOutput += fmt.Sprintf(" {%d:%03b}", v, flag)
+			if param != 0 {
+				debugOutput += fmt.Sprintf(" {%d:%03b:%d}", v, flag, param)
+			} else {
+				debugOutput += fmt.Sprintf(" {%d:%03b}", v, flag)
+			}
+
 			currentParsedInt++
 			if currentParsedInt == 4 {
 				foundLevel = int(v)

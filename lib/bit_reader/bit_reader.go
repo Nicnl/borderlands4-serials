@@ -77,3 +77,7 @@ func (br *BitReader) StringAfter() string {
 	}
 	return result
 }
+
+func (br *BitReader) Len() int {
+	return len(br.data) * 8
+}

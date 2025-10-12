@@ -206,6 +206,46 @@ func TestSerialTokenizeVexClassMods(t *testing.T) {
 			"@Ug!pHG38o5Y4JxKV)h-nP",
 			"1",
 		},
+		{
+			"1 empty   1 bottle",
+			"@Ug!pHG38o5Y4JxKV)h-nP",
+			"1",
+		},
+		{
+			"1 Rarms   1 Bbottle  + 1Gboom",
+			"@Ug!pHG38o5YT`HzQ)k4)S6#x",
+			"1",
+		},
+		{
+			"1 Rarms ",
+			"@Ug!pHG38o5YU8;7e00",
+			"1",
+		},
+		{
+			"1 Rarms 2 bottles",
+			"@Ug!pHG38o5YT`HzQ#Wbker2+r",
+			"1",
+		},
+		{
+			"2 Rarms 1 bottles",
+			"@Ug!pHG38o5YU20t_ra{#%6#x",
+			"1",
+		},
+		{
+			"melee (red skin)",
+			"@Ug!pHG38o6DcBud",
+			"1",
+		},
+		{
+			"melee (white skin)",
+			"@Ug!pHG38o6DP_;`100",
+			"1",
+		},
+		{
+			"1 arm no melee",
+			"@Ug!pHG38o5YT>=",
+			"1",
+		},
 	}
 
 	for _, tt := range tests {
@@ -219,6 +259,7 @@ func TestSerialTokenizeVexClassMods(t *testing.T) {
 			_, debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
 			fmt.Println("Result:", debugOutput)
+			fmt.Println("Bitstream:", tok.DoneString())
 		})
 	}
 }
@@ -521,6 +562,76 @@ func TestSerialProblematicSerials2(t *testing.T) {
 			assert.NoError(t, err)
 			fmt.Println("Result:", debugOutput)
 			fmt.Println("foundLevel:", foundLevel)
+		})
+	}
+}
+
+func TestSerialProblematicSerials3(t *testing.T) {
+	var tests = []struct {
+		name     string
+		serial   string
+		expected string
+	}{
+		{
+			"Sho Kunai (gadget)",
+			"@Ugr$WBm/)}}!bEtWObu#%Z$Os-",
+			"1",
+		},
+		{
+			"Kill Sprint Repkit",
+			"@Uge8#%m/)}}!bmKjM-}RPG}*)&8r1p10ss",
+			"1",
+		},
+		{
+			"Kill Sprint Repkit",
+			"@Uge8#%m/)}}!t}17M-}RPG}&Yt8r1pj0ss",
+			"1",
+		},
+		{
+			"Kill Sprint Repkit",
+			"@Uge8#%m/)}}!rWS*M-}RPG}(k28r1pH0ss",
+			"1",
+		},
+		{
+			"Kill Sprint Repkit",
+			"@Uge8#%m/)}}!gSxDM-}RPG}&Yt8r1p10ss",
+			"1",
+		},
+		{
+			"Kill Sprint Repkit",
+			"@Uge8#%m/)}}!f+~}M-}RPG}*)&8r1n{b_oI",
+			"1",
+		},
+		{
+			"Kill Sprint Repkit",
+			"@Uge8#%m/)}}!u(vIM-}RPG}&Yt8r1n{aLED",
+			"1",
+		},
+		{
+			"Kill Sprint Repkit",
+			"@Uge8#%m/)}}!bIGlM-}RPG}&Yt8r1n{Y{?7&",
+			"1",
+		},
+		{
+			"Kill Sprint Repkit",
+			"@Uge8#%m/)}}!qBXsM-}RPG}(k28r1n{WC;Q",
+			"1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data, err := b85.Decode(tt.serial)
+			assert.NoError(t, err)
+
+			fmt.Println("Name:", tt.name)
+			fmt.Println("Serial:", tt.serial)
+			tok := NewTokenizer(data)
+			foundLevel, debugOutput, err := tok.Parse()
+			assert.NoError(t, err)
+			fmt.Println("Result:", debugOutput)
+			fmt.Println("foundLevel:", foundLevel)
+			fmt.Println("Bits:", tok.DoneString())
 		})
 	}
 }

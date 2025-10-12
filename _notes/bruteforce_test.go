@@ -244,3 +244,45 @@ func TestFilterExcludeCollapsesPerLevel(t *testing.T) {
 		panic(err)
 	}
 }
+
+func binToBytes(s string) []byte {
+	s = strings.ReplaceAll(s, " ", "")
+
+	n := (len(s) + 7) / 8
+	data := make([]byte, n)
+
+	for i := 0; i < len(s); i++ {
+		if s[i] == '1' {
+			data[i/8] |= 1 << (7 - uint(i)%8)
+		}
+	}
+
+	return data
+}
+
+func TestGenerateRandomShit(t *testing.T) {
+	left := "001000010000011100000110000000011001000001"
+	right := "0010001000011001100111001101100000101001110010001010101000010101110000101011101100100010101100111100001010100111110000101011101111000010101000011000001010110011100000101010011101000010101100011100001000000000000"
+
+	numBits := 16
+	serials := make([]string, 1<<numBits)
+
+	for size := 1; size < numBits; size++ {
+		for value := 0; value < (1 << size); value++ {
+			middle := fmt.Sprintf("%0*b", size, value)
+			bitstream := left + "  111  " + middle + "  " + right
+			bitstream = strings.ReplaceAll(bitstream, " ", "")
+			fmt.Println(middle)
+
+			// Zero padding to the next byte
+			for len(bitstream)%8 != 0 {
+				bitstream += "0"
+			}
+
+			serial := b85.Encode(binToBytes(bitstream))
+			serials = append(serials, serial)
+		}
+	}
+
+	_serialsToYaml(serials, "101_bruteforce_steps/111_bruteforce_AAA")
+}

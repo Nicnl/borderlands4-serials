@@ -11,6 +11,21 @@ import (
 
 func binToBytes(s string) []byte {
 	s = strings.ReplaceAll(s, " ", "")
+	s = strings.ReplaceAll(s, ".", "")
+	s = strings.ReplaceAll(s, ":", "")
+	s = strings.ReplaceAll(s, "=", "")
+	s = strings.ReplaceAll(s, "[", "")
+	s = strings.ReplaceAll(s, "]", "")
+	s = strings.ReplaceAll(s, "{", "")
+	s = strings.ReplaceAll(s, "}", "")
+	s = strings.ReplaceAll(s, "(", "")
+	s = strings.ReplaceAll(s, ")", "")
+	s = strings.ReplaceAll(s, "=", "")
+	s = strings.ReplaceAll(s, "-", "")
+	s = strings.ReplaceAll(s, ",", "")
+	s = strings.ReplaceAll(s, "/", "")
+	s = strings.ReplaceAll(s, "|", "")
+	s = strings.ReplaceAll(s, "_", "")
 
 	n := (len(s) + 7) / 8
 	data := make([]byte, n)
@@ -244,6 +259,16 @@ func TestSerialTokenizeVexClassMods(t *testing.T) {
 		{
 			"1 arm no melee",
 			"@Ug!pHG38o5YT>=",
+			"1",
+		},
+		{
+			"1 arm 1 bottle + firmware jacked",
+			"@Ug!pHG38o5YT`HzQ)$V@)",
+			"1",
+		},
+		{
+			"unseen",
+			"@Ugy3L+2}TYgOyvyviz?KiBDJYGs9dOW2m",
 			"1",
 		},
 	}

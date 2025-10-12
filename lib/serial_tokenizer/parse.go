@@ -9,8 +9,8 @@ import (
 type Token byte
 
 const (
-	TOK_SEP1            Token = iota // "01" soft separator
-	TOK_SEP2                         // "00" hard separator
+	TOK_SEP1            Token = iota // "00" hard separator (terminator?)
+	TOK_SEP2                         // "01" soft separator
 	TOK_VARINT                       // "100" ... nibble varint
 	TOK_VARBIT                       // "110" ... varbit
 	TOK_VARINT_EXTENDED              // "101" ... enter KV section
@@ -102,21 +102,27 @@ func (t *Tokenizer) Parse() (int, string, error) {
 				foundLevel = int(v)
 			}
 		case TOK_VARINT_EXTENDED:
-			v, flag, param, err := t.readPart()
+			part, err := t.readPartV2()
 			if err != nil {
 				return foundLevel, debugOutput, err
 			}
 
-			if param != 0 {
-				debugOutput += fmt.Sprintf(" {%d:%03b:%d}", v, flag, param)
-			} else {
-				debugOutput += fmt.Sprintf(" {%d:%03b}", v, flag)
-				//debugOutput += fmt.Sprintf(" {%d}", v)
-			}
-
-			currentParsedInt++
-			if currentParsedInt == 4 {
-				foundLevel = int(v)
+			switch part.SubType {
+			case PART_SUBTYPE_NONE:
+				debugOutput += fmt.Sprintf(" {%d}", part.Index)
+			case PART_SUBTYPE_INT:
+				debugOutput += fmt.Sprintf(" {%d:%d}", part.Index, part.Value)
+			case PART_SUBTYPE_LIST:
+				debugOutput += fmt.Sprintf(" {%d:[", part.Index)
+				for i, v := range part.Values {
+					if i != 0 {
+						debugOutput += " "
+					}
+					debugOutput += fmt.Sprintf("%d", v)
+				}
+				debugOutput += "]}"
+			default:
+				return foundLevel, debugOutput, fmt.Errorf("unknown part subtype %d", part.SubType)
 			}
 		//case TOK_111:
 		//	debugOutput += " <111>"

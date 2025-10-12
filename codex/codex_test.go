@@ -23,20 +23,39 @@ func TestCodex(t *testing.T) {
 
 	t.Run(fmt.Sprintf("%d_fails", nbFails), func(t *testing.T) {
 		for _, item := range loadedItems {
-			t.Run(item.Type+"__"+item.Error+"__"+item.Name, func(t *testing.T) {
-				if item.Error != "" {
+			if item.Error != "" {
+				t.Run(item.Type+"__"+item.Error+"__"+item.Name, func(t *testing.T) {
 					t.Fail()
-				}
-				fmt.Println("Problematic item:", item.Name+" ("+item.Type+")")
-				fmt.Println("Serial:", item.Serial)
-				fmt.Println("Bits:", item.DoneString)
-				fmt.Println("Decoded:", item.DebugOutput)
-				fmt.Println("Error:", item.Error)
 
-				if strings.Contains(strings.ReplaceAll(item.DoneString, " ", ""), "101100001011100001011110001010111101001000101011111111000010101000010010001010100001100000101010101110000010101111111000001010101111100000101010001101000010101110110100001000") {
-					//panic("found")
-				}
-			})
+					fmt.Println("Problematic item:", item.Name+" ("+item.Type+")")
+					fmt.Println("Serial:", item.Serial)
+					fmt.Println("Bits:", item.DoneString)
+					fmt.Println("Decoded:", item.DebugOutput)
+					fmt.Println("Error:", item.Error)
+
+					if strings.Contains(strings.ReplaceAll(item.DoneString, " ", ""), "101100001011100001011110001010111101001000101011111111000010101000010010001010100001100000101010101110000010101111111000001010101111100000101010001101000010101110110100001000") {
+						//panic("found")
+					}
+				})
+			}
+		}
+	})
+
+	t.Run(fmt.Sprintf("%d_success", len(loadedItems)-int(nbFails)), func(t *testing.T) {
+		for _, item := range loadedItems {
+			if item.Error == "" {
+				t.Run(item.Type+"__"+item.Error+"__"+item.Name, func(t *testing.T) {
+					fmt.Println("Problematic item:", item.Name+" ("+item.Type+")")
+					fmt.Println("Serial:", item.Serial)
+					fmt.Println("Bits:", item.DoneString)
+					fmt.Println("Decoded:", item.DebugOutput)
+					fmt.Println("Error:", item.Error)
+
+					if strings.Contains(strings.ReplaceAll(item.DoneString, " ", ""), "101100001011100001011110001010111101001000101011111111000010101000010010001010100001100000101010101110000010101111111000001010101111100000101010001101000010101110110100001000") {
+						//panic("found")
+					}
+				})
+			}
 		}
 	})
 

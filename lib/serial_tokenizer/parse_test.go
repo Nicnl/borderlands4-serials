@@ -657,6 +657,21 @@ func TestSerialProblematicSerials3(t *testing.T) {
 			"@UgbV{rFme!Kc0JHoRG/*Fs6;g?Eb1I89cmqFQ*}^(P<>FdP`^+k5d",
 			"1",
 		},
+		{
+			"discord serial from black market",
+			"@Ugydj=2}TYgT+$BRLlx>!iE7l4p){zHsFA3ds4%EKs8Xm=s9dODh=;Mc0s",
+			"1",
+		},
+		{
+			"discord serial cleared",
+			"@Ugydj=2}TYgT+$BRLlx>!iE7l4p){zHsFA3ds4%EKs8Xm=s9dODh=;Mc0s",
+			"1",
+		},
+		{
+			"discord serial NO SCOPE",
+			"@Ugydj=2}TYgT+$BRLlx>!iE7l4p){zHsFA3ds4%Efs8Og~s9y*",
+			"1",
+		},
 	}
 
 	for _, tt := range tests {

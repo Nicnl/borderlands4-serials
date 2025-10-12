@@ -53,7 +53,10 @@ func (t *Tokenizer) readPart() (uint32, byte, uint32, error) {
 
 			switch param {
 			case 0b110000, 0b010000:
-				// known good
+				// known good :
+				// 101:10000.101:010000  101:01111-00100.010  101:01110.010  101:10111-10000.010  101:00101-01000.010  101:10011-01000.010  101:00111-00100.010  101:10111-00100.010  0000
+				// 101:10000.101:110000  101:01111-00100.010  101:10001-00100.010  101:01110.010  101:10111-10000.010  101:00101-01000.010  101:00111-01000.010  101:10111-01000010  101:1000010110101000000000000
+
 				param = byte_mirror.GenericMirror(param, 6)
 				return index, byte(flag), param, nil
 			default:
@@ -70,7 +73,7 @@ func (t *Tokenizer) readPart() (uint32, byte, uint32, error) {
 			switch param {
 			case 0b01110000000:
 				param = byte_mirror.GenericMirror(param, 11)
-				return index, byte(flag), param, nil
+				//return index, byte(flag), param, nil
 			default:
 				t.bs.Rewind(11)
 			}

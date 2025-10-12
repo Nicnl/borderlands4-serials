@@ -9,11 +9,12 @@ import (
 type Token byte
 
 const (
-	TOK_SEP1            Token = iota // "00" hard separator (terminator?)
-	TOK_SEP2                         // "01" soft separator
-	TOK_VARINT                       // "100" ... nibble varint
-	TOK_VARBIT                       // "110" ... varbit
-	TOK_VARINT_EXTENDED              // "101" ... enter KV section
+	TOK_SEP1     Token = iota // "00" hard separator (terminator?)
+	TOK_SEP2                  // "01" soft separator
+	TOK_VARINT                // "100" ... nibble varint
+	TOK_VARBIT                // "110" ... varbit
+	TOK_PART                  // "101" ... enter KV section
+	TOK_PART_111              // "111" weird, seems linked to DLC items, we DO NOT touch that
 )
 
 type Tokenizer struct {
@@ -68,6 +69,7 @@ func (t *Tokenizer) Parse() (int, string, error) {
 		currentParsedInt = 0
 	)
 
+OUTER:
 	for {
 		token, err := t.nextToken()
 		if err == io.EOF {
@@ -101,7 +103,15 @@ func (t *Tokenizer) Parse() (int, string, error) {
 			if currentParsedInt == 4 {
 				foundLevel = int(v)
 			}
-		case TOK_VARINT_EXTENDED:
+		case TOK_PART_111:
+			// UNSUPPORTED, unknown
+			// Seems linked to DLC weapons
+			// BUT it sometimes appears on items bought from the legendary vending machine
+			// Luckily, it's always at the end of the data
+			// => discard and forget about it
+			break OUTER
+
+		case TOK_PART:
 			part, err := t.readPartV2()
 			if err != nil {
 				return foundLevel, debugOutput, err

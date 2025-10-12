@@ -47,9 +47,14 @@ func (t *Tokenizer) nextToken() (Token, error) {
 		return TOK_VARBIT, nil
 	}
 
-	// 101 => Varint Extended
+	// 101 => complex weapon part
 	if bit1 == 1 && bit2 == 0 && bit3 == 1 {
-		return TOK_VARINT_EXTENDED, nil
+		return TOK_PART, nil
+	}
+
+	// 111 => ??? looks like part, not sure
+	if bit1 == 1 && bit2 == 1 && bit3 == 1 {
+		return TOK_PART_111, nil
 	}
 
 	// Rewind so the caller can read the invalid token if needed

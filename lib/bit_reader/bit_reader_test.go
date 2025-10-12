@@ -14,7 +14,7 @@ func bit(br *BitReader, expected byte, t *testing.T) {
 }
 
 func TestBitReader1(t *testing.T) {
-	br := NewBitReader([]byte{0b10101010, 0b11001100})
+	br := NewBitReader([]byte{0b10101010, 0b11001100, 0b11110000})
 
 	bit(br, 1, t)
 	bit(br, 0, t)
@@ -31,6 +31,15 @@ func TestBitReader1(t *testing.T) {
 	bit(br, 0, t)
 	bit(br, 1, t)
 	bit(br, 1, t)
+	bit(br, 0, t)
+	bit(br, 0, t)
+
+	bit(br, 1, t)
+	bit(br, 1, t)
+	bit(br, 1, t)
+	bit(br, 1, t)
+	bit(br, 0, t)
+	bit(br, 0, t)
 	bit(br, 0, t)
 	bit(br, 0, t)
 

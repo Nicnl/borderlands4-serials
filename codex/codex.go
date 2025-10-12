@@ -32,6 +32,8 @@ type _loadedItem struct {
 	DoneString  string
 	Error       string
 	DebugOutput string
+
+	Score int64
 }
 
 func (c *_codex) Load(jsonPath string) ([]_loadedItem, int64, error) {

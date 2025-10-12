@@ -14,7 +14,6 @@ const (
 	TOK_VARINT                       // "100" ... nibble varint
 	TOK_VARBIT                       // "110" ... varbit
 	TOK_VARINT_EXTENDED              // "101" ... enter KV section
-	TOK_111
 )
 
 type Tokenizer struct {
@@ -112,6 +111,7 @@ func (t *Tokenizer) Parse() (int, string, error) {
 				debugOutput += fmt.Sprintf(" {%d:%03b:%d}", v, flag, param)
 			} else {
 				debugOutput += fmt.Sprintf(" {%d:%03b}", v, flag)
+				//debugOutput += fmt.Sprintf(" {%d}", v)
 			}
 
 			currentParsedInt++

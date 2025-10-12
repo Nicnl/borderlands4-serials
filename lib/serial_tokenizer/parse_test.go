@@ -617,6 +617,46 @@ func TestSerialProblematicSerials3(t *testing.T) {
 			"@Uge8#%m/)}}!qBXsM-}RPG}(k28r1n{WC;Q",
 			"1",
 		},
+		{
+			"Ballistic Bonn-91 (weapon)",
+			"@Uga`vnFme!Kq<v6nRG}8tsG&oVnu!XD8i/_J7}Pw}9aJgQDby^~IMg`=\"",
+			"1",
+		},
+		{
+			"discord gun",
+			"@UgxFw!2}TYgjMN5-iz-y2-lD>yI@JfY3Uv#04iyiT4*>",
+			"1",
+		},
+		{
+			"kickballer ok-ish",
+			"@UgeU_{Fme!K@IFv#RG}7is9{5o3W<7&8i^W%x`R4}nuR)t8pZ$s",
+			"1",
+		},
+		{
+			"kickballer ok-ish",
+			"@UgcJizFme!KY=H8i3bm+44I8?L>WO-Xs)u@m3WZvQN`?A`DvJO",
+			"1",
+		},
+		{
+			"discord gun 2",
+			"@UgbV{rFme!Kc0JHoRG/*Fs6;g?Eb1I89cmqFQ)5tdP=8Q;P_t0KP$Ll!V}k<",
+			"1",
+		},
+		{
+			"discord gun 3",
+			"@Ugfs(8Fme!KYJAX4)SwEr6Sb)^s88iVr9#C*-9ptutwZHR00",
+			"1",
+		},
+		{
+			"discord gun 3 clean",
+			"@UgbV{rFme!Kc0JHoRG/*Fs6;g?Eb1I89cmqFQ)5tdP=8Q;P_t0KP$Ll",
+			"1",
+		},
+		{
+			"discord gun 3 // NO MAGAZINE",
+			"@UgbV{rFme!Kc0JHoRG/*Fs6;g?Eb1I89cmqFQ*}^(P<>FdP`^+k5d",
+			"1",
+		},
 	}
 
 	for _, tt := range tests {

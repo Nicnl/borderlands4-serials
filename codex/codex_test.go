@@ -1,8 +1,10 @@
 package codex
 
 import (
+	"borderlands_4_serials/lib/b85"
 	"fmt"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,14 +32,18 @@ func TestCodex(t *testing.T) {
 				fmt.Println("Bits:", item.DoneString)
 				fmt.Println("Decoded:", item.DebugOutput)
 				fmt.Println("Error:", item.Error)
+
+				if strings.Contains(strings.ReplaceAll(item.DoneString, " ", ""), "101100001011100001011110001010111101001000101011111111000010101000010010001010100001100000101010101110000010101111111000001010101111100000101010001101000010101110110100001000") {
+					//panic("found")
+				}
 			})
 		}
 	})
 
-	// Sort loadedItems by shortest serial length
 	if len(loadedItems) > 0 {
+		// Sort loadedItems by shortest serial length
 		sort.Slice(loadedItems, func(i, j int) bool {
-			return len(loadedItems[i].Serial) < len(loadedItems[j].Serial)
+			return len(loadedItems[i].Serial) > len(loadedItems[j].Serial)
 		})
 
 		// Print top 10 shortest problematic items
@@ -54,6 +60,55 @@ func TestCodex(t *testing.T) {
 						t.Fail()
 					}
 					fmt.Println("Problematic item:", item.Name+" ("+item.Type+")")
+					fmt.Println("Serial:", item.Serial)
+					fmt.Println("Bits:", item.DoneString)
+					fmt.Println("Decoded:", item.DebugOutput)
+					fmt.Println("Error:", item.Error)
+				})
+			}
+		})
+
+		// For each loadedItems, calculate their score
+		// The score is how many continous zeroes starting from right
+		for i := range loadedItems {
+			item := &loadedItems[i]
+			bytes, err := b85.Decode(item.Serial)
+			if err != nil {
+				continue
+			}
+			binStr := ""
+			for _, b := range bytes {
+				binStr += fmt.Sprintf("%08b", b)
+			}
+			score := int64(0)
+			for j := len(binStr) - 1; j >= 0; j-- {
+				if binStr[j] == '0' {
+					score++
+				} else {
+					break
+				}
+			}
+			item.Score = score
+		}
+
+		// Sort loadedItems by score
+		sort.Slice(loadedItems, func(i, j int) bool {
+			return loadedItems[i].Score < loadedItems[j].Score
+		})
+
+		t.Run("TOP_10_HIGHEST_SCORE", func(t *testing.T) {
+			limit := 10
+			if len(loadedItems) < limit {
+				limit = len(loadedItems)
+			}
+			for i := 0; i < limit; i++ {
+				item := loadedItems[i]
+				t.Run(fmt.Sprintf("%d__%s__%s", item.Score, item.Type, item.Name), func(t *testing.T) {
+					if item.Error != "" {
+						t.Fail()
+					}
+					fmt.Println("Problematic item:", item.Name+" ("+item.Type+")")
+					fmt.Println("Score:", item.Score)
 					fmt.Println("Serial:", item.Serial)
 					fmt.Println("Bits:", item.DoneString)
 					fmt.Println("Decoded:", item.DebugOutput)

@@ -62,13 +62,13 @@ func _serialsToTxt(serials []string, filePath string) {
 }
 
 func TestFileToSlots(t *testing.T) {
-	rawSerials := _loadLines("101_bruteforce_1-to-16-bits")
-	_serialsToYaml(rawSerials, "101_bruteforce_1-to-16-bits_slots")
+	rawSerials := _loadLines("101_combinations_1-to-16-bits")
+	_serialsToYaml(rawSerials, "101_combinations_1-to-16-bits_slots")
 }
 
 func TestLinesExcludingOthers(t *testing.T) {
-	rawSerials := _loadLines("101_bruteforce_1-to-16-bits")
-	excludeSerials := _loadLines("101_bruteforce_unknown")
+	rawSerials := _loadLines("101_combinations_1-to-16-bits")
+	excludeSerials := _loadLines("101_combinations_unknown")
 
 	excludeMap := map[string]bool{}
 	for _, line := range excludeSerials {
@@ -86,8 +86,8 @@ func TestLinesExcludingOthers(t *testing.T) {
 }
 
 func TestFileToSlots1111(t *testing.T) {
-	rawSerials := _loadLines("101_bruteforce_1-to-16-bits")
-	_serialsToYaml(rawSerials, "101_bruteforce_1-to-16-bits_rawslots")
+	rawSerials := _loadLines("101_combinations_1-to-16-bits")
+	_serialsToYaml(rawSerials, "101_combinations_1-to-16-bits_rawslots")
 }
 
 func TestFileToSlots2(t *testing.T) {

@@ -48,6 +48,10 @@ var tests = []struct {
 		"@Ugr$lGm/)}}!dNJvM-}RPG}?q38r1nh0{{",
 		"21a5516019062704431a1405e2a8573e2c5b2158582b9f42c000",
 	},
+	{
+		"@Ugr$lGm/)}}!dNJvM-}RPG}?q38r1nh0{{\"\"\"\"\",,,,,,,,,,,,",
+		"21a5516019062704431a1405e2a8573e2c5b2158582b9f42c000",
+	},
 }
 
 func TestDecode(t *testing.T) {

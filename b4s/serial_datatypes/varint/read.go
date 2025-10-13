@@ -1,12 +1,12 @@
 package varint
 
 import (
-	"borderlands_4_serials/lib/bit_reader"
+	"borderlands_4_serials/lib/bit"
 	"borderlands_4_serials/lib/byte_mirror"
 	"fmt"
 )
 
-func Read(br *bit_reader.BitReader) (uint32, error) {
+func Read(br *bit.Reader) (uint32, error) {
 	var (
 		dataRead = 0
 		output   uint32

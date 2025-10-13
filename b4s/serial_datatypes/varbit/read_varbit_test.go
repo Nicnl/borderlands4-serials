@@ -1,7 +1,7 @@
 package varbit
 
 import (
-	"borderlands_4_serials/lib/bit_reader"
+	"borderlands_4_serials/lib/bit"
 	"borderlands_4_serials/lib/helpers"
 	"testing"
 
@@ -117,7 +117,7 @@ func TestReadVarBit(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.bin, func(t *testing.T) {
 			data := helpers.BinToBytes(tt.bin)
-			br := bit_reader.NewBitReader(data)
+			br := bit.NewReader(data)
 			val, err := Read(br)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.expected, val)

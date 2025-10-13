@@ -3,7 +3,7 @@ package _notes
 import (
 	b86 "borderlands_4_serials/b4s/b85"
 	"borderlands_4_serials/b4s/serial_parser"
-	"borderlands_4_serials/lib/bit_reader"
+	"borderlands_4_serials/lib/bit"
 	"borderlands_4_serials/lib/helpers"
 	"fmt"
 	"os"
@@ -218,13 +218,13 @@ func TestFilterExcludeCollapsesPerLevel(t *testing.T) {
 			if err != nil {
 				panic(err)
 			}
-			bitstreamInjected := bit_reader.NewBitReader(data).StringAfter()
+			bitstreamInjected := bit.NewReader(data).StringAfter()
 
 			data, err = b86.Decode(serial.collapsed)
 			if err != nil {
 				panic(err)
 			}
-			bitstreamCollapsed := bit_reader.NewBitReader(data).StringAfter()
+			bitstreamCollapsed := bit.NewReader(data).StringAfter()
 
 			bitstreamPrefix := "001000010000011100000110000000011001000001"
 			bitstreamMarker := "001000100001100110011100110110000010100111001000101010100001010111000010101110110010001010110011110000101010011111000010101110111100001010100001100000101011001110000010101001110100001010110001110"

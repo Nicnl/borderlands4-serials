@@ -1,7 +1,7 @@
 package b85
 
 import (
-	"borderlands_4_serials/lib/bit_reader"
+	"borderlands_4_serials/lib/bit"
 	"fmt"
 	"testing"
 
@@ -113,7 +113,7 @@ func TestDecode2(t *testing.T) {
 		data, err := Decode(serial)
 		assert.NoError(t, err)
 
-		bitStream := bit_reader.NewBitReader(data)
+		bitStream := bit.NewReader(data)
 		fmt.Println(bitStream.StringAfter())
 	}
 }

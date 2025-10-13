@@ -1,12 +1,12 @@
 package varbit
 
 import (
-	"borderlands_4_serials/lib/bit_reader"
+	"borderlands_4_serials/lib/bit"
 	"borderlands_4_serials/lib/byte_mirror"
 	"fmt"
 )
 
-func Read(br *bit_reader.BitReader) (uint32, error) {
+func Read(br *bit.Reader) (uint32, error) {
 	length, ok := br.ReadN(5)
 	if !ok {
 		return 0, fmt.Errorf("unexpected end of data while reading varbit length")

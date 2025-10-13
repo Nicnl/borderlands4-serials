@@ -1,15 +1,15 @@
-package bit_reader
+package bit
 
-type BitReader struct {
+type Reader struct {
 	data []byte
 	pos  int
 }
 
-func NewBitReader(data []byte) *BitReader {
-	return &BitReader{data: data, pos: 0}
+func NewReader(data []byte) *Reader {
+	return &Reader{data: data, pos: 0}
 }
 
-func (br *BitReader) Read() (byte, bool) {
+func (br *Reader) Read() (byte, bool) {
 	if br.pos >= len(br.data)*8 {
 		return 0, false
 	}
@@ -19,7 +19,7 @@ func (br *BitReader) Read() (byte, bool) {
 	return bit, true
 }
 
-func (br *BitReader) ReadN(n int) (uint32, bool) {
+func (br *Reader) ReadN(n int) (uint32, bool) {
 	if n <= 0 || n > 32 {
 		return 0, false
 	}
@@ -36,11 +36,11 @@ func (br *BitReader) ReadN(n int) (uint32, bool) {
 	return value, true
 }
 
-func (br *BitReader) Pos() int {
+func (br *Reader) Pos() int {
 	return br.pos
 }
 
-func (br *BitReader) SetPos(n int) bool {
+func (br *Reader) SetPos(n int) bool {
 	if n < 0 || n > len(br.data)*8 {
 		return false
 	}
@@ -48,7 +48,7 @@ func (br *BitReader) SetPos(n int) bool {
 	return true
 }
 
-func (br *BitReader) Rewind(n int) bool {
+func (br *Reader) Rewind(n int) bool {
 	if n < 0 || br.pos-n < 0 {
 		return false
 	}
@@ -56,7 +56,7 @@ func (br *BitReader) Rewind(n int) bool {
 	return true
 }
 
-func (br *BitReader) StringBefore() string {
+func (br *Reader) StringBefore() string {
 	//As binary
 	oldPos := br.pos
 	br.Rewind(oldPos)
@@ -69,7 +69,7 @@ func (br *BitReader) StringBefore() string {
 	return result
 }
 
-func (br *BitReader) StringAfter() string {
+func (br *Reader) StringAfter() string {
 	result := ""
 	for i := br.pos; i < len(br.data)*8; i++ {
 		bit, _ := br.Read()
@@ -78,6 +78,6 @@ func (br *BitReader) StringAfter() string {
 	return result
 }
 
-func (br *BitReader) Len() int {
+func (br *Reader) Len() int {
 	return len(br.data) * 8
 }

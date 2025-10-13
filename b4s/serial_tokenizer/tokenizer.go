@@ -1,7 +1,7 @@
 package serial_tokenizer
 
 import (
-	"borderlands_4_serials/lib/bit_reader"
+	"borderlands_4_serials/lib/bit"
 )
 
 type Token byte
@@ -16,13 +16,13 @@ const (
 )
 
 type Tokenizer struct {
-	br             *bit_reader.BitReader
+	br             *bit.Reader
 	splitPositions []int
 }
 
 func NewTokenizer(data []byte) *Tokenizer {
 	return &Tokenizer{
-		br:             bit_reader.NewBitReader(data),
+		br:             bit.NewReader(data),
 		splitPositions: make([]int, 0),
 	}
 }
@@ -36,6 +36,6 @@ func (t *Tokenizer) DoneString() string {
 	return splitted
 }
 
-func (t *Tokenizer) BitReader() *bit_reader.BitReader {
+func (t *Tokenizer) BitReader() *bit.Reader {
 	return t.br
 }

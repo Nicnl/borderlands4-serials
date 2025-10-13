@@ -107,5 +107,6 @@ OUTER:
 		trailingTerminators--
 	}
 
+	output.Bits = t.DoneString()
 	return output, nil
 }

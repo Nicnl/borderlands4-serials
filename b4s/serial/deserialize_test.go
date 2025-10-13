@@ -676,6 +676,11 @@ func TestSerialProblematicSerials3(t *testing.T) {
 			"@Uge8Usm/)}}!hF1-NWCv7Xi$@SAI&bID+B-",
 			"1",
 		},
+		{
+			"cyclopean multistrike / sequencer + piercer / gun crit+ gun damage",
+			"@Uge8;)m/)}}!tAP`MZGU4s8EM`AB`=MD**r",
+			"1",
+		},
 	}
 
 	for _, tt := range tests {

@@ -14,12 +14,12 @@ import (
 
 func TestCodex(t *testing.T) {
 	var (
-		loadedItems []_loadedItem
+		loadedItems []LoadedItem
 		err         error
 		nbFails     int64
 	)
 	t.Run("LOAD", func(t *testing.T) {
-		loadedItems, nbFails, err = Codex.Load("resources/bl4-serial-matches.json")
+		loadedItems, nbFails, err = Codex.Load("database/bl4-serial-matches.json")
 		assert.NoError(t, err)
 	})
 
@@ -156,11 +156,11 @@ func TestCodex(t *testing.T) {
 
 func TestCodexReserializeRoundtrip(t *testing.T) {
 	var (
-		loadedItems []_loadedItem
+		loadedItems []LoadedItem
 		err         error
 	)
 	t.Run("LOAD", func(t *testing.T) {
-		loadedItems, _, err = Codex.Load("resources/bl4-serial-matches.json")
+		loadedItems, _, err = Codex.Load("database/bl4-serial-matches.json")
 		assert.NoError(t, err)
 	})
 
@@ -194,16 +194,16 @@ func TestCodesExtractPairSerialsCommonPart(t *testing.T) {
 	// serial -> map[part]bool
 
 	var (
-		loadedItems []_loadedItem
+		loadedItems []LoadedItem
 		err         error
 		_           int64
 	)
 	t.Run("LOAD", func(t *testing.T) {
-		loadedItems, _, err = Codex.Load("resources/bl4-serial-matches.json")
+		loadedItems, _, err = Codex.Load("database/bl4-serial-matches.json")
 		assert.NoError(t, err)
 	})
 
-	partToItem := make(map[string][]*_loadedItem, 0)
+	partToItem := make(map[string][]*LoadedItem, 0)
 	t.Run("GROUP_BY_PARTS_TO_ITEM", func(t *testing.T) {
 		for _, item := range loadedItems {
 			if item.Error != "" {
@@ -218,7 +218,7 @@ func TestCodesExtractPairSerialsCommonPart(t *testing.T) {
 
 					partStr := block.Part.String()
 					if _, ok := partToItem[partStr]; !ok {
-						partToItem[partStr] = make([]*_loadedItem, 0)
+						partToItem[partStr] = make([]*LoadedItem, 0)
 					}
 
 					partToItem[partStr] = append(partToItem[partStr], &item)
@@ -229,7 +229,7 @@ func TestCodesExtractPairSerialsCommonPart(t *testing.T) {
 	})
 
 	serialToParts := make(map[string][]string, 0)
-	serialToItem := make(map[string]*_loadedItem, 0)
+	serialToItem := make(map[string]*LoadedItem, 0)
 	t.Run("GROUP_BY_SERIAL_TO_PARTS", func(t *testing.T) {
 		for _, item := range loadedItems {
 			if item.Error != "" {

@@ -24,9 +24,12 @@ type _codex struct {
 	Items []Item
 }
 
-var Codex = &_codex{}
+var (
+	Codex           = &_codex{}
+	SkipFailedItems = false
+)
 
-type _loadedItem struct {
+type LoadedItem struct {
 	Type                   string
 	Manufacturer           string
 	WeaponType             string
@@ -42,7 +45,7 @@ type _loadedItem struct {
 	Score int64
 }
 
-func (c *_codex) Load(jsonPath string) ([]_loadedItem, int64, error) {
+func (c *_codex) Load(jsonPath string) ([]LoadedItem, int64, error) {
 	rawJson, err := os.ReadFile(jsonPath)
 	if err != nil {
 		return nil, -1, err
@@ -59,8 +62,10 @@ func (c *_codex) Load(jsonPath string) ([]_loadedItem, int64, error) {
 		nbFail int64
 	)
 
-	loadedItems := make([]_loadedItem, 0)
+	loadedItems := make([]LoadedItem, 0)
 	for _, item := range items {
+		item.Serial = strings.Trim(item.Serial, "\"")
+		item.Serial = strings.Trim(item.Serial, ",")
 		item.Serial = strings.Trim(item.Serial, "\"")
 		item.Serial = strings.Trim(item.Serial, ",")
 
@@ -77,7 +82,12 @@ func (c *_codex) Load(jsonPath string) ([]_loadedItem, int64, error) {
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Tokenize error:", err)
 			nbFail++
-			loadedItems = append(loadedItems, _loadedItem{
+
+			if SkipFailedItems {
+				continue
+			}
+
+			loadedItems = append(loadedItems, LoadedItem{
 				Type:                   item.Type,
 				Manufacturer:           item.Manufacturer,
 				WeaponType:             item.WeaponType,
@@ -90,7 +100,7 @@ func (c *_codex) Load(jsonPath string) ([]_loadedItem, int64, error) {
 			})
 			continue
 		} else {
-			loadedItems = append(loadedItems, _loadedItem{
+			loadedItems = append(loadedItems, LoadedItem{
 				Type:                   item.Type,
 				Manufacturer:           item.Manufacturer,
 				WeaponType:             item.WeaponType,

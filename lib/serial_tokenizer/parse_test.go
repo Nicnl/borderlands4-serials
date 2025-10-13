@@ -163,7 +163,7 @@ func TestSerialTokenize1(t *testing.T) {
 			assert.NoError(t, err)
 
 			tok := NewTokenizer(data)
-			_, debugOutput, err := tok.Parse()
+			debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
@@ -281,7 +281,7 @@ func TestSerialTokenizeVexClassMods(t *testing.T) {
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
 			tok := NewTokenizer(data)
-			_, debugOutput, err := tok.Parse()
+			debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
 			fmt.Println("Result:", debugOutput)
 			fmt.Println("Bitstream:", tok.DoneString())
@@ -325,7 +325,7 @@ func TestSerialTokenizeFirmware(t *testing.T) {
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
 			tok := NewTokenizer(data)
-			_, debugOutput, err := tok.Parse()
+			debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
 			fmt.Println("Result:", debugOutput)
 			fmt.Println("Bitstream:", tok.DoneString())
@@ -412,7 +412,7 @@ func TestSerialRandom(t *testing.T) {
 			assert.NoError(t, err)
 
 			tok := NewTokenizer(data)
-			_, debugOutput, err := tok.Parse()
+			debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
@@ -583,10 +583,9 @@ func TestSerialProblematicSerials2(t *testing.T) {
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
 			tok := NewTokenizer(data)
-			foundLevel, debugOutput, err := tok.Parse()
+			debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
 			fmt.Println("Result:", debugOutput)
-			fmt.Println("foundLevel:", foundLevel)
 		})
 	}
 }
@@ -697,6 +696,21 @@ func TestSerialProblematicSerials3(t *testing.T) {
 			"@Ugydj=2}TYgT+$BRLlx>!iE7l4p){zHsFA3ds4%Efs8Og~s9y*",
 			"1",
 		},
+		{
+			"cyclopean multistrike / sequencer + piercer / gun crit + gun magazine",
+			"@Uge8Usm/)}}!hF1-NWCv7Xi$@SA5Ao&D+B-",
+			"1",
+		},
+		{
+			"cyclopean multistrike / sequencer + piercer / gun crit",
+			"@Uge8Usm/)}}!hF1-NWCv7Xi$@S9}Qh000",
+			"1",
+		},
+		{
+			"cyclopean multistrike / sequencer + piercer / gun crit+ gun damage",
+			"@Uge8Usm/)}}!hF1-NWCv7Xi$@SAI&bID+B-",
+			"1",
+		},
 	}
 
 	for _, tt := range tests {
@@ -707,10 +721,9 @@ func TestSerialProblematicSerials3(t *testing.T) {
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
 			tok := NewTokenizer(data)
-			foundLevel, debugOutput, err := tok.Parse()
+			debugOutput, err := tok.Parse()
 			assert.NoError(t, err)
 			fmt.Println("Result:", debugOutput)
-			fmt.Println("foundLevel:", foundLevel)
 			fmt.Println("Bits:", tok.DoneString())
 		})
 	}

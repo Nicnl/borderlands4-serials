@@ -51,9 +51,9 @@ func (t *Tokenizer) DoneString() string {
 	return splitted
 }
 
-func (t *Tokenizer) Parse() (int, string, error) {
+func (t *Tokenizer) Parse() (string, error) {
 	if err := t.expect("magic header", 0, 0, 1, 0, 0, 0, 0); err != nil {
-		return -1, "", err
+		return "", err
 	}
 
 	debugOutput := ""
@@ -64,18 +64,13 @@ func (t *Tokenizer) Parse() (int, string, error) {
 		}
 	}()
 
-	var (
-		foundLevel       = -1
-		currentParsedInt = 0
-	)
-
 OUTER:
 	for {
 		token, err := t.nextToken()
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return foundLevel, debugOutput, err
+			return debugOutput, err
 		}
 
 		switch token {
@@ -86,60 +81,35 @@ OUTER:
 		case TOK_VARINT:
 			v, err := t.readVarint()
 			if err != nil {
-				return foundLevel, debugOutput, err
+				return debugOutput, err
 			}
 			debugOutput += fmt.Sprintf(" %d", v)
-			currentParsedInt++
-			if currentParsedInt == 4 {
-				foundLevel = int(v)
-			}
 		case TOK_VARBIT:
 			v, err := t.readVarBit()
 			if err != nil {
-				return foundLevel, debugOutput, err
+				return debugOutput, err
 			}
 			debugOutput += fmt.Sprintf(" %d", v)
-			currentParsedInt++
-			if currentParsedInt == 4 {
-				foundLevel = int(v)
-			}
 		case TOK_PART_111:
 			// UNSUPPORTED, unknown
 			// Seems linked to DLC weapons
 			// BUT it sometimes appears on items bought from the legendary vending machine
 			// Luckily, it's always at the end of the data
 			// => discard and forget about it
+			//continue
 			break OUTER
 
 		case TOK_PART:
-			part, err := t.readPartV2()
+			p, err := t.readPart()
 			if err != nil {
-				return foundLevel, debugOutput, err
+				return debugOutput, err
 			}
 
-			switch part.SubType {
-			case PART_SUBTYPE_NONE:
-				debugOutput += fmt.Sprintf(" {%d}", part.Index)
-			case PART_SUBTYPE_INT:
-				debugOutput += fmt.Sprintf(" {%d:%d}", part.Index, part.Value)
-			case PART_SUBTYPE_LIST:
-				debugOutput += fmt.Sprintf(" {%d:[", part.Index)
-				for i, v := range part.Values {
-					if i != 0 {
-						debugOutput += " "
-					}
-					debugOutput += fmt.Sprintf("%d", v)
-				}
-				debugOutput += "]}"
-			default:
-				return foundLevel, debugOutput, fmt.Errorf("unknown part subtype %d", part.SubType)
-			}
-		//case TOK_111:
-		//	debugOutput += " <111>"
+			debugOutput += p.ToString()
 		default:
-			return foundLevel, debugOutput, fmt.Errorf("unknown token %d", token)
+			return debugOutput, fmt.Errorf("unknown token %d", token)
 		}
 	}
 
-	return foundLevel, debugOutput, nil
+	return debugOutput, nil
 }

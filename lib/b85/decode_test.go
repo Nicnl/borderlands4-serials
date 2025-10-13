@@ -49,7 +49,7 @@ var tests = []struct {
 		"21a5516019062704431a1405e2a8573e2c5b2158582b9f42c000",
 	},
 	{
-		"@Ugr$lGm/)}}!dNJvM-}RPG}?q38r1nh0{{\"\"\"\"\",,,,,,,,,,,,",
+		"@Ugr$lGm/)}}!dNJvM-}RPG}?q38r1nh0{{",
 		"21a5516019062704431a1405e2a8573e2c5b2158582b9f42c000",
 	},
 }
@@ -58,6 +58,20 @@ func TestDecode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.serial, func(t *testing.T) {
 			decoded, err := Decode(tt.serial)
+			if err != nil {
+				t.Fatalf("Decode() error = %v", err)
+			}
+			if fmt.Sprintf("%x", decoded) != tt.hex {
+				t.Errorf("Decode() = %x, want %s", decoded, tt.hex)
+			}
+		})
+	}
+}
+
+func TestDecodeRobust(t *testing.T) {
+	for _, tt := range tests {
+		t.Run(tt.serial, func(t *testing.T) {
+			decoded, err := Decode(tt.serial + "\"\"\"\"\",,,,,,,,,,,,")
 			if err != nil {
 				t.Fatalf("Decode() error = %v", err)
 			}

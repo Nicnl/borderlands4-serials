@@ -68,7 +68,7 @@ func (c *_codex) Load(jsonPath string) ([]_loadedItem, int64, error) {
 		}
 
 		tokenizer := serial_tokenizer.NewTokenizer(data)
-		_, decoded, err := tokenizer.Parse()
+		decoded, err := tokenizer.Parse()
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Tokenize error:", err)
 			nbFail++

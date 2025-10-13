@@ -11,7 +11,6 @@ import (
 )
 
 func TestCodex(t *testing.T) {
-	return
 	var (
 		loadedItems []_loadedItem
 		err         error

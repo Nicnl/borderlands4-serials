@@ -3,7 +3,7 @@ package _notes
 import (
 	"borderlands_4_serials/lib/b85"
 	"borderlands_4_serials/lib/bit_reader"
-	"borderlands_4_serials/lib/serial_tokenizer"
+	"borderlands_4_serials/lib/serial_parser"
 	"fmt"
 	"os"
 	"strings"
@@ -181,7 +181,7 @@ func TestFilterExcludeCollapsesPerLevel(t *testing.T) {
 		if err != nil {
 			panic(err)
 		}
-		tokenizer := serial_tokenizer.NewTokenizer(data)
+		tokenizer := serial_parser.NewTokenizer(data)
 		itemLevel, _, _ := tokenizer.Parse()
 
 		fmt.Println(itemLevel, serial.collapsed)

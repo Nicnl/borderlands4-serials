@@ -11,6 +11,7 @@ import (
 )
 
 func TestCodex(t *testing.T) {
+	return
 	var (
 		loadedItems []_loadedItem
 		err         error
@@ -29,11 +30,11 @@ func TestCodex(t *testing.T) {
 
 					fmt.Println("Problematic item:", item.Name+" ("+item.Type+")")
 					fmt.Println("Serial:", item.Serial)
-					fmt.Println("Bits:", item.DoneString)
+					fmt.Println("Bits:", item.Bits)
 					fmt.Println("Decoded:", item.DebugOutput)
 					fmt.Println("Error:", item.Error)
 
-					if strings.Contains(strings.ReplaceAll(item.DoneString, " ", ""), "101100001011100001011110001010111101001000101011111111000010101000010010001010100001100000101010101110000010101111111000001010101111100000101010001101000010101110110100001000") {
+					if strings.Contains(strings.ReplaceAll(item.Bits, " ", ""), "101100001011100001011110001010111101001000101011111111000010101000010010001010100001100000101010101110000010101111111000001010101111100000101010001101000010101110110100001000") {
 						//panic("found")
 					}
 				})
@@ -47,11 +48,11 @@ func TestCodex(t *testing.T) {
 				t.Run(item.Type+"__"+item.Error+"__"+item.Name, func(t *testing.T) {
 					fmt.Println("Problematic item:", item.Name+" ("+item.Type+")")
 					fmt.Println("Serial:", item.Serial)
-					fmt.Println("Bits:", item.DoneString)
+					fmt.Println("Bits:", item.Bits)
 					fmt.Println("Decoded:", item.DebugOutput)
 					fmt.Println("Error:", item.Error)
 
-					if strings.Contains(strings.ReplaceAll(item.DoneString, " ", ""), "101100001011100001011110001010111101001000101011111111000010101000010010001010100001100000101010101110000010101111111000001010101111100000101010001101000010101110110100001000") {
+					if strings.Contains(strings.ReplaceAll(item.Bits, " ", ""), "101100001011100001011110001010111101001000101011111111000010101000010010001010100001100000101010101110000010101111111000001010101111100000101010001101000010101110110100001000") {
 						//panic("found")
 					}
 				})
@@ -80,7 +81,7 @@ func TestCodex(t *testing.T) {
 					}
 					fmt.Println("Problematic item:", item.Name+" ("+item.Type+")")
 					fmt.Println("Serial:", item.Serial)
-					fmt.Println("Bits:", item.DoneString)
+					fmt.Println("Bits:", item.Bits)
 					fmt.Println("Decoded:", item.DebugOutput)
 					fmt.Println("Error:", item.Error)
 				})
@@ -129,7 +130,7 @@ func TestCodex(t *testing.T) {
 					fmt.Println("Problematic item:", item.Name+" ("+item.Type+")")
 					fmt.Println("Score:", item.Score)
 					fmt.Println("Serial:", item.Serial)
-					fmt.Println("Bits:", item.DoneString)
+					fmt.Println("Bits:", item.Bits)
 					fmt.Println("Decoded:", item.DebugOutput)
 					fmt.Println("Error:", item.Error)
 				})

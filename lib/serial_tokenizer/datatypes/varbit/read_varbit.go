@@ -1,20 +1,22 @@
-package serial_tokenizer
+package varbit
 
 import (
+	"borderlands_4_serials/lib/bit_reader"
 	"borderlands_4_serials/lib/byte_mirror"
 	"fmt"
 )
 
-func (t *Tokenizer) readVarBit() (uint32, error) {
-	length, ok := t.bs.ReadN(5)
+func Read(br *bit_reader.BitReader) (uint32, error) {
+	length, ok := br.ReadN(5)
 	if !ok {
 		return 0, fmt.Errorf("unexpected end of data while reading varbit length")
 	}
 	length = uint32(byte_mirror.Uint5Mirror[byte(length)])
 
 	if length == 0 {
+		// TODO: check if really 0, or a special case meaning 32
 		return 0, nil
-		_, ok := t.bs.Read()
+		_, ok := br.Read()
 		if !ok {
 			return 0, fmt.Errorf("unexpected end of data while reading varbit length")
 		}
@@ -22,7 +24,7 @@ func (t *Tokenizer) readVarBit() (uint32, error) {
 
 	var v uint32
 	for i := uint32(0); i < length; i++ {
-		bit, ok := t.bs.Read()
+		bit, ok := br.Read()
 		if !ok {
 			return 0, fmt.Errorf("unexpected end of data while reading varbit value")
 		}

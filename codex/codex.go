@@ -2,7 +2,7 @@ package codex
 
 import (
 	"borderlands_4_serials/lib/b85"
-	"borderlands_4_serials/lib/serial_tokenizer"
+	"borderlands_4_serials/lib/serial_parser"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -29,7 +29,7 @@ type _loadedItem struct {
 	Type        string
 	Name        string
 	Serial      string
-	DoneString  string
+	Bits        string
 	Error       string
 	DebugOutput string
 
@@ -67,8 +67,7 @@ func (c *_codex) Load(jsonPath string) ([]_loadedItem, int64, error) {
 			continue
 		}
 
-		tokenizer := serial_tokenizer.NewTokenizer(data)
-		decoded, err := tokenizer.Parse()
+		parsed, err := serial_parser.Parse(data)
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Tokenize error:", err)
 			nbFail++
@@ -76,9 +75,9 @@ func (c *_codex) Load(jsonPath string) ([]_loadedItem, int64, error) {
 				Type:        item.Type,
 				Name:        item.Name,
 				Serial:      item.Serial,
-				DoneString:  tokenizer.DoneString(),
+				Bits:        parsed.Bits,
 				Error:       err.Error(),
-				DebugOutput: decoded,
+				DebugOutput: parsed.Debug,
 			})
 			continue
 		} else {
@@ -86,13 +85,13 @@ func (c *_codex) Load(jsonPath string) ([]_loadedItem, int64, error) {
 				Type:        item.Type,
 				Name:        item.Name,
 				Serial:      item.Serial,
-				DoneString:  tokenizer.DoneString(),
+				Bits:        parsed.Bits,
 				Error:       "",
-				DebugOutput: decoded,
+				DebugOutput: parsed.Debug,
 			})
 		}
 
-		item.Decoded = decoded
+		item.Decoded = parsed.Debug
 		fmt.Println("Decoded:", item.Decoded)
 		nbOk++
 	}

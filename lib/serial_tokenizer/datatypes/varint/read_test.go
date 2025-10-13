@@ -1,6 +1,8 @@
-package serial_tokenizer
+package varint
 
 import (
+	"borderlands_4_serials/lib/bit_reader"
+	"borderlands_4_serials/lib/helpers"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -45,12 +47,13 @@ func TestReadVarintNormal(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.bin, func(t *testing.T) {
-			data := binToBytes(tt.bin)
-			tok := NewTokenizer(data)
-			val, err := tok.readVarint()
+			data := helpers.BinToBytes(tt.bin)
+			br := bit_reader.NewBitReader(data)
+
+			val, err := Read(br)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.expected, val)
-			assert.Equal(t, tt.pos, tok.bs.Pos())
+			assert.Equal(t, tt.pos, br.Pos())
 		})
 	}
 }

@@ -1,43 +1,12 @@
-package serial_tokenizer
+package serial_parser
 
 import (
 	"borderlands_4_serials/lib/b85"
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-func binToBytes(s string) []byte {
-	s = strings.ReplaceAll(s, " ", "")
-	s = strings.ReplaceAll(s, ".", "")
-	s = strings.ReplaceAll(s, ":", "")
-	s = strings.ReplaceAll(s, "=", "")
-	s = strings.ReplaceAll(s, "[", "")
-	s = strings.ReplaceAll(s, "]", "")
-	s = strings.ReplaceAll(s, "{", "")
-	s = strings.ReplaceAll(s, "}", "")
-	s = strings.ReplaceAll(s, "(", "")
-	s = strings.ReplaceAll(s, ")", "")
-	s = strings.ReplaceAll(s, "=", "")
-	s = strings.ReplaceAll(s, "-", "")
-	s = strings.ReplaceAll(s, ",", "")
-	s = strings.ReplaceAll(s, "/", "")
-	s = strings.ReplaceAll(s, "|", "")
-	s = strings.ReplaceAll(s, "_", "")
-
-	n := (len(s) + 7) / 8
-	data := make([]byte, n)
-
-	for i := 0; i < len(s); i++ {
-		if s[i] == '1' {
-			data[i/8] |= 1 << (7 - uint(i)%8)
-		}
-	}
-
-	return data
-}
 
 func TestSerialTokenize1(t *testing.T) {
 	var tests = []struct {
@@ -162,13 +131,12 @@ func TestSerialTokenize1(t *testing.T) {
 			data, err := b85.Decode(tt.serial)
 			assert.NoError(t, err)
 
-			tok := NewTokenizer(data)
-			debugOutput, err := tok.Parse()
+			parsed, err := Parse(data)
 			assert.NoError(t, err)
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			fmt.Println("Result:", debugOutput)
-			fmt.Println("Bitstream:", tok.DoneString())
+			fmt.Println("Result:", parsed.Debug)
+			fmt.Println("Bitstream:", parsed.Bits)
 			fmt.Println()
 			fmt.Println()
 		})
@@ -280,11 +248,10 @@ func TestSerialTokenizeVexClassMods(t *testing.T) {
 
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			tok := NewTokenizer(data)
-			debugOutput, err := tok.Parse()
+			parsed, err := Parse(data)
 			assert.NoError(t, err)
-			fmt.Println("Result:", debugOutput)
-			fmt.Println("Bitstream:", tok.DoneString())
+			fmt.Println("Result:", parsed.Debug)
+			fmt.Println("Bits:", parsed.Bits)
 		})
 	}
 }
@@ -324,11 +291,10 @@ func TestSerialTokenizeFirmware(t *testing.T) {
 
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			tok := NewTokenizer(data)
-			debugOutput, err := tok.Parse()
+			parsed, err := Parse(data)
 			assert.NoError(t, err)
-			fmt.Println("Result:", debugOutput)
-			fmt.Println("Bitstream:", tok.DoneString())
+			fmt.Println("Result:", parsed.Debug)
+			fmt.Println("Bits:", parsed.Bits)
 		})
 	}
 }
@@ -411,13 +377,12 @@ func TestSerialRandom(t *testing.T) {
 			data, err := b85.Decode(tt.serial)
 			assert.NoError(t, err)
 
-			tok := NewTokenizer(data)
-			debugOutput, err := tok.Parse()
+			parsed, err := Parse(data)
 			assert.NoError(t, err)
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			fmt.Println("Result:", debugOutput)
-			fmt.Println("Bitstream:", tok.DoneString())
+			fmt.Println("Result:", parsed.Debug)
+			fmt.Println("Bits:", parsed.Bits)
 		})
 	}
 }
@@ -582,10 +547,10 @@ func TestSerialProblematicSerials2(t *testing.T) {
 
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			tok := NewTokenizer(data)
-			debugOutput, err := tok.Parse()
+			parsed, err := Parse(data)
 			assert.NoError(t, err)
-			fmt.Println("Result:", debugOutput)
+			fmt.Println("Result:", parsed.Debug)
+			fmt.Println("Bits:", parsed.Bits)
 		})
 	}
 }
@@ -720,11 +685,10 @@ func TestSerialProblematicSerials3(t *testing.T) {
 
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			tok := NewTokenizer(data)
-			debugOutput, err := tok.Parse()
+			parsed, err := Parse(data)
 			assert.NoError(t, err)
-			fmt.Println("Result:", debugOutput)
-			fmt.Println("Bits:", tok.DoneString())
+			fmt.Println("Result:", parsed.Debug)
+			fmt.Println("Bits:", parsed.Bits)
 		})
 	}
 }

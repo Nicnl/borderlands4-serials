@@ -34,9 +34,9 @@ func TestWriteVarint(t *testing.T) {
 func TestWriteReadRoundtrip(t *testing.T) {
 	for i := 0; i < helpers.IntPow(2, VARINT_MAX_USABLE_BITS); i++ {
 		// Write
-		br := bit.NewWriter()
-		Write(br, uint32(i))
-		data := br.Data()
+		bw := bit.NewWriter()
+		Write(bw, uint32(i))
+		data := bw.Data()
 
 		// Read
 		br2 := bit.NewReader(data)
@@ -45,6 +45,6 @@ func TestWriteReadRoundtrip(t *testing.T) {
 
 		// Compare
 		assert.Equal(t, uint32(i), val)
-		assert.Equal(t, br.Pos(), br2.Pos())
+		assert.Equal(t, bw.Pos(), br2.Pos())
 	}
 }

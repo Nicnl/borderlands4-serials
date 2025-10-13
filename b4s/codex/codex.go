@@ -2,7 +2,7 @@ package codex
 
 import (
 	"borderlands_4_serials/b4s/b85"
-	"borderlands_4_serials/b4s/serial_parser"
+	"borderlands_4_serials/b4s/serial"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -10,13 +10,14 @@ import (
 )
 
 type Item struct {
-	Name         string `json:"itemName"`
-	Type         string `json:"type"`
-	Serial       string `json:"partString"`
-	Decoded      string `json:"-"`
-	Manufacturer string `json:"manufacturer"`
-	WeaponType   string `json:"weaponType"`
-	Rarity       string `json:"rarity"`
+	Name                   string `json:"itemName"`
+	Type                   string `json:"type"`
+	Serial                 string `json:"partString"`
+	Decoded                string `json:"-"`
+	Manufacturer           string `json:"manufacturer"`
+	ManufacturerWeaponType string `json:"manufacturerWeaponType"`
+	WeaponType             string `json:"weaponType"`
+	Rarity                 string `json:"rarity"`
 }
 
 type _codex struct {
@@ -26,12 +27,17 @@ type _codex struct {
 var Codex = &_codex{}
 
 type _loadedItem struct {
-	Type        string
-	Name        string
-	Serial      string
-	Bits        string
-	Error       string
-	DebugOutput string
+	Type                   string
+	Manufacturer           string
+	WeaponType             string
+	ManufacturerWeaponType string
+	Name                   string
+	Serial                 string
+	Bits                   string
+	Error                  string
+	DebugOutput            string
+
+	Parsed serial.Serial
 
 	Score int64
 }
@@ -58,7 +64,7 @@ func (c *_codex) Load(jsonPath string) ([]_loadedItem, int64, error) {
 		item.Serial = strings.Trim(item.Serial, "\"")
 		item.Serial = strings.Trim(item.Serial, ",")
 
-		fmt.Println("Decoding", item.Name, item.Serial)
+		//fmt.Println("Decoding", item.Name, item.Serial)
 
 		data, err := b85.Decode(item.Serial)
 		if err != nil {
@@ -67,32 +73,39 @@ func (c *_codex) Load(jsonPath string) ([]_loadedItem, int64, error) {
 			continue
 		}
 
-		parsed, err := serial_parser.Parse(data)
+		parsed, err := serial.Deserialize(data)
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Tokenize error:", err)
 			nbFail++
 			loadedItems = append(loadedItems, _loadedItem{
-				Type:        item.Type,
-				Name:        item.Name,
-				Serial:      item.Serial,
-				Bits:        parsed.Bits,
-				Error:       err.Error(),
-				DebugOutput: parsed.Debug,
+				Type:                   item.Type,
+				Manufacturer:           item.Manufacturer,
+				WeaponType:             item.WeaponType,
+				ManufacturerWeaponType: item.ManufacturerWeaponType,
+				Name:                   item.Name,
+				Serial:                 item.Serial,
+				Bits:                   parsed.Bits,
+				Error:                  err.Error(),
+				DebugOutput:            parsed.String(),
 			})
 			continue
 		} else {
 			loadedItems = append(loadedItems, _loadedItem{
-				Type:        item.Type,
-				Name:        item.Name,
-				Serial:      item.Serial,
-				Bits:        parsed.Bits,
-				Error:       "",
-				DebugOutput: parsed.Debug,
+				Type:                   item.Type,
+				Manufacturer:           item.Manufacturer,
+				WeaponType:             item.WeaponType,
+				ManufacturerWeaponType: item.ManufacturerWeaponType,
+				Name:                   item.Name,
+				Serial:                 item.Serial,
+				Bits:                   parsed.Bits,
+				Error:                  "",
+				DebugOutput:            parsed.String(),
+				Parsed:                 parsed,
 			})
 		}
 
-		item.Decoded = parsed.Debug
-		fmt.Println("Decoded:", item.Decoded)
+		item.Decoded = parsed.String()
+		//fmt.Println("Decoded:", item.Decoded)
 		nbOk++
 	}
 

@@ -2,7 +2,7 @@ package _notes
 
 import (
 	b86 "borderlands_4_serials/b4s/b85"
-	"borderlands_4_serials/b4s/serial_parser"
+	"borderlands_4_serials/b4s/serial"
 	"borderlands_4_serials/lib/bit"
 	"borderlands_4_serials/lib/helpers"
 	"fmt"
@@ -189,7 +189,7 @@ func TestFilterExcludeCollapsesPerLevel(t *testing.T) {
 		if err != nil {
 			panic(err)
 		}
-		parsed, err := serial_parser.Parse(data)
+		parsed, err := serial.Parse(data)
 		if err != nil {
 			panic(err)
 		}

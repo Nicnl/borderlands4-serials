@@ -1,4 +1,4 @@
-package serial_parser
+package serial
 
 import (
 	"borderlands_4_serials/b4s/b85"
@@ -131,11 +131,11 @@ func TestSerialTokenize1(t *testing.T) {
 			data, err := b85.Decode(tt.serial)
 			assert.NoError(t, err)
 
-			parsed, err := Parse(data)
+			parsed, err := Deserialize(data)
 			assert.NoError(t, err)
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			fmt.Println("Result:", parsed.Debug)
+			fmt.Println("Result:", parsed.String())
 			fmt.Println("Bitstream:", parsed.Bits)
 			fmt.Println()
 			fmt.Println()
@@ -248,9 +248,9 @@ func TestSerialTokenizeVexClassMods(t *testing.T) {
 
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			parsed, err := Parse(data)
+			parsed, err := Deserialize(data)
 			assert.NoError(t, err)
-			fmt.Println("Result:", parsed.Debug)
+			fmt.Println("Result:", parsed.String())
 			fmt.Println("Bits:", parsed.Bits)
 		})
 	}
@@ -291,9 +291,9 @@ func TestSerialTokenizeFirmware(t *testing.T) {
 
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			parsed, err := Parse(data)
+			parsed, err := Deserialize(data)
 			assert.NoError(t, err)
-			fmt.Println("Result:", parsed.Debug)
+			fmt.Println("Result:", parsed.String())
 			fmt.Println("Bits:", parsed.Bits)
 		})
 	}
@@ -377,11 +377,11 @@ func TestSerialRandom(t *testing.T) {
 			data, err := b85.Decode(tt.serial)
 			assert.NoError(t, err)
 
-			parsed, err := Parse(data)
+			parsed, err := Deserialize(data)
 			assert.NoError(t, err)
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			fmt.Println("Result:", parsed.Debug)
+			fmt.Println("Result:", parsed.String())
 			fmt.Println("Bits:", parsed.Bits)
 		})
 	}
@@ -547,9 +547,9 @@ func TestSerialProblematicSerials2(t *testing.T) {
 
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			parsed, err := Parse(data)
+			parsed, err := Deserialize(data)
 			assert.NoError(t, err)
-			fmt.Println("Result:", parsed.Debug)
+			fmt.Println("Result:", parsed.String())
 			fmt.Println("Bits:", parsed.Bits)
 		})
 	}
@@ -685,10 +685,56 @@ func TestSerialProblematicSerials3(t *testing.T) {
 
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			parsed, err := Parse(data)
+			parsed, err := Deserialize(data)
 			assert.NoError(t, err)
-			fmt.Println("Result:", parsed.Debug)
+			fmt.Println("Result:", parsed.String())
 			fmt.Println("Bits:", parsed.Bits)
+		})
+	}
+}
+
+func TestSerialCompareBuybacks(t *testing.T) {
+	var tests = []struct {
+		name           string
+		serialOriginal string
+		serialBuyback  string
+	}{
+		{
+			"L50 Legendary Cooking Ambushing Truck",
+			"@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf{00",
+			"@Ugy3L+2}Ta0Od!I{*`S=LLLKTRY91;d>K-Z#Y7QzFY8(O",
+		},
+		{
+			"L50 Legendary Ambushing Truck",
+			"@Ugy3L+2}TYgjMogxi7Hg07IhPq4>b?9sX3@zs9y*",
+			"@Ugy3L+2}Ta0Od!H/&7hp9LM3WZH&OXe^H7_bgUW^ag#Z",
+		},
+		{
+			"L49 Uncommon Playful Kitty",
+			"@Ugct)%FmVuJXn{hb3U#POJ!&6nQ*lsxP_0lm5d",
+			"@Ugct)%FmVuN0uhE5C^V{2hg#I5_MtWv2ek*)3Uw0!",
+		},
+		{
+			"L49 Common Karkadann",
+			"@UgzR8/2__CAOuq;Eiz?Kj9yO^ss8y(TsD20",
+			"@UgzR8/2__DrOd!Jad!WClLM`f1lbVBCg=&ZDhX4",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dataOriginal, err := b85.Decode(tt.serialOriginal)
+			assert.NoError(t, err)
+			parsedOriginal, err := Deserialize(dataOriginal)
+			assert.NoError(t, err)
+
+			dataBuyback, err := b85.Decode(tt.serialBuyback)
+			assert.NoError(t, err)
+			parsedBuyback, err := Deserialize(dataBuyback)
+			assert.NoError(t, err)
+
+			fmt.Println("Original:", parsedOriginal.String())
+			fmt.Println("Buyback: ", parsedBuyback.String())
 		})
 	}
 }

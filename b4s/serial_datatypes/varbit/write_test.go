@@ -56,11 +56,11 @@ func TestWrite2VarBit(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.bin, func(t *testing.T) {
 			// Write the int
-			br := bit.NewWriter()
-			fmt.Println(br)
-			Write(br, test.int)
-			assert.Equal(t, test.pos, br.Pos())
-			assert.Equal(t, strings.ReplaceAll(test.bin, " ", ""), br.String())
+			bw := bit.NewWriter()
+			fmt.Println(bw)
+			Write(bw, test.int)
+			assert.Equal(t, test.pos, bw.Pos())
+			assert.Equal(t, strings.ReplaceAll(test.bin, " ", ""), bw.String())
 		})
 	}
 }
@@ -69,9 +69,9 @@ func TestWrite2VarBit(t *testing.T) {
 func TestWriteReadRoundtrip(t *testing.T) {
 	for i := 0; i < helpers.IntPow(2, 18); i++ {
 		// Write
-		br := bit.NewWriter()
-		Write(br, uint32(i))
-		data := br.Data()
+		bw := bit.NewWriter()
+		Write(bw, uint32(i))
+		data := bw.Data()
 
 		// Read
 		br2 := bit.NewReader(data)
@@ -80,6 +80,6 @@ func TestWriteReadRoundtrip(t *testing.T) {
 
 		// Compare
 		assert.Equal(t, uint32(i), val)
-		assert.Equal(t, br.Pos(), br2.Pos())
+		assert.Equal(t, bw.Pos(), br2.Pos())
 	}
 }

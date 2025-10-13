@@ -3,7 +3,7 @@ package item
 // Kind is a unified enum for manufacturers, item types, and characters
 // Add all relevant values here
 
-type Kind int
+type Kind uint32
 
 const (
 	Unknown Kind = iota
@@ -102,7 +102,7 @@ type key struct {
 }
 
 // idMap and reverseIDMap are private
-var idMap = map[key]int{
+var idMap = map[key]uint32{
 	{Daedalus, Pistol}: 2,
 	{Jacobs, Pistol}: 3,
 	{Order, Pistol}: 4,
@@ -133,10 +133,31 @@ var idMap = map[key]int{
 	{Amon, ClassMod}: 255,
 	{Rafa, ClassMod}: 256,
 	{Harlowe, ClassMod}: 259,
+	{Torgue, Repkit}: 261,
+	{Maliwan, Grenade}: 263,
+	{Jacobs, Grenade}: 267,
+	{Daedalus, Grenade}: 270,
+	{Order, Grenade}: 272,
+	{Ripper, HeavyWeapon}: 275,
+	{Ripper, Repkit}: 274,
+	{Daedalus, Repkit}: 277,
+	{Maliwan, Shield}: 279, // Shield Energy
+	{Vladof, HeavyWeapon}: 282,
+	{Vladof, Shield}: 283, // Shield Armor
+	{Atlas, Enhancer}: 284,
+	{Order, Repkit}: 285,
+	{Tediore, Shield}: 287, // Shield Armor
+	{Maliwan, HeavyWeapon}: 289,
+	{Order, Shield}: 293, // Shield Energy
+	{Ripper, Shield}: 300, // Shield Energy
+	{Torgue, Enhancer}: 303,
+	{Jacobs, Shield}: 306, // Shield Armor
+	{Daedalus, Shield}: 312, // Shield Energy
+	{Torgue, Shield}: 321, // Shield Armor
 	// ... add more as needed ...
 }
 
-var reverseIDMap = map[int]key{}
+var reverseIDMap = map[uint32]key{}
 
 func init() {
 	for k, v := range idMap {
@@ -145,13 +166,13 @@ func init() {
 }
 
 // LookupID returns the ID for a [Manufacturer/Character, ItemType] combination
-func GetItemTypeID(first, second Kind) (int, bool) {
+func GetItemTypeID(first, second Kind) (uint32, bool) {
 	id, ok := idMap[key{first, second}]
 	return id, ok
 }
 
 // LookupEnums returns the [Manufacturer/Character, ItemType] for a given ID
-func GetKindEnums(id int) (Kind, Kind, bool) {
+func GetKindEnums(id uint32) (Kind, Kind, bool) {
 	if k, ok := reverseIDMap[id]; ok {
 		return k.First, k.Second, true
 	}

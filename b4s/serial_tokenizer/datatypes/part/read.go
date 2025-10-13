@@ -1,9 +1,9 @@
 package part
 
 import (
-	"borderlands_4_serials/lib/serial_tokenizer"
-	"borderlands_4_serials/lib/serial_tokenizer/datatypes/varbit"
-	"borderlands_4_serials/lib/serial_tokenizer/datatypes/varint"
+	"borderlands_4_serials/b4s/serial_tokenizer"
+	"borderlands_4_serials/b4s/serial_tokenizer/datatypes/varbit"
+	"borderlands_4_serials/b4s/serial_tokenizer/datatypes/varint"
 	"fmt"
 )
 

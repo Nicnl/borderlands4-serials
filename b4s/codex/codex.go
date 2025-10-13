@@ -1,8 +1,8 @@
 package codex
 
 import (
-	"borderlands_4_serials/lib/b85"
-	"borderlands_4_serials/lib/serial_parser"
+	"borderlands_4_serials/b4s/b85"
+	"borderlands_4_serials/b4s/serial_parser"
 	"encoding/json"
 	"fmt"
 	"os"

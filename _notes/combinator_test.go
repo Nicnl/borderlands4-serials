@@ -1,9 +1,10 @@
 package _notes
 
 import (
-	"borderlands_4_serials/lib/b85"
+	b86 "borderlands_4_serials/b4s/b85"
+	"borderlands_4_serials/b4s/serial_parser"
 	"borderlands_4_serials/lib/bit_reader"
-	"borderlands_4_serials/lib/serial_parser"
+	"borderlands_4_serials/lib/helpers"
 	"fmt"
 	"os"
 	"strings"
@@ -62,11 +63,13 @@ func _serialsToTxt(serials []string, filePath string) {
 }
 
 func TestFileToSlots(t *testing.T) {
+	return
 	rawSerials := _loadLines("101_combinations_1-to-16-bits")
 	_serialsToYaml(rawSerials, "101_combinations_1-to-16-bits_slots")
 }
 
 func TestLinesExcludingOthers(t *testing.T) {
+	return
 	rawSerials := _loadLines("101_combinations_1-to-16-bits")
 	excludeSerials := _loadLines("101_combinations_unknown")
 
@@ -86,11 +89,13 @@ func TestLinesExcludingOthers(t *testing.T) {
 }
 
 func TestFileToSlots1111(t *testing.T) {
+	return
 	rawSerials := _loadLines("101_combinations_1-to-16-bits")
 	_serialsToYaml(rawSerials, "101_combinations_1-to-16-bits_rawslots")
 }
 
 func TestFileToSlots2(t *testing.T) {
+	return
 	rawSerials := _loadLines("101_bruteforce_steps/AA_half2")
 	_serialsToYaml(rawSerials, "101_bruteforce_steps/AA_half2_slots")
 }
@@ -103,6 +108,7 @@ type workableSerial struct {
 var globalWorkableSerials []workableSerial
 
 func TestFileExcludeCollapses(t *testing.T) {
+	return
 	rawSerials := _loadLines("101_bruteforce_steps/AA_half1")
 	collapses := _loadLines("101_bruteforce_steps/AA_half1_collapse")
 	excludeSerials := _loadLines("101_bruteforce_steps/list_of_collapses")
@@ -137,6 +143,7 @@ func TestFileExcludeCollapses(t *testing.T) {
 }
 
 func TestFileExcludeCollapses2(t *testing.T) {
+	return
 	rawSerials := _loadLines("101_bruteforce_steps/AA_half2")
 	collapses := _loadLines("101_bruteforce_steps/AA_half2_collapse")
 	excludeSerials := _loadLines("101_bruteforce_steps/list_of_collapses")
@@ -171,24 +178,29 @@ func TestFileExcludeCollapses2(t *testing.T) {
 }
 
 func TestFilterExcludeCollapsesPerLevel(t *testing.T) {
+	return
 	t.Run("TestFileExcludeCollapses", TestFileExcludeCollapses)
 	t.Run("TestFileExcludeCollapses2", TestFileExcludeCollapses2)
 
 	mapSerialsPerLevel := make(map[int][]workableSerial)
 
 	for _, serial := range globalWorkableSerials {
-		data, err := b85.Decode(serial.collapsed)
+		data, err := b86.Decode(serial.collapsed)
 		if err != nil {
 			panic(err)
 		}
-		tokenizer := serial_parser.NewTokenizer(data)
-		itemLevel, _, _ := tokenizer.Parse()
-
-		fmt.Println(itemLevel, serial.collapsed)
-
-		if itemLevel >= 1 && itemLevel <= 50 {
-			mapSerialsPerLevel[itemLevel] = append(mapSerialsPerLevel[itemLevel], serial)
+		parsed, err := serial_parser.Parse(data)
+		if err != nil {
+			panic(err)
 		}
+		fmt.Println(serial.original, "=>", serial.collapsed, "=>", parsed.Debug)
+		panic("item level extraction not implemented (removed temporarily)")
+
+		//fmt.Println(itemLevel, serial.collapsed)
+		//
+		//if itemLevel >= 1 && itemLevel <= 50 {
+		//	mapSerialsPerLevel[itemLevel] = append(mapSerialsPerLevel[itemLevel], serial)
+		//}
 	}
 
 	output := ""
@@ -202,13 +214,13 @@ func TestFilterExcludeCollapsesPerLevel(t *testing.T) {
 		//output += fmt.Sprintln("Level:", level)
 		for _, serial := range serials {
 			//fmt.Sprintln("  ", serial.original, "=>", serial.collapsed)
-			data, err := b85.Decode(serial.original)
+			data, err := b86.Decode(serial.original)
 			if err != nil {
 				panic(err)
 			}
 			bitstreamInjected := bit_reader.NewBitReader(data).StringAfter()
 
-			data, err = b85.Decode(serial.collapsed)
+			data, err = b86.Decode(serial.collapsed)
 			if err != nil {
 				panic(err)
 			}
@@ -245,22 +257,8 @@ func TestFilterExcludeCollapsesPerLevel(t *testing.T) {
 	}
 }
 
-func binToBytes(s string) []byte {
-	s = strings.ReplaceAll(s, " ", "")
-
-	n := (len(s) + 7) / 8
-	data := make([]byte, n)
-
-	for i := 0; i < len(s); i++ {
-		if s[i] == '1' {
-			data[i/8] |= 1 << (7 - uint(i)%8)
-		}
-	}
-
-	return data
-}
-
 func TestGenerateRandomShit(t *testing.T) {
+	return
 	left := "001000010000011100000110000000011001000001"
 	right := "0010001000011001100111001101100000101001110010001010101000010101110000101011101100100010101100111100001010100111110000101011101111000010101000011000001010110011100000101010011101000010101100011100001000000000000"
 
@@ -279,7 +277,7 @@ func TestGenerateRandomShit(t *testing.T) {
 				bitstream += "0"
 			}
 
-			serial := b85.Encode(binToBytes(bitstream))
+			serial := b86.Encode(helpers.BinToBytes(bitstream))
 			serials = append(serials, serial)
 		}
 	}

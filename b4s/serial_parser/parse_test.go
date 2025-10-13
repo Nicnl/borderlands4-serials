@@ -1,7 +1,7 @@
 package serial_parser
 
 import (
-	"borderlands_4_serials/lib/b85"
+	"borderlands_4_serials/b4s/b85"
 	"fmt"
 	"testing"
 

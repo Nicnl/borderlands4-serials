@@ -1,7 +1,7 @@
 package codex
 
 import (
-	"borderlands_4_serials/lib/b85"
+	"borderlands_4_serials/b4s/b85"
 	"fmt"
 	"sort"
 	"strings"
@@ -17,7 +17,7 @@ func TestCodex(t *testing.T) {
 		nbFails     int64
 	)
 	t.Run("LOAD", func(t *testing.T) {
-		loadedItems, nbFails, err = Codex.Load("C:\\Users\\Nicnl\\GolandProjects\\borderlands_4_serials\\codex\\resources\\bl4-serial-matches.json")
+		loadedItems, nbFails, err = Codex.Load("resources/bl4-serial-matches.json")
 		assert.NoError(t, err)
 	})
 

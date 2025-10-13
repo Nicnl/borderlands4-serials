@@ -1,8 +1,8 @@
 package part
 
 import (
+	"borderlands_4_serials/b4s/serial_tokenizer"
 	"borderlands_4_serials/lib/helpers"
-	"borderlands_4_serials/lib/serial_tokenizer"
 	"fmt"
 	"testing"
 

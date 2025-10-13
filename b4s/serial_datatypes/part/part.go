@@ -17,7 +17,7 @@ type Part struct {
 	Values  []uint32
 }
 
-func (p *Part) ToString() string {
+func (p *Part) String() string {
 	switch p.SubType {
 	case SUBTYPE_NONE:
 		return fmt.Sprintf(" {%d}", p.Index)

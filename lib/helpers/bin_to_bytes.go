@@ -15,6 +15,7 @@ func BinToBytes(s string) []byte {
 	s = strings.ReplaceAll(s, ")", "")
 	s = strings.ReplaceAll(s, "=", "")
 	s = strings.ReplaceAll(s, "-", "")
+	s = strings.ReplaceAll(s, "+", "")
 	s = strings.ReplaceAll(s, ",", "")
 	s = strings.ReplaceAll(s, "/", "")
 	s = strings.ReplaceAll(s, "|", "")

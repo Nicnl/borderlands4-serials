@@ -6,8 +6,12 @@ import (
 	"fmt"
 )
 
+const (
+	VARBIT_LENGTH_BLOCK_SIZE = 5
+)
+
 func Read(br *bit.Reader) (uint32, error) {
-	length, ok := br.ReadN(5)
+	length, ok := br.ReadN(VARBIT_LENGTH_BLOCK_SIZE)
 	if !ok {
 		return 0, fmt.Errorf("unexpected end of data while reading varbit length")
 	}

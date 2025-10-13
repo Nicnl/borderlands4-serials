@@ -65,7 +65,7 @@ OUTER:
 				return Parsed{}, err
 			}
 
-			output.Debug += p.ToString()
+			output.Debug += p.String()
 		default:
 			return Parsed{}, fmt.Errorf("unknown token %d", token)
 		}

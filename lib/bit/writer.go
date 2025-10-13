@@ -10,11 +10,13 @@ func NewWriter() *Writer {
 }
 
 func (bw *Writer) WriteBit(bit byte) {
-	if bw.pos/8 >= len(bw.data) {
+	for bw.pos/8 >= len(bw.data) {
 		bw.data = append(bw.data, 0)
 	}
 	if bit&1 == 1 {
 		bw.data[bw.pos/8] |= 1 << (7 - (bw.pos % 8))
+	} else {
+		bw.data[bw.pos/8] &^= 1 << (7 - (bw.pos % 8))
 	}
 
 	bw.pos++
@@ -31,4 +33,25 @@ func (bw *Writer) WriteN(value uint32, n int) {
 		bit := (value >> i) & 1
 		bw.WriteBit(byte(bit))
 	}
+}
+
+func (bw *Writer) String() string {
+	//As binary
+	str := ""
+	for i := 0; i < bw.pos; i++ {
+		if (bw.data[i/8]>>(7-(i%8)))&1 == 1 {
+			str += "1"
+		} else {
+			str += "0"
+		}
+	}
+	return str
+}
+
+func (bw *Writer) Data() []byte {
+	return bw.data
+}
+
+func (bw *Writer) Pos() int {
+	return bw.pos
 }

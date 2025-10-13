@@ -71,7 +71,7 @@ func Read(t *serial_tokenizer.Tokenizer) (Part, error) {
 		}
 
 		if token != serial_tokenizer.TOK_SEP2 {
-			return Part{}, fmt.Errorf("expected part list beginning token to be TOK_SEP1 (%d), got %d", serial_tokenizer.TOK_SEP1, token)
+			return Part{}, fmt.Errorf("expected part list beginning token to be TOK_SEP2 (%d), got %d", serial_tokenizer.TOK_SEP2, token)
 		}
 
 		for {

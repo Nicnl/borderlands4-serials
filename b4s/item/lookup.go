@@ -135,23 +135,32 @@ var idMap = map[key]uint32{
 	{Harlowe, ClassMod}: 259,
 	{Torgue, Repkit}: 261,
 	{Maliwan, Grenade}: 263,
+	{Hyperion, Enhancer}: 264,
 	{Jacobs, Grenade}: 267,
+	{Jacobs, Enhancer}: 268,
 	{Daedalus, Grenade}: 270,
+	{Maliwan, Enhancer}: 271,
 	{Order, Grenade}: 272,
 	{Ripper, HeavyWeapon}: 275,
 	{Ripper, Repkit}: 274,
 	{Daedalus, Repkit}: 277,
 	{Maliwan, Shield}: 279, // Shield Energy
+	{Order, Enhancer}: 281,
 	{Vladof, HeavyWeapon}: 282,
 	{Vladof, Shield}: 283, // Shield Armor
 	{Atlas, Enhancer}: 284,
 	{Order, Repkit}: 285,
+	{COV, Enhancer}: 286,
 	{Tediore, Shield}: 287, // Shield Armor
 	{Maliwan, HeavyWeapon}: 289,
+	{Tediore, Enhancer}: 292,
 	{Order, Shield}: 293, // Shield Energy
+	{Ripper, Enhancer}: 296,
+	{Daedalus, Enhancer}: 299,
 	{Ripper, Shield}: 300, // Shield Energy
 	{Torgue, Enhancer}: 303,
 	{Jacobs, Shield}: 306, // Shield Armor
+	{Vladof, Enhancer}: 310,
 	{Daedalus, Shield}: 312, // Shield Energy
 	{Torgue, Shield}: 321, // Shield Armor
 	// ... add more as needed ...

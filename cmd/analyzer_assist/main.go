@@ -6,6 +6,7 @@ import (
 	"borderlands_4_serials/b4s/serial"
 	"borderlands_4_serials/b4s/serial_datatypes/part"
 	"borderlands_4_serials/b4s/serial_tokenizer"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"os"
@@ -363,6 +364,55 @@ func compareSlot01Serials(foundSlot0Serial string, foundSlot1Serial string) {
 // INJECTION_SAV
 
 func main() {
+	// Load conf from config.json if exists
+	{
+		pwd, err := os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+
+		configPath := filepath.Join(pwd, "config.json")
+		if _, err := os.Stat(configPath); err == nil {
+			rawData, err := os.ReadFile(configPath)
+			if err != nil {
+				panic(err)
+			}
+
+			var conf struct {
+				CODEX_JSON_DATABASE_DIR string `json:"CODEX_JSON_DATABASE_DIR"`
+				CODEX_JSON_RAW_ITEMS    string `json:"CODEX_JSON_RAW_ITEMS"`
+				INJECTION_SAV           string `json:"INJECTION_SAV"`
+				INJECTION_USERID        string `json:"INJECTION_USERID"`
+				INJECTION_YAML_DEST     string `json:"INJECTION_YAML_DEST"`
+				INJECTION_YAML_MODEL    string `json:"INJECTION_YAML_MODEL"`
+				MODE_SINGLE_PART        bool   `json:"MODE_SINGLE_PART"`
+			}
+			err = json.Unmarshal(rawData, &conf)
+			if err != nil {
+				panic(err)
+			}
+
+			if os.Getenv("CODEX_JSON_DATABASE_DIR") == "" {
+				os.Setenv("CODEX_JSON_DATABASE_DIR", conf.CODEX_JSON_DATABASE_DIR)
+			}
+			if os.Getenv("CODEX_JSON_RAW_ITEMS") == "" {
+				os.Setenv("CODEX_JSON_RAW_ITEMS", conf.CODEX_JSON_RAW_ITEMS)
+			}
+			if os.Getenv("INJECTION_SAV") == "" {
+				os.Setenv("INJECTION_SAV", conf.INJECTION_SAV)
+			}
+			if os.Getenv("INJECTION_USERID") == "" {
+				os.Setenv("INJECTION_USERID", conf.INJECTION_USERID)
+			}
+			if os.Getenv("INJECTION_YAML_DEST") == "" {
+				os.Setenv("INJECTION_YAML_DEST", conf.INJECTION_YAML_DEST)
+			}
+			if os.Getenv("INJECTION_YAML_MODEL") == "" {
+				os.Setenv("INJECTION_YAML_MODEL", conf.INJECTION_YAML_MODEL)
+			}
+		}
+	}
+
 	initializeCodexInfos()
 	updateMainMenuInfos()
 	updateDataFillInfos()

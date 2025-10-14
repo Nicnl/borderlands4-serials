@@ -1,0 +1,8 @@
+{
+  "part_str": "{72}",
+  "serial": "@Uguq~c2}TYgOqL2diHeB;",
+  "type": "barrel",
+  "name": "Rallying Stop Gap",
+  "description": "Reconfigure - When firing, fire rate decreases down to 20%, but Damage increases up to 750%",
+  "stats": "legendary dmg=1265 acc=87 rel=1.8 spd=4.4 mag=30"
+}

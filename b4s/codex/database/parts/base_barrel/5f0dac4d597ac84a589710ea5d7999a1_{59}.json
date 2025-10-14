@@ -1,0 +1,8 @@
+{
+  "part_str": "{59}",
+  "serial": "@Ugw$Yw2}TYgjPwl3hq{LV",
+  "type": "barrel",
+  "name": "Omg I Got",
+  "description": "Energy Transfer - When energy shield is active, grants +50% damage by consuming the shield's energy instead of ammo. When overshield is also active, energy shield will not deplete. \u003cBack off, man. I'm a scientist.\u003e",
+  "stats": "dmg=803 acc=100 rel=2.1 spd=8.0 mag=30 shock=1665/8%"
+}

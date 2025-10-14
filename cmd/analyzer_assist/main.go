@@ -45,7 +45,7 @@ func currentSaveInjectionsString() string {
 }
 
 var (
-	loadedItems []codex_loader.LoadedItem
+	loadedItems []codex.LoadedItem
 
 	app   = tview.NewApplication()
 	pages = tview.NewPages()
@@ -227,7 +227,7 @@ func pickItem() {
 		}
 
 		// is it unknown?
-		if _, isKnown := codex_loader.Parts[block.Part.String()]; isKnown {
+		if _, isKnown := codex.Parts[block.Part.String()]; isKnown {
 			continue
 		}
 

@@ -677,8 +677,28 @@ func TestSerialProblematicSerials3(t *testing.T) {
 			"1",
 		},
 		{
-			"cyclopean multistrike / sequencer + piercer / gun crit+ gun damage",
-			"@Uge8;)m/)}}!tAP`MZGU4s8EM`AB`=MD**r",
+			"discord enhancement",
+			"@Uge8^+m/)}}!t6/-_/YH$",
+			"1",
+		},
+		{
+			"discord gun + hyperion grip",
+			"@UgbV{rFme!K?j_JzRG}7is6;g?ENUGp9qJrvQ+H6OP^D10P$>}",
+			"1",
+		},
+		{
+			"discord gun + no grip",
+			"@UgbV{rFme!K?j_JzRG}7is6;g?ENUGp9qJrvQ+H6OP^C~Q5d",
+			"1",
+		},
+		{
+			"discord destination with unwanted grip",
+			"@UgbV{rFme!Kc0JHoRG/*Fs6;g?Eb1I89cmqFQ)5tdP=8Q;P_t0KP$Ll",
+			"1",
+		},
+		{
+			"discord destination with no grip",
+			"@UgbV{rFme!Kc0JHoRG/*Fs6;g?Eb1I89cmqFQ)5tdP=8Q;P`^+k5d",
 			"1",
 		},
 	}

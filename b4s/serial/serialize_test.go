@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSerializeRoundtrip(t *testing.T) {
+func TestSerializePartsRoundtrip(t *testing.T) {
 	var tests = []struct {
 		name string
 		b85  string

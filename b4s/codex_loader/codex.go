@@ -1,4 +1,4 @@
-package codex
+package codex_loader
 
 import (
 	"borderlands_4_serials/b4s/b85"

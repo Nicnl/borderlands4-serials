@@ -19,6 +19,46 @@ type Serial struct {
 	Blocks []Block
 }
 
+func (s *Serial) FindPartAtPos(pos int, splitLists bool) *part.Part {
+	for _, b := range s.Blocks {
+		if b.Token != serial_tokenizer.TOK_PART {
+			continue
+		}
+
+		switch b.Part.SubType {
+		case part.SUBTYPE_NONE, part.SUBTYPE_INT:
+			if pos == 0 {
+				return &b.Part
+			} else {
+				pos -= 1
+			}
+		case part.SUBTYPE_LIST:
+			if !splitLists {
+				if pos == 0 {
+					return &b.Part
+				} else {
+					pos -= 1
+				}
+			} else {
+				for _, value := range b.Part.Values {
+					subPart := part.Part{
+						Index:   b.Part.Index,
+						SubType: part.SUBTYPE_LIST,
+						Values:  []uint32{value},
+					}
+					if pos == 0 {
+						return &subPart
+					} else {
+						pos -= 1
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 func (s *Serial) String() string {
 	// TODO: we may have to sort the PART blocks by their index to get a repeatable output
 	// (don't forget the subtype list too)
@@ -26,19 +66,32 @@ func (s *Serial) String() string {
 
 	output := ""
 
-	for _, b := range s.Blocks {
+	for i, b := range s.Blocks {
+
 		switch b.Token {
 		case serial_tokenizer.TOK_SEP1:
 			output += "|"
 		case serial_tokenizer.TOK_SEP2:
 			output += ","
 		case serial_tokenizer.TOK_VARINT:
-			output += fmt.Sprintf(" %d", b.Value)
+			if i > 0 {
+				output += " "
+			}
+			output += fmt.Sprintf("%d", b.Value)
 		case serial_tokenizer.TOK_VARBIT:
-			output += fmt.Sprintf(" %d", b.Value)
+			if i > 0 {
+				output += " "
+			}
+			output += fmt.Sprintf("%d", b.Value)
 		case serial_tokenizer.TOK_PART_111:
-			output += fmt.Sprintf(" <111>")
+			if i > 0 {
+				output += " "
+			}
+			output += fmt.Sprintf("<111>")
 		case serial_tokenizer.TOK_PART:
+			if i > 0 {
+				output += " "
+			}
 			output += b.Part.String()
 		default:
 			output += fmt.Sprintf(" <UNKNOWN_TOKEN:%d>", b.Token)

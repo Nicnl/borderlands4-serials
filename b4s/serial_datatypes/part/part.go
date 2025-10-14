@@ -20,11 +20,11 @@ type Part struct {
 func (p *Part) String() string {
 	switch p.SubType {
 	case SUBTYPE_NONE:
-		return fmt.Sprintf(" {%d}", p.Index)
+		return fmt.Sprintf("{%d}", p.Index)
 	case SUBTYPE_INT:
-		return fmt.Sprintf(" {%d:%d}", p.Index, p.Value)
+		return fmt.Sprintf("{%d:%d}", p.Index, p.Value)
 	case SUBTYPE_LIST:
-		output := fmt.Sprintf(" {%d:[", p.Index)
+		output := fmt.Sprintf("{%d:[", p.Index)
 		for i, v := range p.Values {
 			if i != 0 {
 				output += " "

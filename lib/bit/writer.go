@@ -52,6 +52,18 @@ func (bw *Writer) Data() []byte {
 	return bw.data
 }
 
+func (bw *Writer) Bits() []byte {
+	output := make([]byte, bw.pos)
+	for i := 0; i < bw.pos; i++ {
+		if (bw.data[i/8]>>(7-(i%8)))&1 == 1 {
+			output[i] = 1
+		} else {
+			output[i] = 0
+		}
+	}
+	return output
+}
+
 func (bw *Writer) Pos() int {
 	return bw.pos
 }

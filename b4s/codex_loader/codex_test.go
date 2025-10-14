@@ -1,8 +1,10 @@
-package codex
+package codex_loader
 
 import (
 	"borderlands_4_serials/b4s/b85"
+	"borderlands_4_serials/b4s/codex_loader/codex"
 	"borderlands_4_serials/b4s/serial"
+	"borderlands_4_serials/b4s/serial_datatypes/part"
 	"borderlands_4_serials/b4s/serial_tokenizer"
 	"fmt"
 	"sort"
@@ -62,7 +64,7 @@ func TestCodex(t *testing.T) {
 						manufacturerIndex := item.Parsed.Blocks[0].Value
 						fmt.Println("manufacturerIndex:", manufacturerIndex)
 
-						if _, ok := itemTypesByIndex[manufacturerIndex]; !ok {
+						if _, ok := codex.GetItemTypeByIndex(manufacturerIndex); !ok {
 							t.Fatalf("unknown manufacturer index: " + fmt.Sprint(manufacturerIndex))
 						}
 					}
@@ -188,6 +190,7 @@ func TestCodexReserializeRoundtrip(t *testing.T) {
 }
 
 func TestCodesExtractPairSerialsCommonPart(t *testing.T) {
+	return // Disabled, too long
 	// Build:
 	// []part
 	// part -> map[serial]bool
@@ -331,5 +334,121 @@ func TestCodesExtractPairSerialsCommonPart(t *testing.T) {
 			}
 			fmt.Println()
 		}
+	}
+}
+
+func TestListAllUniqueParts(t *testing.T) {
+	var (
+		loadedItems []LoadedItem
+		err         error
+		_           int64
+	)
+	t.Run("LOAD", func(t *testing.T) {
+		SkipFailedItems = true
+		loadedItems, _, err = Codex.Load("database/bl4-serial-matches.json")
+		assert.NoError(t, err)
+	})
+
+	uniqueParts := make(map[string][]LoadedItem)
+	partsPerManufacturer := make(map[string]map[uint32]bool)
+	t.Run("SPLIT_PARTS", func(t *testing.T) {
+		for _, item := range loadedItems {
+			fmt.Println(item.DebugOutput)
+			for _, block := range item.Parsed.Blocks {
+				if block.Token == serial_tokenizer.TOK_PART {
+					switch block.Part.SubType {
+					case part.SUBTYPE_NONE, part.SUBTYPE_INT:
+						uniqueParts[block.Part.String()] = append(uniqueParts[block.Part.String()], item)
+					case part.SUBTYPE_LIST:
+						for _, v := range block.Part.Values {
+							subPart := part.Part{
+								Index:   block.Part.Index,
+								SubType: part.SUBTYPE_LIST,
+								Values:  []uint32{v},
+							}
+							uniqueParts[subPart.String()] = append(uniqueParts[subPart.String()], item)
+						}
+					}
+				}
+			}
+		}
+	})
+
+	for part, nb := range uniqueParts {
+		for _, item := range nb {
+			manufacturer := item.Parsed.Blocks[0].Value
+
+			if _, ok := partsPerManufacturer[part]; !ok {
+				partsPerManufacturer[part] = make(map[uint32]bool)
+			}
+
+			partsPerManufacturer[part][manufacturer] = true
+		}
+	}
+
+	t.Run("DATA", func(t *testing.T) {
+		fmt.Println("len(uniqueParts) =", len(uniqueParts))
+
+		for part, manufacturers := range partsPerManufacturer {
+			fmt.Println()
+			fmt.Println()
+			fmt.Println()
+			fmt.Println("Part:", part, "=> used by", len(manufacturers), "manufacturers")
+			for manufacturerIndex := range manufacturers {
+				manufacturerInfos, ok := codex.GetItemTypeByIndex(manufacturerIndex)
+				if !ok {
+					panic("unknown manufacturer index: " + fmt.Sprint(manufacturerIndex))
+				}
+				fmt.Println("   - ", manufacturerInfos.Type+":"+manufacturerInfos.Manufacturer)
+			}
+		}
+	})
+}
+
+func TestListAllFirstParts(t *testing.T) {
+	var (
+		loadedItems []LoadedItem
+		err         error
+		_           int64
+	)
+	t.Run("LOAD", func(t *testing.T) {
+		SkipFailedItems = true
+		loadedItems, _, err = Codex.Load("database/bl4-serial-matches.json")
+		assert.NoError(t, err)
+	})
+
+	for pos := 0; pos < 20; pos++ {
+		uniqueParts := make(map[string]*part.Part)
+		for _, item := range loadedItems {
+			p := item.Parsed.FindPartAtPos(pos, false)
+			if p != nil {
+				uniqueParts[p.String()] = p
+			}
+		}
+
+		var (
+			countSubtypeNone = 0
+			countSubtypeInt  = 0
+			countSubtypeList = 0
+		)
+
+		for _, p := range uniqueParts {
+			switch p.SubType {
+			case part.SUBTYPE_NONE:
+				countSubtypeNone++
+			case part.SUBTYPE_INT:
+				countSubtypeInt++
+			case part.SUBTYPE_LIST:
+				countSubtypeList++
+			}
+		}
+
+		fmt.Println()
+		fmt.Println()
+		fmt.Println("# Position:", pos)
+		fmt.Println("  Total unique parts:", len(uniqueParts))
+		fmt.Println("  - SUBTYPE_NONE:", countSubtypeNone)
+		fmt.Println("  - SUBTYPE_INT :", countSubtypeInt)
+		fmt.Println("  - SUBTYPE_LIST:", countSubtypeList)
 	}
 }

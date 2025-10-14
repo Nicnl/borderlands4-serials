@@ -2,7 +2,7 @@ package main
 
 import (
 	"borderlands_4_serials/b4s/b85"
-	"borderlands_4_serials/b4s/codex"
+	"borderlands_4_serials/b4s/codex_loader"
 	"borderlands_4_serials/b4s/serial"
 	"borderlands_4_serials/b4s/serial_datatypes/part"
 	"borderlands_4_serials/b4s/serial_tokenizer"
@@ -56,7 +56,7 @@ var (
 	formDataFill  = tview.NewForm()
 	dataFillFrame = tview.NewFrame(formDataFill)
 
-	selectedItem         codex.LoadedItem
+	selectedItem         codex_loader.LoadedItem
 	selectedSerial       = "<NONE>"
 	serialData           = "<NONE>"
 	selectedUnknownParts uint32
@@ -73,16 +73,16 @@ var (
 	modeDiffParts []part.Part
 
 	allParts     = make(map[string]part.Part)
-	partToItems  = make(map[string][]*codex.LoadedItem)
+	partToItems  = make(map[string][]*codex_loader.LoadedItem)
 	unknownParts = []part.Part{}
 
 	injectSaves          = false
 	extractSaves         = false
 	saveInjectionCounter = 0
 	saveInjectionModal   = tview.NewModal().
-		SetText(currentSaveInjectionsString()).
-		AddButtons([]string{"Stop"}).
-		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+				SetText(currentSaveInjectionsString()).
+				AddButtons([]string{"Stop"}).
+				SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			injectSaves = false
 			pages.SwitchToPage("menu")
 		})
@@ -92,7 +92,7 @@ func updateUnknownParts() {
 	// Count unknown parts
 	unknownParts = []part.Part{}
 	for partStr := range allParts {
-		_, isKnown := codex.Parts[partStr]
+		_, isKnown := codex_loader.Parts[partStr]
 		if !isKnown {
 			unknownParts = append(unknownParts, allParts[partStr])
 		}
@@ -129,9 +129,9 @@ func updateDataFillInfos() {
 }
 
 func initializeCodexInfos() {
-	codex.SkipFailedItems = true
+	codex_loader.SkipFailedItems = true
 	var err error
-	loadedItems, _, err = codex.Codex.Load(os.Getenv("CODEX_JSON_RAW_ITEMS"))
+	loadedItems, _, err = codex_loader.Codex.Load(os.Getenv("CODEX_JSON_RAW_ITEMS"))
 	if err != nil {
 		panic(err)
 	}
@@ -188,7 +188,7 @@ func pickItem() {
 		if block.Token == serial_tokenizer.TOK_PART {
 			switch block.Part.SubType {
 			case part.SUBTYPE_NONE, part.SUBTYPE_INT:
-				if _, isKnown := codex.Parts[block.Part.String()]; !isKnown {
+				if _, isKnown := codex_loader.Parts[block.Part.String()]; !isKnown {
 					selectedUnknownParts++
 				}
 				itemBlocks = append(itemBlocks, block)
@@ -200,7 +200,7 @@ func pickItem() {
 						SubType: part.SUBTYPE_INT,
 						Values:  []uint32{subpartValue},
 					}
-					if _, isKnown := codex.Parts[p.String()]; !isKnown {
+					if _, isKnown := codex_loader.Parts[p.String()]; !isKnown {
 						selectedUnknownParts++
 					}
 					itemBlocks = append(itemBlocks, serial.Block{Token: serial_tokenizer.TOK_PART, Part: p})

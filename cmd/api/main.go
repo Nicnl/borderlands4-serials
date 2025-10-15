@@ -58,6 +58,10 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid serial"})
 		}
 
+		fmt.Println("# Deserialize:")
+		fmt.Println(" - From: ", jsonReq.SerialB85)
+		fmt.Println(" - To:   ", item.Serial.String())
+		fmt.Println(" - Infos:", additionalDataFunc(item))
 		c.JSON(http.StatusOK, gin.H{
 			"deserialized":    item.Serial.String(),
 			"additional_data": additionalDataFunc(item),
@@ -89,6 +93,10 @@ func main() {
 			return
 		}
 
+		fmt.Println("# Reserialize:")
+		fmt.Println(" - From: ", jsonReq.Deserialized)
+		fmt.Println(" - To:   ", jsonReq.Deserialized)
+		fmt.Println(" - Infos:", additionalDataFunc(item))
 		c.JSON(http.StatusOK, gin.H{
 			"serial_b85":      item.B85,
 			"additional_data": additionalDataFunc(item),

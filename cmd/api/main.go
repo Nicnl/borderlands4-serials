@@ -77,6 +77,19 @@ func main() {
 			return
 		}
 
+		// Clean the reserialized data
+		{
+			// Add a terminator if missing
+			if !strings.HasSuffix(jsonReq.Deserialized, "|") {
+				jsonReq.Deserialized = jsonReq.Deserialized + "|"
+			}
+
+			// If more than two terminators, keep only the first two
+			for len(jsonReq.Deserialized) >= 2 && jsonReq.Deserialized[len(jsonReq.Deserialized)-1] == '|' && jsonReq.Deserialized[len(jsonReq.Deserialized)-2] == '|' {
+				jsonReq.Deserialized = jsonReq.Deserialized[:len(jsonReq.Deserialized)-1]
+			}
+		}
+
 		s := serial.Serial{}
 		err := s.FromString(jsonReq.Deserialized)
 		if err != nil {

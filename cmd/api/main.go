@@ -32,14 +32,14 @@ func additionalDataFunc(item *codex.Item) string {
 	}
 
 	if baseType, found := item.BaseBarrel(); found {
-		additionalDataArr = append(additionalDataArr, baseType.Name)
-
 		for _, stat := range strings.Split(baseType.Stats, " ") {
 			if strings.Contains(stat, "=") {
 				continue
 			}
 			additionalDataArr = append(additionalDataArr, stat)
 		}
+
+		additionalDataArr = append(additionalDataArr, "\""+baseType.Name+"\"")
 	}
 
 	if len(additionalDataArr) > 0 {

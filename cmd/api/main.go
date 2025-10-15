@@ -55,14 +55,15 @@ func main() {
 
 		item, err := codex.Deserialize(jsonReq.SerialB85)
 		if err != nil {
+			fmt.Fprintln(os.Stderr, "Failed to deserialize:", jsonReq.SerialB85, "=>", err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid serial"})
 			return
 		}
 
-		fmt.Println("# Deserialize:")
-		fmt.Println(" - From: ", jsonReq.SerialB85)
-		fmt.Println(" - To:   ", item.Serial.String())
-		fmt.Println(" - Infos:", additionalDataFunc(item))
+		fmt.Fprintln(os.Stderr, "# Deserialize:")
+		fmt.Fprintln(os.Stderr, " - From: ", jsonReq.SerialB85)
+		fmt.Fprintln(os.Stderr, " - To:   ", item.Serial.String())
+		fmt.Fprintln(os.Stderr, " - Infos:", additionalDataFunc(item))
 		c.JSON(http.StatusOK, gin.H{
 			"deserialized":    item.Serial.String(),
 			"additional_data": additionalDataFunc(item),
@@ -94,6 +95,7 @@ func main() {
 		s := serial.Serial{}
 		err := s.FromString(jsonReq.Deserialized)
 		if err != nil {
+			fmt.Fprintln(os.Stderr, "Failed to import:", jsonReq.Deserialized, "=>", err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid deserialized data"})
 			return
 		}
@@ -103,14 +105,15 @@ func main() {
 
 		item, err := codex.Deserialize(b85Serial)
 		if err != nil {
+			fmt.Fprintln(os.Stderr, "Failed to re-deserialize:", b85Serial, "=>", err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": "failed to re-deserialize data"})
 			return
 		}
 
-		fmt.Println("# Reserialize:")
-		fmt.Println(" - From: ", jsonReq.Deserialized)
-		fmt.Println(" - To:   ", item.B85)
-		fmt.Println(" - Infos:", additionalDataFunc(item))
+		fmt.Fprintln(os.Stderr, "# Reserialize:")
+		fmt.Fprintln(os.Stderr, " - From: ", jsonReq.Deserialized)
+		fmt.Fprintln(os.Stderr, " - To:   ", item.B85)
+		fmt.Fprintln(os.Stderr, " - Infos:", additionalDataFunc(item))
 		c.JSON(http.StatusOK, gin.H{
 			"serial_b85":      item.B85,
 			"additional_data": additionalDataFunc(item),

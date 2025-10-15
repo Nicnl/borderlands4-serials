@@ -42,7 +42,7 @@ func additionalDataFunc(item *codex.Item) string {
 }
 
 func main() {
-	r := gin.New()
+	r := gin.Default()
 
 	r.POST("/api/v1/deserialize", func(c *gin.Context) {
 		var jsonReq struct {

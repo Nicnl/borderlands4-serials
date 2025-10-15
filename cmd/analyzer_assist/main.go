@@ -83,9 +83,9 @@ var (
 	extractSaves         = false
 	saveInjectionCounter = 0
 	saveInjectionModal   = tview.NewModal().
-		SetText(currentSaveInjectionsString()).
-		AddButtons([]string{"Stop"}).
-		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+				SetText(currentSaveInjectionsString()).
+				AddButtons([]string{"Stop"}).
+				SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			injectSaves = false
 			pages.SwitchToPage("menu")
 		})

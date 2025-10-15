@@ -1,0 +1,15 @@
+POST http://127.0.0.1:8080/api/v1/deserialize
+Content-Type: application/json
+
+{
+  "serial_b85": "@Ugr$WBm/$!m!X=5&qXxA;nj3OOD#<4R"
+}
+
+###
+
+POST http://127.0.0.1:8080/api/v1/reserialize
+Content-Type: application/json
+
+{
+  "deserialized": "267, 0, 1, 22| 2, 274|| {7} {1} {245:[23 39 69 79]}|"
+}

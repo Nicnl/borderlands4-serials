@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Borderlands 4 Deserializer / By @Nicnl and @InflamedSebi</title>
+    <script src="https://unpkg.com/vue@3.5.22/dist/vue.global.js"></script>
+</head>
+
+<body>
+
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        font-family: Arial, sans-serif;
+        background-color: #232323;
+        color: white;
+    }
+
+    #app {
+        position: absolute;
+        display: block;
+        width: 100%;
+        left: 0;
+        height: 100%;
+        top: 0;
+    }
+
+    #centerContainer {
+        background-color: #171718;
+        width: 850px;
+        height: 185px;
+        position: absolute;
+        top: calc(50% - 100px);
+        left: calc(50% - 425px);
+        border-radius: 12px;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    #mainTitle {
+        position: absolute;
+        top: -30px;
+        left: 5px;
+    }
+
+    .nice-input {
+        background-color: #202023;
+        height: 28px;
+        width: calc(100% - 18px);
+        border-radius: 6px;
+        border: 1px solid #1C1C1F;
+        outline: 1px solid #343435;
+        margin-bottom: 1px;
+        color: #ccc;
+        padding-left: 9px;
+        padding-right: 9px;
+        font-size: 17px;
+    }
+
+    .nice-input:focus {
+        outline: 1px solid #2863D5;
+    }
+</style>
+
+<div id="app">
+    <div id="centerContainer">
+        <div id="mainTitle">Borderlands 4 Deserializer / By @Nicnl and @InflamedSebi</div>
+
+        <div style="margin-left: 8px;margin-top: 16px;margin-bottom: 8px;font-size: 14px;color: #aaaaaa;">Base85:</div>
+        <input type="text" class="nice-input" placeholder="Enter serial here:   @Ugy3L+2}TYg..." v-model="formBase85">
+        <div style="margin-left: 8px;margin-top: 16px;margin-bottom: 8px;font-size: 14px;color: #aaaaaa;">Deserialized:</div>
+        <input type="text" class="nice-input" placeholder="Enter parts here:   24, 0, 1, 50| 2, 3379..." v-model="formDeserialized">
+        <div style="margin-left: 2px;margin-top: 9px;margin-bottom: 8px;font-size: 16px;color: #aaaaaa;">Status: {{status}}</div>
+    </div>
+
+</div>
+
+<script type="module">
+    const { createApp, ref } = Vue
+
+    function debounce(callback, wait, maxWait) {
+        let timeoutId = null;
+        let lastArgs = null;
+        let lastThis = null;
+        let startTime = null;
+
+        // The function that will eventually execute the callback
+        const executeCallback = () => {
+            callback.apply(lastThis, lastArgs);
+            // Reset after execution
+            startTime = null;
+        };
+
+        return function(...args) {
+            lastArgs = args;
+            lastThis = this; // Capture the 'this' context
+            const now = Date.now();
+
+            // If it's the first call in a series, record the start time
+            if (!startTime) {
+                startTime = now;
+            }
+
+            // Always clear the previous trailing-edge timer
+            clearTimeout(timeoutId);
+
+            const timeSinceStart = now - startTime;
+
+            // Check if the maxWait time has been exceeded
+            if (maxWait && timeSinceStart >= maxWait) {
+                executeCallback();
+            } else {
+                // Otherwise, set a new trailing-edge timer
+                timeoutId = setTimeout(executeCallback, wait);
+            }
+        };
+    };
+
+    createApp({
+
+        data() {
+            return {
+                message: 'hello',
+                status: 'Ready',
+
+                // @Ugy3L+2}TYgOyvyviz?KiBDJYGs9dOW2m
+                formBase85: '',
+                formDeserialized: '',
+
+                currentBase85: '',
+                currentDeserialized: '',
+
+                base85ChangedDebounced: debounce(this.base85Changed, 100, 160),
+                deserializedChangedDebounced: debounce(this.deserializedChanged, 100, 160),
+
+                postingBase85: false,
+                redoPostBase85: false,
+
+                postingDeserialized: false,
+                redoPostDeserialized: false,
+            };
+        },
+
+        methods: {
+            base85Changed() {
+                if (this.currentBase85 !== this.formBase85) {
+                    console.log('formBase85 changed');
+                    this.postDeserialize();
+                }
+            },
+
+            deserializedChanged() {
+                if (this.currentDeserialized !== this.formDeserialized) {
+                    console.log('formDeserialized changed');
+                    this.postReserialize();
+                }
+            },
+
+            async postDeserialize() {
+                if (this.postingDeserialized) return;
+                if (this.postingBase85) {
+                    this.redoPostBase85 = true;
+                    return;
+                }
+                this.postingBase85 = true;
+
+                try {
+                    const response = await fetch('/api/v1/deserialize', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            serial_b85: this.formBase85,
+                        }),
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    console.log(result);
+                    this.status = 'OK' + (result.additional_data ? (' (' + result.additional_data + ')') : '');
+
+                    this.currentBase85 = this.formBase85;
+                    this.currentDeserialized = result.deserialized;
+                    this.formDeserialized = result.deserialized;
+                } catch (error) {
+                    console.error(error.message);
+                    this.status = 'Error: invalid serial';
+
+                    this.currentBase85 = '';
+                    this.currentDeserialized = '';
+                    this.formDeserialized = '';
+                } finally {
+                    this.postingBase85 = false;
+                    if (this.redoPostBase85) {
+                        this.redoPostBase85 = false;
+                        this.postDeserialize();
+                    }
+                }
+            },
+
+            async postReserialize() {
+                if (this.postingBase85) return;
+                if (this.postingDeserialized) {
+                    this.redoPostDeserialized = true;
+                    return;
+                }
+                this.postingDeserialized = true;
+
+                try {
+                    const response = await fetch('/api/v1/reserialize', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            deserialized: this.formDeserialized,
+                        }),
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    console.log(result);
+                    this.status = 'OK' + (result.additional_data ? (' (' + result.additional_data + ')') : '');
+
+                    this.currentDeserialized = this.formDeserialized;
+                    this.currentBase85 = result.serial_b85;
+                    this.formBase85 = result.serial_b85;
+                } catch (error) {
+                    console.error(error.message);
+                    this.status = 'Error: invalid deserialized';
+
+                    this.currentDeserialized = '';
+                    this.currentBase85 = '';
+                    this.formBase85 = '';
+                } finally {
+                    this.postingDeserialized = false;
+                    if (this.redoPostDeserialized) {
+                        this.redoPostDeserialized = false;
+                        this.postReserialize();
+                    }
+                }
+            },
+        },
+
+        watch: {
+            formBase85() {
+                this.base85ChangedDebounced();
+            },
+            formDeserialized() {
+                this.deserializedChangedDebounced();
+            },
+        }
+
+    }).mount('#app')
+</script>
+</body>
+</html>

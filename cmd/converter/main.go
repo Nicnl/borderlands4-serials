@@ -23,7 +23,7 @@ func main() {
 	)
 
 	a := app.New()
-	w := a.NewWindow("Borderlands 4 Deserializer / By @Nicnl and @InflamedSebi")
+	w := a.NewWindow("Borderlands 4 Deserializer v1.0 / By @Nicnl and @InflamedSebi")
 
 	labelBase85 := widget.NewLabel("Base85:")
 	inputBase85 := widget.NewEntry()
@@ -35,7 +35,7 @@ func main() {
 	inputParts.SetPlaceHolder("Enter parts here:   24, 0, 1, 50| 2, 3379...")
 	inputParts.TextStyle = fyne.TextStyle{Monospace: true}
 
-	labelStatus := widget.NewLabel("Status:" + currentStatus)
+	labelStatus := widget.NewLabel("Status: " + currentStatus)
 
 	deferUpdateData := func(updateBase85 bool, updateParts bool) {
 		if updateBase85 {

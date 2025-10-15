@@ -108,7 +108,7 @@ func main() {
 
 		fmt.Println("# Reserialize:")
 		fmt.Println(" - From: ", jsonReq.Deserialized)
-		fmt.Println(" - To:   ", jsonReq.Deserialized)
+		fmt.Println(" - To:   ", item.B85)
 		fmt.Println(" - Infos:", additionalDataFunc(item))
 		c.JSON(http.StatusOK, gin.H{
 			"serial_b85":      item.B85,

@@ -56,6 +56,7 @@ func main() {
 		item, err := codex.Deserialize(jsonReq.SerialB85)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid serial"})
+			return
 		}
 
 		fmt.Println("# Deserialize:")

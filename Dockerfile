@@ -8,7 +8,7 @@ RUN go mod download -x
 
 # 2) Add sources and compile
 ADD . .
-RUN GOOS=linux go build -ldflags "-s -w" -v -o /borderlands_4_serials ./cmd/api
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -v -o /borderlands_4_serials ./cmd/api
 
 
 FROM scratch

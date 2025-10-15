@@ -2,8 +2,10 @@ package main
 
 import (
 	"borderlands_4_serials/b4s/b85"
+	"borderlands_4_serials/b4s/codex"
 	"borderlands_4_serials/b4s/serial"
 	"fmt"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -13,24 +15,27 @@ import (
 
 func main() {
 	var (
-		currentBase85 = ""
-		currentParts  = ""
-		currentStatus = "Ready"
-		currentSerial serial.Serial
+		currentBase85      = ""
+		currentParts       = ""
+		currentStatus      = "Ready"
+		currentStatusError = false
+		currentItem        codex.Item
 	)
 
 	a := app.New()
-	w := a.NewWindow("Borderlands 4 Serial Converter")
+	w := a.NewWindow("Borderlands 4 Deserializer / By @Nicnl and @InflamedSebi")
 
 	labelBase85 := widget.NewLabel("Base85:")
 	inputBase85 := widget.NewEntry()
 	inputBase85.SetPlaceHolder("Enter serial here:   @Ugy3L+2}TYg...")
+	//inputBase85.TextStyle = fyne.TextStyle{Monospace: true}
 
 	labelParts := widget.NewLabel("Parts:")
 	inputParts := widget.NewEntry()
 	inputParts.SetPlaceHolder("Enter parts here:   24, 0, 1, 50| 2, 3379...")
+	inputParts.TextStyle = fyne.TextStyle{Monospace: true}
 
-	labelStatus := widget.NewLabel("Status: " + currentStatus)
+	labelStatus := widget.NewLabel("Status:" + currentStatus)
 
 	deferUpdateData := func(updateBase85 bool, updateParts bool) {
 		if updateBase85 {
@@ -41,61 +46,71 @@ func main() {
 		}
 
 		if currentBase85 != "" && currentParts != "" {
-			additionalData := ""
-			if level, found := currentSerial.FindLevel(); found {
-				additionalData += "L" + fmt.Sprint(level)
-			}
-			if additionalData != "" {
-				additionalData += " "
+			additionalDataArr := []string{}
+
+			if level, found := currentItem.Level(); found {
+				additionalDataArr = append(additionalDataArr, "L"+fmt.Sprint(level))
 			}
 
-			if itemType, found := currentSerial.FindItemType(); found {
-				additionalData += itemType.Type + ":" + itemType.Manufacturer
+			if itemType, found := currentItem.Type(); found {
+				additionalDataArr = append(additionalDataArr, itemType.Type+":"+itemType.Manufacturer)
 			} else {
-				additionalData += "?"
+				additionalDataArr = append(additionalDataArr, "?")
 			}
-			if additionalData != "" {
-				currentStatus += " (" + additionalData + ")"
+
+			if baseType, found := currentItem.BaseBarrel(); found {
+				additionalDataArr = append(additionalDataArr, baseType.Name)
+			}
+
+			if len(additionalDataArr) > 0 {
+				currentStatus += " (" + strings.Join(additionalDataArr, " ") + ")"
 			}
 		}
 
 		labelStatus.SetText("Status: " + currentStatus)
+		if currentStatusError {
+		} else {
+		}
 	}
 
-	inputBase85.OnChanged = func(str string) {
-		if str == currentBase85 {
+	inputBase85.OnChanged = func(serialB85 string) {
+		if serialB85 == currentBase85 {
 			return
 		}
 
 		defer deferUpdateData(false, true)
 
-		data, err := b85.Decode(str)
+		item, err := codex.Deserialize(serialB85)
 		if err != nil {
 			currentBase85 = ""
 			currentParts = ""
-			currentStatus = "ERROR: " + err.Error()
-			currentSerial = serial.Serial{}
+			//currentStatus = "ERROR: " + err.Error()
+			currentStatus = "ERROR: Invalid serial"
+			currentItem = codex.Item{}
+			currentStatusError = true
 			return
 		}
 
-		deserialized, err := serial.Deserialize(data)
-		if err != nil {
-			currentBase85 = ""
-			currentParts = ""
-			currentStatus = "ERROR: " + err.Error()
-			currentSerial = serial.Serial{}
-			return
-		}
-
-		currentBase85 = str
-		currentParts = deserialized.String()
+		currentBase85 = serialB85
+		currentParts = item.Serial.String()
 		currentStatus = "OK"
-		currentSerial = deserialized
+		currentItem = *item
+		currentStatusError = false
 	}
 
 	inputParts.OnChanged = func(str string) {
 		if str == currentParts {
 			return
+		}
+
+		// Add a terminator if missing
+		if !strings.HasSuffix(str, "|") {
+			str = str + "|"
+		}
+
+		// If more than two terminators, keep only the first two
+		for len(str) >= 2 && str[len(str)-1] == '|' && str[len(str)-2] == '|' {
+			str = str[:len(str)-1]
 		}
 
 		defer deferUpdateData(true, false)
@@ -105,8 +120,10 @@ func main() {
 		if err != nil {
 			currentBase85 = ""
 			currentParts = ""
-			currentStatus = "ERROR: " + err.Error()
-			currentSerial = serial.Serial{}
+			//currentStatus = "ERROR: " + err.Error()
+			currentStatus = "ERROR: Invalid parts"
+			currentItem = codex.Item{}
+			currentStatusError = true
 			return
 		}
 
@@ -116,7 +133,11 @@ func main() {
 		currentBase85 = encoded
 		currentParts = str
 		currentStatus = "OK"
-		currentSerial = s
+		currentItem = codex.Item{
+			B85:    currentBase85,
+			Serial: s,
+		}
+		currentStatusError = false
 	}
 
 	w.SetContent(container.NewVBox(
@@ -126,6 +147,7 @@ func main() {
 		inputParts,
 		labelStatus,
 	))
-	w.Resize(fyne.NewSize(700, 1))
+	w.Resize(fyne.NewSize(850, 1))
+	w.SetFixedSize(true)
 	w.ShowAndRun()
 }

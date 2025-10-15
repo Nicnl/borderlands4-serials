@@ -1,8 +1,10 @@
+//go:build ignore
+
 package main
 
 import (
 	"borderlands_4_serials/b4s/b85"
-	"borderlands_4_serials/b4s/codex_loader"
+	"borderlands_4_serials/b4s/codex"
 	"borderlands_4_serials/b4s/serial"
 	"crypto/md5"
 	"encoding/json"
@@ -21,7 +23,7 @@ import (
 var (
 	MODE_SINGLE_PART = false
 
-	loadedItems []codex_loader.LoadedItem
+	loadedItems []codex.LoadedItem
 
 	app   = tview.NewApplication()
 	pages = tview.NewPages()
@@ -32,7 +34,7 @@ var (
 	formDataFill  = tview.NewForm()
 	dataFillFrame = tview.NewFrame(formDataFill)
 
-	selectedItem         codex_loader.LoadedItem
+	selectedItem         codex.LoadedItem
 	selectedSerial       = "<NONE>"
 	serialData           = "<NONE>"
 	selectedUnknownParts uint32
@@ -65,9 +67,9 @@ func updateDataFillInfos() {
 }
 
 func initializeCodexInfos() {
-	codex_loader.SkipFailedItems = true
+	codex.SkipFailedItems = true
 	var err error
-	loadedItems, _, err = codex_loader.Codex.Load(os.Getenv("CODEX_JSON_RAW_ITEMS"))
+	loadedItems, _, err = codex.Codex.Load(os.Getenv("CODEX_JSON_RAW_ITEMS"))
 	if err != nil {
 		panic(err)
 	}

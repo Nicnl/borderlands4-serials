@@ -9,17 +9,17 @@ import (
 	"io"
 )
 
-func Deserialize(data []byte) (Serial, error) {
+func Deserialize(data []byte) (Serial, string, error) {
 	t := serial_tokenizer.NewTokenizer(data)
 
 	// Expect the magic header as the first bits
 	if err := t.Expect("magic header", 0, 0, 1, 0, 0, 0, 0); err != nil {
-		return Serial{}, err
+		return nil, "", err
 	}
 
 	var (
 		br     = t.BitReader()
-		output = Serial{Blocks: make([]Block, 0, 50)} // Preallocate some space for performance
+		blocks = make([]Block, 0, 50) // Preallocate some space for performance
 
 		// Keep track of the trailing terminators for sanitization later
 		trailingTerminators = 0
@@ -35,7 +35,7 @@ OUTER:
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return Serial{}, err
+			return nil, "", err
 		}
 
 		block := Block{
@@ -59,21 +59,21 @@ OUTER:
 		case serial_tokenizer.TOK_VARINT:
 			v, err := varint.Read(br)
 			if err != nil {
-				return Serial{}, err
+				return nil, "", err
 			}
 			block.Value = v
 
 		case serial_tokenizer.TOK_VARBIT:
 			v, err := varbit.Read(br)
 			if err != nil {
-				return Serial{}, err
+				return nil, "", err
 			}
 			block.Value = v
 
 		case serial_tokenizer.TOK_PART:
 			p, err := part.Read(t)
 			if err != nil {
-				return Serial{}, err
+				return nil, "", err
 			}
 
 			block.Part = p
@@ -91,22 +91,21 @@ OUTER:
 			} else {
 				// If we did NOT find any part blocks, then this is probably a DLC item
 				// We stop here and fail
-				return Serial{}, fmt.Errorf("unsupported PART_111 block found, aborting")
+				return nil, "", fmt.Errorf("unsupported PART_111 block found, aborting")
 			}
 		default:
-			return Serial{}, fmt.Errorf("unknown token %d", token)
+			return nil, "", fmt.Errorf("unknown token %d", token)
 		}
 
-		output.Blocks = append(output.Blocks, block)
+		blocks = append(blocks, block)
 	}
 
 	// Sanitization: we probably read the zero-padding as terminators.
 	// Only one terminator is needed, remove the extra ones
 	for trailingTerminators > 1 {
-		output.Blocks = output.Blocks[:len(output.Blocks)-1]
+		blocks = blocks[:len(blocks)-1]
 		trailingTerminators--
 	}
 
-	output.Bits = t.DoneString()
-	return output, nil
+	return blocks, t.DoneString(), nil
 }

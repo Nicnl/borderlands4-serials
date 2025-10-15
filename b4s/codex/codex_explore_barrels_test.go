@@ -1,16 +1,13 @@
-package codex_loader
+package codex
 
 import (
 	"borderlands_4_serials/b4s/b85"
-	"borderlands_4_serials/b4s/codex"
 	"borderlands_4_serials/b4s/serial"
 	"borderlands_4_serials/b4s/serial_datatypes/part"
 	"borderlands_4_serials/b4s/serial_tokenizer"
 	"fmt"
 	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func _serialsToYaml(serials []string) {
@@ -30,17 +27,6 @@ func _serialsToYaml(serials []string) {
 }
 
 func TestConstructBasesWithParts(t *testing.T) {
-	var (
-		loadedItems []codex.LoadedItem
-		err         error
-		_           int64
-	)
-	t.Run("LOAD", func(t *testing.T) {
-		codex.SkipFailedItems = true
-		loadedItems, _, err = codex.Codex.Load("database/bl4-serial-matches.json")
-		assert.NoError(t, err)
-	})
-
 	type WeaponBase struct {
 		manufacturerIndex uint32
 		baseIndex         uint32
@@ -50,14 +36,14 @@ func TestConstructBasesWithParts(t *testing.T) {
 	weaponBases := make(map[WeaponBase]map[string]bool)
 
 	t.Run("EXTRACT_BASES", func(t *testing.T) {
-		for _, item := range loadedItems {
+		for _, jsonItem := range Codex.JsonItems {
 
-			manufacturerIndex, found := item.FindIntAtPos(0)
+			manufacturerIndex, found := jsonItem.Item.FindIntAtPos(0)
 			if !found {
 				continue
 			}
 
-			itemType, found := codex.GetItemTypeByIndex(manufacturerIndex)
+			itemType, found := GetItemTypeByIndex(manufacturerIndex)
 			if !found {
 				continue
 			}
@@ -69,7 +55,7 @@ func TestConstructBasesWithParts(t *testing.T) {
 				continue
 			}
 
-			baseIndexPart := item.Serial.FindPartAtPos(0, false)
+			baseIndexPart := jsonItem.Item.FindPartAtPos(0, false)
 			if baseIndexPart == nil {
 				continue
 			}
@@ -88,7 +74,7 @@ func TestConstructBasesWithParts(t *testing.T) {
 
 			pos := 1
 			for {
-				p := item.Serial.FindPartAtPos(pos, true)
+				p := jsonItem.Item.FindPartAtPos(pos, true)
 				if p == nil {
 					break
 				}
@@ -117,25 +103,21 @@ func TestConstructBasesWithParts(t *testing.T) {
 				if !found {
 					continue
 				}
-				s := serial.Serial{
-					Blocks: []serial.Block{
-						{Token: serial_tokenizer.TOK_VARINT, Value: weaponBase.manufacturerIndex},
-						{Token: serial_tokenizer.TOK_SEP2},
-						{Token: serial_tokenizer.TOK_VARINT, Value: 0}, // Unknown, always zero
-						{Token: serial_tokenizer.TOK_SEP2},
-						{Token: serial_tokenizer.TOK_VARINT, Value: 1}, // Unknown, always one before the level
-						{Token: serial_tokenizer.TOK_SEP2},
-						{Token: serial_tokenizer.TOK_VARINT, Value: 50}, // Level 50
-						{Token: serial_tokenizer.TOK_SEP1},
-						{Token: serial_tokenizer.TOK_SEP1},
-						{Token: serial_tokenizer.TOK_PART, Part: part.Part{Index: weaponBase.baseIndex, SubType: part.SUBTYPE_NONE}},
-						{Token: serial_tokenizer.TOK_PART, Part: curPart},
-						{Token: serial_tokenizer.TOK_SEP1},
-					},
-				}
 
-				data := serial.Serialize(s)
-				encoded := b85.Encode(data)
+				encoded := b85.Encode(serial.Serialize([]serial.Block{
+					{Token: serial_tokenizer.TOK_VARINT, Value: weaponBase.manufacturerIndex},
+					{Token: serial_tokenizer.TOK_SEP2},
+					{Token: serial_tokenizer.TOK_VARINT, Value: 0}, // Unknown, always zero
+					{Token: serial_tokenizer.TOK_SEP2},
+					{Token: serial_tokenizer.TOK_VARINT, Value: 1}, // Unknown, always one before the level
+					{Token: serial_tokenizer.TOK_SEP2},
+					{Token: serial_tokenizer.TOK_VARINT, Value: 50}, // Level 50
+					{Token: serial_tokenizer.TOK_SEP1},
+					{Token: serial_tokenizer.TOK_SEP1},
+					{Token: serial_tokenizer.TOK_PART, Part: part.Part{Index: weaponBase.baseIndex, SubType: part.SUBTYPE_NONE}},
+					{Token: serial_tokenizer.TOK_PART, Part: curPart},
+					{Token: serial_tokenizer.TOK_SEP1},
+				}))
 				fmt.Printf("  // ManufacturerIndex: %d, BaseIndex: %d\n", weaponBase.manufacturerIndex, weaponBase.baseIndex)
 				fmt.Printf("  \"%s\",\n", encoded)
 				serialsToTest = append(serialsToTest, encoded)

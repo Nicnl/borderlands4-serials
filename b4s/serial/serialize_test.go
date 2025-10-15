@@ -93,7 +93,7 @@ func TestSerializePartsRoundtrip(t *testing.T) {
 			data, err := b85.Decode(tt.b85)
 			assert.NoError(t, err)
 
-			serial, err := Deserialize(data)
+			serial, _, err := Deserialize(data)
 			assert.NoError(t, err)
 			fmt.Println("Parsed:", serial.String())
 

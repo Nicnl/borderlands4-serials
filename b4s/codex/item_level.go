@@ -18,10 +18,10 @@ func (i *Item) FindIntAtPos(pos int) (uint32, bool) {
 	return 0, false
 }
 
-// FindLevel finds the level in the serial.
+// Level finds the level in the serial.
 // The level is stored as a pair of varints: (marker, level).
 // Level seems to be after the marker "1".
-func (i *Item) FindLevel() (uint32, bool) {
+func (i *Item) Level() (uint32, bool) {
 	pos := 2
 	for {
 		value, found := i.FindIntAtPos(pos)

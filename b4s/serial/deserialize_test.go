@@ -131,12 +131,12 @@ func TestSerialTokenize1(t *testing.T) {
 			data, err := b85.Decode(tt.serial)
 			assert.NoError(t, err)
 
-			parsed, err := Deserialize(data)
+			blocks, bits, err := Deserialize(data)
 			assert.NoError(t, err)
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			fmt.Println("Result:", parsed.String())
-			fmt.Println("Bitstream:", parsed.Bits)
+			fmt.Println("Result:", blocks.String())
+			fmt.Println("Bitstream:", bits)
 			fmt.Println()
 			fmt.Println()
 		})
@@ -248,10 +248,10 @@ func TestSerialTokenizeVexClassMods(t *testing.T) {
 
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			parsed, err := Deserialize(data)
+			blocks, bits, err := Deserialize(data)
 			assert.NoError(t, err)
-			fmt.Println("Result:", parsed.String())
-			fmt.Println("Bits:", parsed.Bits)
+			fmt.Println("Result:", blocks.String())
+			fmt.Println("Bits:", bits)
 		})
 	}
 }
@@ -291,10 +291,10 @@ func TestSerialTokenizeFirmware(t *testing.T) {
 
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			parsed, err := Deserialize(data)
+			blocks, bits, err := Deserialize(data)
 			assert.NoError(t, err)
-			fmt.Println("Result:", parsed.String())
-			fmt.Println("Bits:", parsed.Bits)
+			fmt.Println("Result:", blocks.String())
+			fmt.Println("Bits:", bits)
 		})
 	}
 }
@@ -377,12 +377,12 @@ func TestSerialRandom(t *testing.T) {
 			data, err := b85.Decode(tt.serial)
 			assert.NoError(t, err)
 
-			parsed, err := Deserialize(data)
+			blocks, bits, err := Deserialize(data)
 			assert.NoError(t, err)
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			fmt.Println("Result:", parsed.String())
-			fmt.Println("Bits:", parsed.Bits)
+			fmt.Println("Result:", blocks.String())
+			fmt.Println("Bits:", bits)
 		})
 	}
 }
@@ -547,10 +547,10 @@ func TestSerialProblematicSerials2(t *testing.T) {
 
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			parsed, err := Deserialize(data)
+			blocks, bits, err := Deserialize(data)
 			assert.NoError(t, err)
-			fmt.Println("Result:", parsed.String())
-			fmt.Println("Bits:", parsed.Bits)
+			fmt.Println("Result:", blocks.String())
+			fmt.Println("Bits:", bits)
 		})
 	}
 }
@@ -710,10 +710,10 @@ func TestSerialProblematicSerials3(t *testing.T) {
 
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
-			parsed, err := Deserialize(data)
+			blocks, bits, err := Deserialize(data)
 			assert.NoError(t, err)
-			fmt.Println("Result:", parsed.String())
-			fmt.Println("Bits:", parsed.Bits)
+			fmt.Println("Result:", blocks.String())
+			fmt.Println("Bits:", bits)
 		})
 	}
 }
@@ -750,12 +750,12 @@ func TestSerialCompareBuybacks(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			dataOriginal, err := b85.Decode(tt.serialOriginal)
 			assert.NoError(t, err)
-			parsedOriginal, err := Deserialize(dataOriginal)
+			parsedOriginal, _, err := Deserialize(dataOriginal)
 			assert.NoError(t, err)
 
 			dataBuyback, err := b85.Decode(tt.serialBuyback)
 			assert.NoError(t, err)
-			parsedBuyback, err := Deserialize(dataBuyback)
+			parsedBuyback, _, err := Deserialize(dataBuyback)
 			assert.NoError(t, err)
 
 			fmt.Println("Original:", parsedOriginal.String())

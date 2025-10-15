@@ -14,7 +14,7 @@ func Serialize(s Serial) []byte {
 	// Write magic header
 	bw.WriteBits(0, 0, 1, 0, 0, 0, 0)
 
-	for _, block := range s.Blocks {
+	for _, block := range s {
 		// Write the token (aka: major type)
 		switch block.Token {
 		case serial_tokenizer.TOK_SEP1:

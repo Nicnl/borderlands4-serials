@@ -195,7 +195,7 @@ func (s *Serial) FromString(str string) error {
 				})
 				//fmt.Println("    Add block:", blocks[len(blocks)-1])
 			} else {
-				return fmt.Errorf("invalid varint: '%s'", buffer)
+				return fmt.Errorf("invalid integer: '%s'", buffer)
 			}
 		}
 
@@ -225,9 +225,8 @@ func (s *Serial) FromString(str string) error {
 		to++
 	}
 
-	s.Blocks = blocks
-
 	//fmt.Println("FINAL:", s.String())
+	*s = blocks
 
 	return nil
 }

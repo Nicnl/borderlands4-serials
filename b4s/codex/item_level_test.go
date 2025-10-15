@@ -10,7 +10,7 @@ func TestFindLevel(t *testing.T) {
 	item, err := Deserialize("@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf{00")
 	assert.NoError(t, err)
 
-	level, found := item.FindLevel()
+	level, found := item.Level()
 	assert.True(t, found)
 	assert.Equal(t, uint32(50), level)
 }

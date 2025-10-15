@@ -6,449 +6,129 @@ import (
 	"borderlands_4_serials/b4s/serial_datatypes/part"
 	"borderlands_4_serials/b4s/serial_tokenizer"
 	"fmt"
-	"sort"
-	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
-func TestCodex(t *testing.T) {
-	return
-	var (
-		loadedItems []LoadedItem
-		err         error
-		nbFails     int64
-	)
-	t.Run("LOAD", func(t *testing.T) {
-		loadedItems, nbFails, err = Codex.Load("database/bl4-serial-matches.json")
-		assert.NoError(t, err)
-	})
-
-	t.Run(fmt.Sprintf("%d_fails", nbFails), func(t *testing.T) {
-		for _, item := range loadedItems {
-			if item.Error != "" {
-				t.Run(item.Type+"__"+item.Error+"__"+item.Name, func(t *testing.T) {
-					t.Fail()
-
-					fmt.Println("Item:", item.Name+" ("+item.Type+")"+item.Manufacturer)
-					fmt.Println("Serial:", item.Serial)
-					fmt.Println("Bits:", item.Bits)
-					fmt.Println("Decoded:", item.DebugOutput)
-					fmt.Println("Error:", item.Error)
-
-					if strings.Contains(strings.ReplaceAll(item.Bits, " ", ""), "101100001011100001011110001010111101001000101011111111000010101000010010001010100001100000101010101110000010101111111000001010101111100000101010001101000010101110110100001000") {
-						//panic("found")
-					}
-				})
-			}
-		}
-	})
-
-	t.Run(fmt.Sprintf("%d_success", len(loadedItems)-int(nbFails)), func(t *testing.T) {
-		for _, item := range loadedItems {
-			if item.Error == "" {
-				t.Run(item.Type+"__"+item.Error+"__"+item.Name, func(t *testing.T) {
-
-					fmt.Println("Item:", item.Name+" ("+item.Type+")"+item.Manufacturer)
-					fmt.Println("Serial:", item.Serial)
-					fmt.Println("Bits:", item.Bits)
-					fmt.Println("Decoded:", item.DebugOutput)
-					fmt.Println("Error:", item.Error)
-					fmt.Println("Name:", item.Name)
-					fmt.Println("Manufacturer:", item.Manufacturer)
-					fmt.Println("WeaponType:", item.WeaponType)
-					fmt.Println("ManufacturerWeaponType:", item.ManufacturerWeaponType)
-
-					if len(item.Serial.Blocks) > 0 {
-						manufacturerIndex := item.Serial.Blocks[0].Value
-						fmt.Println("manufacturerIndex:", manufacturerIndex)
-
-						if _, ok := GetItemTypeByIndex(manufacturerIndex); !ok {
-							t.Fatalf("unknown manufacturer index: " + fmt.Sprint(manufacturerIndex))
-						}
-					}
-
-					if strings.Contains(strings.ReplaceAll(item.Bits, " ", ""), "101100001011100001011110001010111101001000101011111111000010101000010010001010100001100000101010101110000010101111111000001010101111100000101010001101000010101110110100001000") {
-						//panic("found")
-					}
-				})
-			}
-		}
-	})
-
-	if len(loadedItems) > 0 {
-		// Sort loadedItems by shortest serial length
-		sort.Slice(loadedItems, func(i, j int) bool {
-			return len(loadedItems[i].RawSerial) > len(loadedItems[j].RawSerial)
-		})
-
-		// Print top 10 shortest problematic items
-
-		t.Run("TOP_10_SHORTEST_FAILS", func(t *testing.T) {
-			limit := 2500
-			if len(loadedItems) < limit {
-				limit = len(loadedItems)
-			}
-			for i := 0; i < limit; i++ {
-				item := loadedItems[i]
-				t.Run(item.Type+"__"+item.Error+"__"+item.Name, func(t *testing.T) {
-					if item.Error != "" {
-						t.Fail()
-					}
-					fmt.Println("Item:", item.Name+" ("+item.Type+")"+item.Manufacturer)
-					fmt.Println("Serial:", item.Serial)
-					fmt.Println("Bits:", item.Bits)
-					fmt.Println("Decoded:", item.DebugOutput)
-					fmt.Println("Error:", item.Error)
-				})
-			}
-		})
-
-		// For each loadedItems, calculate their score
-		// The score is how many continous zeroes starting from right
-		for i := range loadedItems {
-			item := &loadedItems[i]
-			bytes, err := b85.Decode(item.RawSerial)
-			if err != nil {
-				continue
-			}
-			binStr := ""
-			for _, b := range bytes {
-				binStr += fmt.Sprintf("%08b", b)
-			}
-			score := int64(0)
-			for j := len(binStr) - 1; j >= 0; j-- {
-				if binStr[j] == '0' {
-					score++
-				} else {
-					break
-				}
-			}
-			item.Score = score
-		}
-
-		// Sort loadedItems by score
-		sort.Slice(loadedItems, func(i, j int) bool {
-			return loadedItems[i].Score < loadedItems[j].Score
-		})
-
-		t.Run("TOP_10_HIGHEST_SCORE", func(t *testing.T) {
-			limit := 10
-			if len(loadedItems) < limit {
-				limit = len(loadedItems)
-			}
-			for i := 0; i < limit; i++ {
-				item := loadedItems[i]
-				t.Run(fmt.Sprintf("%d__%s__%s", item.Score, item.Type, item.Name), func(t *testing.T) {
-					if item.Error != "" {
-						t.Fail()
-					}
-					fmt.Println("Item:", item.Name+" ("+item.Type+")"+item.Manufacturer)
-					fmt.Println("Score:", item.Score)
-					fmt.Println("Serial:", item.Serial)
-					fmt.Println("Bits:", item.Bits)
-					fmt.Println("Decoded:", item.DebugOutput)
-					fmt.Println("Error:", item.Error)
-				})
-			}
-		})
-	}
-}
-
-func TestCodexReserializeRoundtrip(t *testing.T) {
-	var (
-		loadedItems []LoadedItem
-		err         error
-	)
-	t.Run("LOAD", func(t *testing.T) {
-		loadedItems, _, err = Codex.Load("database/bl4-serial-matches.json")
-		assert.NoError(t, err)
-	})
-
-	t.Run("round_trip", func(t *testing.T) {
-		for _, item := range loadedItems {
-			if item.Error != "" {
-				continue
-			}
-
-			t.Run(item.Type+"__"+item.Error+"__"+item.Name, func(t *testing.T) {
-				expectedSerial := strings.Trim(item.RawSerial, "\"")
-
-				serializedData := serial.Serialize(item.Serial)
-				assert.NoError(t, err)
-
-				reserializedB85 := b85.Encode(serializedData)
-				assert.Equal(t, expectedSerial, reserializedB85)
-
-				fmt.Println("Decoded:     ", item.DebugOutput)
-				fmt.Println("Original:    ", expectedSerial)
-				fmt.Println("Reserialized:", reserializedB85)
-			})
-		}
-	})
-}
-
-func TestCodesExtractPairSerialsCommonPart(t *testing.T) {
-	return // Disabled, too long
-	// Build:
-	// []part
-	// part -> map[serial]bool
-	// serial -> map[part]bool
-
-	var (
-		loadedItems []LoadedItem
-		err         error
-		_           int64
-	)
-	t.Run("LOAD", func(t *testing.T) {
-		loadedItems, _, err = Codex.Load("database/bl4-serial-matches.json")
-		assert.NoError(t, err)
-	})
-
-	partToItem := make(map[string][]*LoadedItem, 0)
-	t.Run("GROUP_BY_PARTS_TO_ITEM", func(t *testing.T) {
-		for _, item := range loadedItems {
-			if item.Error != "" {
-				continue
-			}
-
-			for _, block := range item.Serial.Blocks {
-				if block.Token == serial_tokenizer.TOK_PART {
-					if len(block.Part.Values) > 0 {
-						continue
-					}
-
-					partStr := block.Part.String()
-					if _, ok := partToItem[partStr]; !ok {
-						partToItem[partStr] = make([]*LoadedItem, 0)
-					}
-
-					partToItem[partStr] = append(partToItem[partStr], &item)
-				}
-			}
-		}
-		fmt.Println("len(partToItem) =", len(partToItem))
-	})
-
-	serialToParts := make(map[string][]string, 0)
-	serialToItem := make(map[string]*LoadedItem, 0)
-	t.Run("GROUP_BY_SERIAL_TO_PARTS", func(t *testing.T) {
-		for _, item := range loadedItems {
-			if item.Error != "" {
-				continue
-			}
-
-			serialToItem[item.RawSerial] = &item
-
-			if _, ok := serialToParts[item.RawSerial]; !ok {
-				serialToParts[item.RawSerial] = make([]string, 0)
-			}
-
-			for _, block := range item.Serial.Blocks {
-				if block.Token == serial_tokenizer.TOK_PART {
-					if len(block.Part.Values) > 0 {
-						continue
-					}
-
-					partStr := block.Part.String()
-					serialToParts[item.RawSerial] = append(serialToParts[item.RawSerial], partStr)
-				}
-			}
-		}
-		fmt.Println("len(serialToParts) =", len(serialToParts))
-	})
-
-	partPairs := make(map[string][][2]string, 0)
-
-	for part := range partToItem {
-		// For each part, we'll get its items
-		itemsHavingThisPart := partToItem[part]
-
-		pairs := make([][2]string, 0)
-		partPairs[part] = pairs
-
-		// We base on each item as a pivvot
-		for _, pivotItem := range itemsHavingThisPart {
-			// For each item having this part, we check if they have other parts in common
-			for _, otherItem := range itemsHavingThisPart {
-				if pivotItem == otherItem {
-					continue
-				}
-
-				// We want to verify is the only part in common is `part`
-				// If there are common parts, we stop
-				hasOtherCommonPart := false
-
-			OUTER:
-				for _, pivotPart := range serialToParts[pivotItem.RawSerial] {
-					if pivotPart == part {
-						continue
-					}
-
-					item1 := serialToItem[pivotItem.RawSerial]
-
-					for _, otherPart := range serialToParts[otherItem.RawSerial] {
-						if otherPart == part {
-							continue
-						}
-
-						item2 := serialToItem[otherItem.RawSerial]
-
-						// If different manufacturers, skip
-						if item1.Serial.Blocks[0].Value != item2.Serial.Blocks[0].Value {
-							continue
-						}
-
-						if pivotPart == otherPart {
-							hasOtherCommonPart = true
-							break OUTER
-						}
-					}
-				}
-
-				//fmt.Println(part, "=>", hasOtherCommonPart)
-				if !hasOtherCommonPart {
-					partPairs[part] = append(partPairs[part], [2]string{
-						pivotItem.RawSerial,
-						otherItem.RawSerial,
-					})
-				}
-			}
-		}
-	}
-
-	// Print the results
-	for part, pairs := range partPairs {
-		if len(pairs) > 0 {
-			fmt.Println("Part:", part)
-			for _, pair := range pairs {
-				// obtain the two items
-				item1 := serialToItem[pair[0]]
-				item2 := serialToItem[pair[1]]
-
-				fmt.Println("  - ", pair[0], "("+item1.Name+")")
-				fmt.Println("  - ", pair[1], "("+item2.Name+")")
-
+func TestCodesMachin(t *testing.T) {
+	// Collect all parts
+	mapParts := make(map[string]part.Part)
+	for _, jsonItem := range Codex.JsonItems {
+		pos := 1
+		for {
+			p := jsonItem.Item.FindPartAtPos(pos, true)
+			pos++
+			if p == nil {
 				break
 			}
-			fmt.Println()
+
+			if p.SubType != part.SUBTYPE_NONE {
+				continue
+			}
+
+			mapParts[p.String()] = *p
 		}
 	}
+
+	// Group parts by barrel base
+	baseToParts := make(map[BaseBarrel]map[uint32]bool)
+	for _, jsonItem := range Codex.JsonItems {
+		base, found := jsonItem.Item.BaseBarrel()
+		if !found {
+			//fmt.Println("no base barrel found for " + jsonItem.Name)
+			continue
+		}
+
+		if _, exists := baseToParts[base.BaseBarrel]; !exists {
+			baseToParts[base.BaseBarrel] = make(map[uint32]bool)
+		}
+
+		pos := 1
+		for {
+			p := jsonItem.Item.FindPartAtPos(pos, true)
+			pos++
+			if p == nil {
+				break
+			}
+
+			if p.SubType != part.SUBTYPE_NONE {
+				continue
+			}
+
+			if p.Index == base.BaseBarrel.BarrelIndex {
+				// Skip the barrel part itself
+				continue
+			}
+
+			if _, exists := baseToParts[base.BaseBarrel][p.Index]; !exists {
+				baseToParts[base.BaseBarrel][p.Index] = true
+			}
+		}
+	}
+
+	combinations := 0
+	fmt.Println("Total parts", len(mapParts))
+	fmt.Println("Total bases", len(baseToParts))
+	fmt.Println()
+	fmt.Print("ALl parts =")
+	for _, part := range mapParts {
+		fmt.Print(" ", part.String())
+	}
+	fmt.Println()
+
+	fmt.Println()
+	for baseBarrel, parts := range baseToParts {
+		combinations += len(parts)
+		infos := Barrels[baseBarrel]
+		fmt.Println("Base:", infos.Name, infos.BaseBarrel.ManufacturerIndex, infos.BaseBarrel.BaseIndex, infos.BaseBarrel.BarrelIndex)
+
+		generatedSerials := make([]string, 0)
+		for partIndex := range parts {
+			encoded := b85.Encode(serial.Serialize([]serial.Block{
+				{Token: serial_tokenizer.TOK_VARINT, Value: baseBarrel.ManufacturerIndex},
+				{Token: serial_tokenizer.TOK_SEP2},
+				{Token: serial_tokenizer.TOK_VARINT, Value: 0}, // Unknown, always zero
+				{Token: serial_tokenizer.TOK_SEP2},
+				{Token: serial_tokenizer.TOK_VARINT, Value: 1}, // Unknown, always one before the level
+				{Token: serial_tokenizer.TOK_SEP2},
+				{Token: serial_tokenizer.TOK_VARINT, Value: 50}, // Level 50
+				{Token: serial_tokenizer.TOK_SEP1},
+				{Token: serial_tokenizer.TOK_SEP1},
+				{Token: serial_tokenizer.TOK_PART, Part: part.Part{Index: baseBarrel.BaseIndex, SubType: part.SUBTYPE_NONE}},
+				{Token: serial_tokenizer.TOK_PART, Part: part.Part{Index: baseBarrel.BarrelIndex, SubType: part.SUBTYPE_NONE}},
+				{Token: serial_tokenizer.TOK_PART, Part: part.Part{Index: partIndex, SubType: part.SUBTYPE_NONE}},
+				{Token: serial_tokenizer.TOK_SEP1},
+			}))
+			generatedSerials = append(generatedSerials, encoded)
+		}
+
+		_serialsToYaml(generatedSerials)
+	}
+
+	fmt.Println("Total combinations:", combinations)
 }
 
-func TestListAllUniqueParts(t *testing.T) {
-	var (
-		loadedItems []LoadedItem
-		err         error
-		_           int64
-	)
-	t.Run("LOAD", func(t *testing.T) {
-		SkipFailedItems = true
-		loadedItems, _, err = Codex.Load("database/bl4-serial-matches.json")
-		assert.NoError(t, err)
-	})
+func TestAddSamePartALlBases(t *testing.T) {
+	generatedSerials := make([]string, 0)
+	for baseBarrel, _ := range Barrels {
 
-	uniqueParts := make(map[string][]LoadedItem)
-	partsPerManufacturer := make(map[string]map[uint32]bool)
-	t.Run("SPLIT_PARTS", func(t *testing.T) {
-		for _, item := range loadedItems {
-			fmt.Println(item.DebugOutput)
-			for _, block := range item.Serial.Blocks {
-				if block.Token == serial_tokenizer.TOK_PART {
-					switch block.Part.SubType {
-					case part.SUBTYPE_NONE, part.SUBTYPE_INT:
-						uniqueParts[block.Part.String()] = append(uniqueParts[block.Part.String()], item)
-					case part.SUBTYPE_LIST:
-						for _, v := range block.Part.Values {
-							subPart := part.Part{
-								Index:   block.Part.Index,
-								SubType: part.SUBTYPE_LIST,
-								Values:  []uint32{v},
-							}
-							uniqueParts[subPart.String()] = append(uniqueParts[subPart.String()], item)
-						}
-					}
-				}
-			}
-		}
-	})
-
-	for part, nb := range uniqueParts {
-		for _, item := range nb {
-			manufacturer := item.Serial.Blocks[0].Value
-
-			if _, ok := partsPerManufacturer[part]; !ok {
-				partsPerManufacturer[part] = make(map[uint32]bool)
-			}
-
-			partsPerManufacturer[part][manufacturer] = true
-		}
+		encoded := b85.Encode(serial.Serialize([]serial.Block{
+			{Token: serial_tokenizer.TOK_VARINT, Value: baseBarrel.ManufacturerIndex},
+			{Token: serial_tokenizer.TOK_SEP2},
+			{Token: serial_tokenizer.TOK_VARINT, Value: 0}, // Unknown, always zero
+			{Token: serial_tokenizer.TOK_SEP2},
+			{Token: serial_tokenizer.TOK_VARINT, Value: 1}, // Unknown, always one before the level
+			{Token: serial_tokenizer.TOK_SEP2},
+			{Token: serial_tokenizer.TOK_VARINT, Value: 50}, // Level 50
+			{Token: serial_tokenizer.TOK_SEP1},
+			{Token: serial_tokenizer.TOK_SEP1},
+			{Token: serial_tokenizer.TOK_PART, Part: part.Part{Index: baseBarrel.BaseIndex, SubType: part.SUBTYPE_NONE}},
+			{Token: serial_tokenizer.TOK_PART, Part: part.Part{Index: baseBarrel.BarrelIndex, SubType: part.SUBTYPE_NONE}},
+			{Token: serial_tokenizer.TOK_PART, Part: part.Part{Index: 25, SubType: part.SUBTYPE_NONE}},
+			{Token: serial_tokenizer.TOK_PART, Part: part.Part{Index: 29, SubType: part.SUBTYPE_NONE}},
+			{Token: serial_tokenizer.TOK_SEP1},
+		}))
+		generatedSerials = append(generatedSerials, encoded)
 	}
 
-	t.Run("DATA", func(t *testing.T) {
-		fmt.Println("len(uniqueParts) =", len(uniqueParts))
-
-		for part, manufacturers := range partsPerManufacturer {
-			fmt.Println()
-			fmt.Println()
-			fmt.Println()
-			fmt.Println("Part:", part, "=> used by", len(manufacturers), "manufacturers")
-			for manufacturerIndex := range manufacturers {
-				manufacturerInfos, ok := GetItemTypeByIndex(manufacturerIndex)
-				if !ok {
-					panic("unknown manufacturer index: " + fmt.Sprint(manufacturerIndex))
-				}
-				fmt.Println("   - ", manufacturerInfos.Type+":"+manufacturerInfos.Manufacturer)
-			}
-		}
-	})
-}
-
-func TestListAllFirstParts(t *testing.T) {
-	var (
-		loadedItems []LoadedItem
-		err         error
-		_           int64
-	)
-	t.Run("LOAD", func(t *testing.T) {
-		SkipFailedItems = true
-		loadedItems, _, err = Codex.Load("database/bl4-serial-matches.json")
-		assert.NoError(t, err)
-	})
-
-	for pos := 0; pos < 20; pos++ {
-		uniqueParts := make(map[string]*part.Part)
-		for _, item := range loadedItems {
-			p := item.Serial.FindPartAtPos(pos, false)
-			if p != nil {
-				uniqueParts[p.String()] = p
-			}
-		}
-
-		var (
-			countSubtypeNone = 0
-			countSubtypeInt  = 0
-			countSubtypeList = 0
-		)
-
-		for _, p := range uniqueParts {
-			switch p.SubType {
-			case part.SUBTYPE_NONE:
-				countSubtypeNone++
-			case part.SUBTYPE_INT:
-				countSubtypeInt++
-			case part.SUBTYPE_LIST:
-				countSubtypeList++
-			}
-		}
-
-		fmt.Println()
-		fmt.Println()
-		fmt.Println("# Position:", pos)
-		fmt.Println("  Total unique parts:", len(uniqueParts))
-		fmt.Println("  - SUBTYPE_NONE:", countSubtypeNone)
-		fmt.Println("  - SUBTYPE_INT :", countSubtypeInt)
-		fmt.Println("  - SUBTYPE_LIST:", countSubtypeList)
-	}
+	_serialsToYaml(generatedSerials)
 }

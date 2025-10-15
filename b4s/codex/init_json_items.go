@@ -1,11 +1,8 @@
 package codex
 
 import (
-	"borderlands_4_serials/b4s/b85"
-	"borderlands_4_serials/b4s/serial"
+	_ "embed"
 	"encoding/json"
-	"fmt"
-	"os"
 	"strings"
 )
 
@@ -29,18 +26,16 @@ type _codex struct {
 var (
 	Codex           = &_codex{}
 	SkipFailedItems = false
+
+	//go:embed database/bl4-serial-matches.json
+	rawBl4Serials []byte
 )
 
-func (c *_codex) Load(jsonPath string) ([]Item, int64, error) {
-	rawJson, err := os.ReadFile(jsonPath)
-	if err != nil {
-		return nil, -1, err
-	}
-
+func init() {
 	var jsonItems []JsonItem
-	err = json.Unmarshal(rawJson, &jsonItems)
+	err := json.Unmarshal(rawBl4Serials, &jsonItems)
 	if err != nil {
-		return nil, -1, err
+		return
 	}
 
 	var (
@@ -59,14 +54,14 @@ func (c *_codex) Load(jsonPath string) ([]Item, int64, error) {
 
 		item, err := Deserialize(jsonItem.Serial)
 		if err != nil {
-			fmt.Fprint(os.Stderr, "Serial decode error:", err)
+			//fmt.Fprint(os.Stderr, "Serial decode error:", err)
 			//nbFail++
 			continue
 		}
 		jsonItem.Item = item
 
 		if err != nil {
-			fmt.Fprint(os.Stderr, "Tokenize error:", err)
+			//fmt.Fprint(os.Stderr, "Tokenize error:", err)
 			nbFail++
 
 			if !SkipFailedItems {
@@ -79,8 +74,6 @@ func (c *_codex) Load(jsonPath string) ([]Item, int64, error) {
 		nbOk++
 	}
 
-	fmt.Println("nbOk:", nbOk)
-	fmt.Println("nbFail:", nbFail)
-
-	return loadedItems, nbFail, nil
+	//fmt.Println("nbOk:", nbOk)
+	//fmt.Println("nbFail:", nbFail)
 }

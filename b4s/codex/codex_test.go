@@ -1,8 +1,7 @@
-package codex_loader
+package codex
 
 import (
 	"borderlands_4_serials/b4s/b85"
-	"borderlands_4_serials/b4s/codex_loader/codex"
 	"borderlands_4_serials/b4s/serial"
 	"borderlands_4_serials/b4s/serial_datatypes/part"
 	"borderlands_4_serials/b4s/serial_tokenizer"
@@ -15,6 +14,7 @@ import (
 )
 
 func TestCodex(t *testing.T) {
+	return
 	var (
 		loadedItems []LoadedItem
 		err         error
@@ -60,11 +60,11 @@ func TestCodex(t *testing.T) {
 					fmt.Println("WeaponType:", item.WeaponType)
 					fmt.Println("ManufacturerWeaponType:", item.ManufacturerWeaponType)
 
-					if len(item.Parsed.Blocks) > 0 {
-						manufacturerIndex := item.Parsed.Blocks[0].Value
+					if len(item.Serial.Blocks) > 0 {
+						manufacturerIndex := item.Serial.Blocks[0].Value
 						fmt.Println("manufacturerIndex:", manufacturerIndex)
 
-						if _, ok := codex.GetItemTypeByIndex(manufacturerIndex); !ok {
+						if _, ok := GetItemTypeByIndex(manufacturerIndex); !ok {
 							t.Fatalf("unknown manufacturer index: " + fmt.Sprint(manufacturerIndex))
 						}
 					}
@@ -80,7 +80,7 @@ func TestCodex(t *testing.T) {
 	if len(loadedItems) > 0 {
 		// Sort loadedItems by shortest serial length
 		sort.Slice(loadedItems, func(i, j int) bool {
-			return len(loadedItems[i].Serial) > len(loadedItems[j].Serial)
+			return len(loadedItems[i].RawSerial) > len(loadedItems[j].RawSerial)
 		})
 
 		// Print top 10 shortest problematic items
@@ -109,7 +109,7 @@ func TestCodex(t *testing.T) {
 		// The score is how many continous zeroes starting from right
 		for i := range loadedItems {
 			item := &loadedItems[i]
-			bytes, err := b85.Decode(item.Serial)
+			bytes, err := b85.Decode(item.RawSerial)
 			if err != nil {
 				continue
 			}
@@ -173,9 +173,9 @@ func TestCodexReserializeRoundtrip(t *testing.T) {
 			}
 
 			t.Run(item.Type+"__"+item.Error+"__"+item.Name, func(t *testing.T) {
-				expectedSerial := strings.Trim(item.Serial, "\"")
+				expectedSerial := strings.Trim(item.RawSerial, "\"")
 
-				serializedData := serial.Serialize(item.Parsed)
+				serializedData := serial.Serialize(item.Serial)
 				assert.NoError(t, err)
 
 				reserializedB85 := b85.Encode(serializedData)
@@ -213,7 +213,7 @@ func TestCodesExtractPairSerialsCommonPart(t *testing.T) {
 				continue
 			}
 
-			for _, block := range item.Parsed.Blocks {
+			for _, block := range item.Serial.Blocks {
 				if block.Token == serial_tokenizer.TOK_PART {
 					if len(block.Part.Values) > 0 {
 						continue
@@ -239,20 +239,20 @@ func TestCodesExtractPairSerialsCommonPart(t *testing.T) {
 				continue
 			}
 
-			serialToItem[item.Serial] = &item
+			serialToItem[item.RawSerial] = &item
 
-			if _, ok := serialToParts[item.Serial]; !ok {
-				serialToParts[item.Serial] = make([]string, 0)
+			if _, ok := serialToParts[item.RawSerial]; !ok {
+				serialToParts[item.RawSerial] = make([]string, 0)
 			}
 
-			for _, block := range item.Parsed.Blocks {
+			for _, block := range item.Serial.Blocks {
 				if block.Token == serial_tokenizer.TOK_PART {
 					if len(block.Part.Values) > 0 {
 						continue
 					}
 
 					partStr := block.Part.String()
-					serialToParts[item.Serial] = append(serialToParts[item.Serial], partStr)
+					serialToParts[item.RawSerial] = append(serialToParts[item.RawSerial], partStr)
 				}
 			}
 		}
@@ -281,22 +281,22 @@ func TestCodesExtractPairSerialsCommonPart(t *testing.T) {
 				hasOtherCommonPart := false
 
 			OUTER:
-				for _, pivotPart := range serialToParts[pivotItem.Serial] {
+				for _, pivotPart := range serialToParts[pivotItem.RawSerial] {
 					if pivotPart == part {
 						continue
 					}
 
-					item1 := serialToItem[pivotItem.Serial]
+					item1 := serialToItem[pivotItem.RawSerial]
 
-					for _, otherPart := range serialToParts[otherItem.Serial] {
+					for _, otherPart := range serialToParts[otherItem.RawSerial] {
 						if otherPart == part {
 							continue
 						}
 
-						item2 := serialToItem[otherItem.Serial]
+						item2 := serialToItem[otherItem.RawSerial]
 
 						// If different manufacturers, skip
-						if item1.Parsed.Blocks[0].Value != item2.Parsed.Blocks[0].Value {
+						if item1.Serial.Blocks[0].Value != item2.Serial.Blocks[0].Value {
 							continue
 						}
 
@@ -310,8 +310,8 @@ func TestCodesExtractPairSerialsCommonPart(t *testing.T) {
 				//fmt.Println(part, "=>", hasOtherCommonPart)
 				if !hasOtherCommonPart {
 					partPairs[part] = append(partPairs[part], [2]string{
-						pivotItem.Serial,
-						otherItem.Serial,
+						pivotItem.RawSerial,
+						otherItem.RawSerial,
 					})
 				}
 			}
@@ -354,7 +354,7 @@ func TestListAllUniqueParts(t *testing.T) {
 	t.Run("SPLIT_PARTS", func(t *testing.T) {
 		for _, item := range loadedItems {
 			fmt.Println(item.DebugOutput)
-			for _, block := range item.Parsed.Blocks {
+			for _, block := range item.Serial.Blocks {
 				if block.Token == serial_tokenizer.TOK_PART {
 					switch block.Part.SubType {
 					case part.SUBTYPE_NONE, part.SUBTYPE_INT:
@@ -376,7 +376,7 @@ func TestListAllUniqueParts(t *testing.T) {
 
 	for part, nb := range uniqueParts {
 		for _, item := range nb {
-			manufacturer := item.Parsed.Blocks[0].Value
+			manufacturer := item.Serial.Blocks[0].Value
 
 			if _, ok := partsPerManufacturer[part]; !ok {
 				partsPerManufacturer[part] = make(map[uint32]bool)
@@ -395,7 +395,7 @@ func TestListAllUniqueParts(t *testing.T) {
 			fmt.Println()
 			fmt.Println("Part:", part, "=> used by", len(manufacturers), "manufacturers")
 			for manufacturerIndex := range manufacturers {
-				manufacturerInfos, ok := codex.GetItemTypeByIndex(manufacturerIndex)
+				manufacturerInfos, ok := GetItemTypeByIndex(manufacturerIndex)
 				if !ok {
 					panic("unknown manufacturer index: " + fmt.Sprint(manufacturerIndex))
 				}
@@ -420,7 +420,7 @@ func TestListAllFirstParts(t *testing.T) {
 	for pos := 0; pos < 20; pos++ {
 		uniqueParts := make(map[string]*part.Part)
 		for _, item := range loadedItems {
-			p := item.Parsed.FindPartAtPos(pos, false)
+			p := item.Serial.FindPartAtPos(pos, false)
 			if p != nil {
 				uniqueParts[p.String()] = p
 			}

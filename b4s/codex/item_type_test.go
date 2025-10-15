@@ -1,7 +1,6 @@
-package serial
+package codex
 
 import (
-	"borderlands_4_serials/b4s/b85"
 	"fmt"
 	"testing"
 
@@ -9,13 +8,10 @@ import (
 )
 
 func TestFindItemType(t *testing.T) {
-	data, err := b85.Decode("@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf{00")
+	item, err := Deserialize("@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf{00")
 	assert.NoError(t, err)
 
-	s, err := Deserialize(data)
-	assert.NoError(t, err)
-
-	itemType, found := s.FindItemType()
+	itemType, found := item.FindItemType()
 	assert.True(t, found)
 	fmt.Println(itemType)
 	assert.Equal(t, "jakobs", itemType.Manufacturer)

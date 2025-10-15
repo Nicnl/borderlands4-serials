@@ -2,7 +2,7 @@ package codex_loader
 
 import (
 	"borderlands_4_serials/b4s/b85"
-	"borderlands_4_serials/b4s/codex_loader/codex"
+	"borderlands_4_serials/b4s/codex"
 	"borderlands_4_serials/b4s/serial"
 	"borderlands_4_serials/b4s/serial_datatypes/part"
 	"borderlands_4_serials/b4s/serial_tokenizer"
@@ -31,13 +31,13 @@ func _serialsToYaml(serials []string) {
 
 func TestConstructBasesWithParts(t *testing.T) {
 	var (
-		loadedItems []LoadedItem
+		loadedItems []codex.LoadedItem
 		err         error
 		_           int64
 	)
 	t.Run("LOAD", func(t *testing.T) {
-		SkipFailedItems = true
-		loadedItems, _, err = Codex.Load("database/bl4-serial-matches.json")
+		codex.SkipFailedItems = true
+		loadedItems, _, err = codex.Codex.Load("database/bl4-serial-matches.json")
 		assert.NoError(t, err)
 	})
 
@@ -52,7 +52,7 @@ func TestConstructBasesWithParts(t *testing.T) {
 	t.Run("EXTRACT_BASES", func(t *testing.T) {
 		for _, item := range loadedItems {
 
-			manufacturerIndex, found := item.Parsed.FindIntAtPos(0)
+			manufacturerIndex, found := item.FindIntAtPos(0)
 			if !found {
 				continue
 			}
@@ -69,7 +69,7 @@ func TestConstructBasesWithParts(t *testing.T) {
 				continue
 			}
 
-			baseIndexPart := item.Parsed.FindPartAtPos(0, false)
+			baseIndexPart := item.Serial.FindPartAtPos(0, false)
 			if baseIndexPart == nil {
 				continue
 			}
@@ -88,7 +88,7 @@ func TestConstructBasesWithParts(t *testing.T) {
 
 			pos := 1
 			for {
-				p := item.Parsed.FindPartAtPos(pos, true)
+				p := item.Serial.FindPartAtPos(pos, true)
 				if p == nil {
 					break
 				}

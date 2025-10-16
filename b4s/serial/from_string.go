@@ -85,6 +85,9 @@ func isPartSubtypeList(str string) (uint32, []uint32, bool) {
 	}
 
 	listStr := strings.TrimSpace(splitted[1])
+	if len(listStr) == 0 {
+		return 0, nil, false
+	}
 	if listStr[0] != '[' || listStr[len(listStr)-1] != ']' {
 		return 0, nil, false
 	}

@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/render"
 )
 
 var (
@@ -64,6 +65,69 @@ func CORSMiddleware(c *gin.Context) {
 
 func main() {
 	r := gin.Default()
+
+	r.POST("/api/v1/deserialize_bulk", CORSMiddleware, func(c *gin.Context) {
+		var jsonReq []string
+		if err := c.BindJSON(&jsonReq); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
+			return
+		}
+
+		results := make(map[string]gin.H, len(jsonReq))
+		for _, serialB85 := range jsonReq {
+			item, err := codex.Deserialize(serialB85)
+			if err != nil {
+				results[serialB85] = gin.H{
+					"success": false,
+				}
+				continue
+			} else {
+				result := gin.H{
+					"deserialized": item.Serial.String(),
+					"success":      true,
+				}
+
+				if level, found := item.Level(); found {
+					result["deserialized_level"] = level
+				}
+
+				if itemType, found := item.Type(); found {
+					result["deserialized_manufacturer"] = itemType.Manufacturer
+					result["deserialized_type"] = itemType.Type
+				}
+
+				if baseType, found := item.BaseBarrel(); found {
+					result["deserialized_base_name"] = baseType.Name
+
+					for _, stat := range strings.Split(baseType.Stats, " ") {
+						switch stat {
+						case "common", "uncommon", "rare", "epic", "legendary":
+							result["deserialized_rarity"] = stat
+						}
+					}
+				}
+
+				deserializedParts := make([]string, 0, len(item.Serial))
+				{
+					pos := 0
+					for {
+						part := item.FindPartAtPos(pos, true)
+						if part == nil {
+							break
+						}
+						deserializedParts = append(deserializedParts, part.String())
+						pos++
+					}
+				}
+
+				result["deserialized_parts"] = deserializedParts
+
+				results[serialB85] = result
+			}
+		}
+
+		c.Render(http.StatusOK, render.IndentedJSON{Data: results})
+	})
 
 	r.POST("/api/v1/deserialize", CORSMiddleware, func(c *gin.Context) {
 		var jsonReq struct {

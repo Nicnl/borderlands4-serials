@@ -279,3 +279,15 @@ func TestImportStringCrash(t *testing.T) {
 	assert.Error(t, err)
 	fmt.Println("Error:", err.Error())
 }
+
+func TestImportStringCrash2(t *testing.T) {
+	// Found by a user:
+	// 291, 0, 1, 50| 9, 1| 10, 1| 2, 1375|| {5} {8} {245:}|
+	// It should generate an error (unfinished part at the end)
+	// But it panics
+
+	var s Serial
+	err := s.FromString("291, 0, 1, 50| 9, 1| 10, 1| 2, 1375|| {5} {8} {245:[}|")
+	assert.Error(t, err)
+	fmt.Println("Error:", err.Error())
+}

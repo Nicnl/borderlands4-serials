@@ -48,10 +48,24 @@ func additionalDataFunc(item *codex.Item) string {
 	return ""
 }
 
+func CORSMiddleware(c *gin.Context) {
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+	c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+	if c.Request.Method == "OPTIONS" {
+		c.AbortWithStatus(204)
+		return
+	}
+
+	c.Next()
+}
+
 func main() {
 	r := gin.Default()
 
-	r.POST("/api/v1/deserialize", func(c *gin.Context) {
+	r.POST("/api/v1/deserialize", CORSMiddleware, func(c *gin.Context) {
 		var jsonReq struct {
 			SerialB85 string `json:"serial_b85"`
 		}
@@ -77,7 +91,7 @@ func main() {
 		})
 	})
 
-	r.POST("/api/v1/reserialize", func(c *gin.Context) {
+	r.POST("/api/v1/reserialize", CORSMiddleware, func(c *gin.Context) {
 		var jsonReq struct {
 			Deserialized string `json:"deserialized"`
 		}

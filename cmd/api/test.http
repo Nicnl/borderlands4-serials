@@ -13,3 +13,17 @@ Content-Type: application/json
 {
   "deserialized": "267, 0, 1, 22| 2, 274|| {7} {1} {245:[23 39 69 79]}|"
 }
+
+###
+
+POST https://borderlands4-deserializer.nicnl.com/api/v1/deserialize
+Content-Type: application/json
+
+{"serial_b85": "@Ugr$WBm/$!m!X=5&qXxA;nj3OOD#<4R"}
+
+###
+
+POST https://borderlands4-deserializer.nicnl.com/api/v1/reserialize
+Content-Type: application/json
+
+{"deserialized": "267, 0, 1, 22| 2, 274|| {7} {1} {245:[23 39 69 79]}|"}

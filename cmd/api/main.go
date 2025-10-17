@@ -66,6 +66,10 @@ func CORSMiddleware(c *gin.Context) {
 func main() {
 	r := gin.Default()
 
+	r.OPTIONS("/api/v1/deserialize_bulk", CORSMiddleware)
+	r.OPTIONS("/api/v1/deserialize", CORSMiddleware)
+	r.OPTIONS("/api/v1/reserialize", CORSMiddleware)
+
 	r.POST("/api/v1/deserialize_bulk", CORSMiddleware, func(c *gin.Context) {
 		var jsonReq []string
 		if err := c.BindJSON(&jsonReq); err != nil {
@@ -122,7 +126,7 @@ func main() {
 
 				result["deserialized_parts"] = deserializedParts
 
-				results[serialB85] = result
+				//results[serialB85] = result
 			}
 		}
 

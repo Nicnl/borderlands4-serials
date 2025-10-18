@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Matt's Special Place</title>
+    <script src="https://unpkg.com/vue@3.5.22/dist/vue.global.js"></script>
+</head>
+
+<body>
+
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        font-family: Arial, sans-serif;
+        background-color: #232323;
+        color: white;
+    }
+
+    #app {
+        position: absolute;
+        display: block;
+        width: 100%;
+        left: 0;
+        height: 100%;
+        top: 0;
+    }
+
+    #centerContainer {
+        background-color: #171718;
+        width: 850px;
+        height: 185px;
+        position: absolute;
+        top: 60px;
+        left: calc(50% - 425px);
+        border-radius: 12px;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    #mainTitle {
+        position: absolute;
+        top: -30px;
+        left: 5px;
+    }
+
+    .nice-input {
+        background-color: #202023;
+        height: 28px;
+        width: calc(100% - 18px);
+        border-radius: 6px;
+        border: 1px solid #1C1C1F;
+        outline: 1px solid #343435;
+        margin-bottom: 1px;
+        color: #ccc;
+        padding-left: 9px;
+        padding-right: 9px;
+        font-size: 17px;
+    }
+
+    .nice-input.smaller {
+        width: 70px;
+        color-scheme: dark !important;
+    }
+
+    .nice-button {
+        background-color: #12357e;
+        height: 32px;
+        border-radius: 6px;
+        padding-left: 9px;
+        padding-right: 9px;
+        border: none;
+        color: white;
+        font-size: 15px;
+        cursor: pointer;
+    }
+
+    .nice-button:hover {
+        background-color: #1454b0;
+    }
+
+    .nice-button:active {
+        background-color: #0e2e6b;
+    }
+
+    .nice-button:disabled {
+        background-color: #232323;
+        color: #555555;
+        cursor: not-allowed;
+    }
+
+    .nice-input:focus {
+        outline: 1px solid #2863D5;
+    }
+
+    .textZone {
+        position: absolute;
+        top: 270px;
+        left: calc(50% - 425px);
+        width: 850px;
+        height: calc(100% - 350px);
+        background-color: #1e1e1e;
+        border: 1px solid #1C1C1F;
+        outline: 1px solid #343435;
+        border-radius: 8px;
+        padding: 12px;
+        color: #cccccc;
+        font-size: 14px;
+        font-family: Consolas, monospace;
+        resize: none;
+        user-select: all;
+
+        white-space: pre;
+        word-wrap: normal;
+    }
+
+    .textZone:focus {
+        outline: 1px solid #2863D5;
+    }
+</style>
+
+<div id="app">
+    <div id="centerContainer">
+        <div id="mainTitle">Matt's special bruteforcing place / Assembled with love by @Nicnl</div>
+
+        <div style="margin-left: 8px;margin-top: 16px;margin-bottom: 8px;font-size: 14px;color: #aaaaaa;">Pattern:</div>
+        <input type="text" class="nice-input" placeholder="Enter serial here:   @Ugy3L+2}TYg..." v-model="formPattern"><br/>
+
+        <div style="display: inline-block;">
+            <div style="margin-left: 8px;margin-top: 16px;margin-bottom: 8px;font-size: 14px;color: #aaaaaa;">From:</div>
+            <input type="number" min="1" max="10000" step="1" class="nice-input smaller" placeholder="" v-model="formFrom">
+        </div>
+
+        <div style="display: inline-block;margin-left: 18px;">
+            <div style="margin-left: 8px;margin-top: 16px;margin-bottom: 8px;font-size: 14px;color: #aaaaaa;">To:</div>
+            <input type="number" min="1" max="10000" step="1" class="nice-input smaller" placeholder="" v-model="fromTo">
+        </div>
+
+        <div style="display: inline-block;margin-left: 18px;">
+            <div style="margin-left: 8px;margin-top: 16px;margin-bottom: 8px;font-size: 14px;color: #aaaaaa;">Steps:</div>
+
+            <button class="nice-button" v-on:click="step1Patterns" v-bind:disabled="!formValid">1. Patterns</button>
+            <button class="nice-button" v-on:click="step2Serialize" style="margin-left: 12px;" v-bind:disabled="currentStep < 1">2. Serialize</button>
+            <button class="nice-button" v-on:click="step3Yaml(false)" style="margin-left: 12px;" v-bind:disabled="currentStep < 2">3.a Flat YAML</button>
+            <button class="nice-button" v-on:click="step3Yaml(true)" style="margin-left: 12px;" v-bind:disabled="currentStep < 2">3.b Matt's YAML</button>
+        </div>
+
+    </div>
+
+    <textarea class="textZone" v-model="currentData"></textarea>
+
+</div>
+
+<script type="module">
+    const { createApp, ref } = Vue
+
+    createApp({
+
+        data() {
+            return {
+                formPattern: '259, 0, 1, 50| 2, 1422|| {22} {#}|',
+                formFrom: 1,
+                fromTo: 400,
+
+                currentStep: 0,
+
+                currentData: '',
+            };
+        },
+
+        methods: {
+            step1Patterns() {
+                if (!this.formValid) return;
+
+                let outputLines = [];
+                for (let i = this.formFrom; i <= this.fromTo; i++) {
+                    let patternInstance = this.formPattern.replace('#', i.toString());
+                    outputLines.push(patternInstance);
+                }
+
+                this.currentData = outputLines.join('\n');
+                this.currentStep = 1;
+            },
+
+            async step2Serialize() {
+                if (this.currentStep < 1) return;
+
+                try {
+                    const response = await fetch('/api/v1/serialize_bulk', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(this.currentData.split('\n')),
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Response status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    this.currentData = data.join('\n');
+
+                    this.currentStep = 2;
+                }
+                catch (error) {
+                    console.error('Error during serialization:', error);
+                    this.currentData = 'Error during serialization: ' + error.message;
+                }
+            },
+
+            step3Yaml(mattMode) {
+                if (this.currentStep < 2) return;
+
+                let serials = this.currentData.split('\n');
+                let output = '';
+
+                for (let i = 0; i < serials.length; i++) {
+                    let serial = serials[i].trim();
+                    if (serial.length === 0) continue;
+
+                    let slotCounter = i;
+                    if (mattMode) slotCounter = slotCounter%7;
+
+                    output += "        slot_" + slotCounter + ":\n";
+                    output += "          serial: '" + serial + "'\n";
+
+                    if (mattMode) {
+                        let flags = [1, 3, 5, 17, 33, 65, 129];
+                        output += "          state_flags: " + flags[slotCounter] + "\n";
+
+                        if (slotCounter === 6)
+                            output += "\n\n";
+                    }
+                }
+
+                this.currentData = output;
+            },
+        },
+
+        computed: {
+            formValid() {
+                return this.formPattern.length > 0 && this.formFrom > 0 && this.fromTo >= this.formFrom && this.formPattern.indexOf('#') >= 0 && (this.formPattern.split('#').length - 1) === 1;
+            },
+        },
+
+    }).mount('#app')
+</script>
+</body>
+</html>

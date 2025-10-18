@@ -2,3 +2,10 @@ POST http://127.0.0.1:8080/api/v1/deserialize_bulk
 Content-Type: application/json
 
 < ./guncode_export.json
+
+###
+
+POST https://borderlands4-deserializer.nicnl.com/api/v1/deserialize_bulk
+Content-Type: application/json
+
+< ./guncode_export.json

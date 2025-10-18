@@ -17,6 +17,9 @@ import (
 var (
 	//go:embed index.html
 	indexHtmlBytes []byte
+
+	//go:embed matt_special_place.html
+	mattHtmlBytes []byte
 )
 
 func additionalDataFunc(item *codex.Item) string {
@@ -171,15 +174,14 @@ func main() {
 				}
 			}
 
-			fmt.Fprintln(os.Stderr, "# Reserialize:")
-			fmt.Fprintln(os.Stderr, " - From: ", serialB85)
+			//fmt.Fprintln(os.Stderr, "# Reserialize:")
+			//fmt.Fprintln(os.Stderr, " - From: ", serialB85)
 
 			s := serial.Serial{}
 			err := s.FromString(serialB85)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "Failed to import:", serialB85, "=>", err.Error())
-				c.JSON(http.StatusBadRequest, gin.H{"error": "invalid deserialized data"})
-				return
+				continue
 			}
 
 			data := serial.Serialize(s)
@@ -284,12 +286,31 @@ func main() {
 		// Prevent go compiler from being annoying
 	}
 
+	routeMattFromDisk := func(c *gin.Context) {
+		// Load file directly from disk for debug
+		mattHtmlBytes, err := os.ReadFile("C:\\Users\\Nicnl\\GolandProjects\\borderlands_4_serials\\cmd\\api\\matt_special_place.html")
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Failed to load index.html")
+			return
+		}
+		c.Data(http.StatusOK, "text/html; charset=utf-8", mattHtmlBytes)
+	}
+
 	routeIndexEmbeded := func(c *gin.Context) {
 		c.Data(http.StatusOK, "text/html; charset=utf-8", indexHtmlBytes)
 	}
 
+	routeMattEmbeded := func(c *gin.Context) {
+		c.Data(http.StatusOK, "text/html; charset=utf-8", mattHtmlBytes)
+	}
+
+	if routeMattFromDisk != nil || routeIndexFromDisk != nil || routeMattEmbeded != nil || routeIndexEmbeded != nil {
+		// Prevent go compiler from being annoying
+	}
+
 	r.GET("/", routeIndexEmbeded)
 	r.GET("/index.html", routeIndexEmbeded)
+	r.GET("/matt.html", routeMattEmbeded)
 
 	if err := r.Run(":8080"); err != nil {
 		panic(err)

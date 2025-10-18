@@ -146,6 +146,50 @@ func main() {
 		c.Render(http.StatusOK, render.IndentedJSON{Data: results})
 	})
 
+	r.POST("/api/v1/serialize_bulk", CORSMiddleware, func(c *gin.Context) {
+		var jsonReq []string
+		if err := c.BindJSON(&jsonReq); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
+			return
+		}
+
+		output := make([]string, 0, len(jsonReq))
+		for i, serialB85 := range jsonReq {
+			output = append(output, "")
+
+			// Clean the reserialized data
+			{
+				// Add a terminator if missing
+				if !strings.HasSuffix(serialB85, "|") {
+					serialB85 = serialB85 + "|"
+				}
+
+				// If more than two terminators, keep only the first two
+				for len(serialB85) >= 2 && serialB85[len(serialB85)-1] == '|' && serialB85[len(serialB85)-2] == '|' {
+					serialB85 = serialB85[:len(serialB85)-1]
+				}
+			}
+
+			fmt.Fprintln(os.Stderr, "# Reserialize:")
+			fmt.Fprintln(os.Stderr, " - From: ", serialB85)
+
+			s := serial.Serial{}
+			err := s.FromString(serialB85)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "Failed to import:", serialB85, "=>", err.Error())
+				c.JSON(http.StatusBadRequest, gin.H{"error": "invalid deserialized data"})
+				return
+			}
+
+			data := serial.Serialize(s)
+			b85Serial := b85.Encode(data)
+
+			output[i] = b85Serial
+		}
+
+		c.Render(http.StatusOK, render.IndentedJSON{Data: output})
+	})
+
 	r.POST("/api/v1/deserialize", CORSMiddleware, func(c *gin.Context) {
 		var jsonReq struct {
 			SerialB85 string `json:"serial_b85"`

@@ -82,6 +82,7 @@ func main() {
 	r.OPTIONS("/api/v1/deserialize_bulk", CORSMiddleware)
 	r.OPTIONS("/api/v1/deserialize", CORSMiddleware)
 	r.OPTIONS("/api/v1/reserialize", CORSMiddleware)
+	r.OPTIONS("/api/v1/serialize_bulk", CORSMiddleware)
 
 	r.POST("/api/v1/deserialize_bulk", CORSMiddleware, func(c *gin.Context) {
 		var jsonReq []string

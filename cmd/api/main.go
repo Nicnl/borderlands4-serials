@@ -136,6 +136,7 @@ func main() {
 						if part == nil {
 							break
 						}
+
 						deserializedParts = append(deserializedParts, part.String())
 						pos++
 					}
@@ -143,7 +144,7 @@ func main() {
 
 				result["deserialized_parts"] = deserializedParts
 
-				//results[serialB85] = result
+				results[serialB85] = result
 			}
 		}
 

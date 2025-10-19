@@ -45,6 +45,14 @@
         left: 5px;
     }
 
+    #bottomDisclaimer {
+        position: absolute;
+        bottom: -30px;
+        left: 16px;
+        color: #666;
+        font-size: 14px;
+    }
+
     .nice-input {
         background-color: #202023;
         height: 28px;
@@ -73,6 +81,8 @@
         <div style="margin-left: 8px;margin-top: 16px;margin-bottom: 8px;font-size: 14px;color: #aaaaaa;">Deserialized:</div>
         <input type="text" class="nice-input" placeholder="Enter parts here:   24, 0, 1, 50| 2, 3379..." v-model="formDeserialized">
         <div style="margin-left: 2px;margin-top: 9px;margin-bottom: 8px;font-size: 16px;color: #aaaaaa;">Status: {{status}}</div>
+
+        <div id="bottomDisclaimer">Note: this tool is <b>not compatible</b> with DLC items, and support will not be added.</div>
     </div>
 
 </div>

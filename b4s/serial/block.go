@@ -39,7 +39,7 @@ func (s Serial) String() string {
 				output += " "
 			}
 			output += fmt.Sprintf("%d", b.Value)
-		case serial_tokenizer.TOK_PART_111:
+		case serial_tokenizer.TOK_UNSUPPORTED_111:
 			if i > 0 {
 				output += " "
 			}

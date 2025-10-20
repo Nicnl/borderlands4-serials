@@ -30,10 +30,10 @@ func Serialize(s Serial) []byte {
 		case serial_tokenizer.TOK_PART:
 			bw.WriteBits(1, 0, 1)
 			part.Write(bw, block.Part)
-		case serial_tokenizer.TOK_PART_111:
-			// Unsupported, unknown
-			// bw.WriteBits(1, 1, 1)
-			// We do not handle this case
+		case serial_tokenizer.TOK_UNSUPPORTED_111:
+			// Unsupported, linked to DLC item.
+			// We explicitly DO NOT handle this case.
+			// We respect 2K and Gearbox money boundaries: we don't touch paid stuff.
 			break
 		}
 	}

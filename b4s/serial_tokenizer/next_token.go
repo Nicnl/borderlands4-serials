@@ -10,54 +10,42 @@ func (t *Tokenizer) NextToken() (Token, error) {
 	t.splitPositions = append(t.splitPositions, t.br.Pos())
 
 	// Read the first two bits, as zero-tokens are two bits long
-	bit1, ok := t.br.Read()
+	b1, b2, ok := t.br.Read2()
 	if !ok {
 		return 0, io.EOF
 	}
 
-	bit2, ok := t.br.Read()
-	if !ok {
-		return 0, io.EOF
+	tok := b1<<1 | b2
+	switch tok {
+	case 0b00:
+		return TOK_SEP1, nil
+	case 0b01:
+		return TOK_SEP2, nil
 	}
 
-	// Token 00 (terminator) + 01 (separator)
+	// If we are here, the first bit was a 1 => one-tokens are three-bit long
+	// => Read one mor bit, and combine it to form the full token
 	{
-		if bit1 == 0 && bit2 == 0 {
-			return TOK_SEP1, nil
+		b3, ok := t.br.Read()
+		if !ok {
+			return 0, io.EOF
 		}
-
-		if bit1 == 0 && bit2 == 1 {
-			return TOK_SEP2, nil
-		}
+		tok = tok<<1 | b3
 	}
 
-	// If we are here, the first bit was a 1 => tokens are now three-bits long
-	bit3, ok := t.br.Read()
-	if !ok {
-		return 0, io.EOF
-	}
-
-	// 100 => Varint
-	if bit1 == 1 && bit2 == 0 && bit3 == 0 {
+	switch tok {
+	case 0b100:
 		return TOK_VARINT, nil
-	}
-
-	// 110 => Varbit
-	if bit1 == 1 && bit2 == 1 && bit3 == 0 {
+	case 0b110:
 		return TOK_VARBIT, nil
-	}
-
-	// 101 => complex weapon part
-	if bit1 == 1 && bit2 == 0 && bit3 == 1 {
+	case 0b101:
 		return TOK_PART, nil
+	case 0b111:
+		return TOK_UNSUPPORTED_111, nil
 	}
 
-	// 111 => ??? looks like part, not sure
-	if bit1 == 1 && bit2 == 1 && bit3 == 1 {
-		return TOK_PART_111, nil
-	}
-
-	// Rewind so the caller can read the invalid token if needed
+	// If we are here, it means our rules didn't match any valid token
+	// => Rewind so the bitwriter, as if we never read those bits + error out
 	t.br.Rewind(3)
-	return 0, fmt.Errorf("invalid token, got %d%d%d at position %d", bit1, bit2, bit3, t.br.Pos())
+	return 0, fmt.Errorf("invalid token, got %03b at position %d", tok, t.br.Pos())
 }

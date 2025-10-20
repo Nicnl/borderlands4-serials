@@ -7,12 +7,12 @@ import (
 type Token byte
 
 const (
-	TOK_SEP1     Token = iota // "00" hard separator (terminator?)
-	TOK_SEP2                  // "01" soft separator
-	TOK_VARINT                // "100" ... nibble varint
-	TOK_VARBIT                // "110" ... varbit
-	TOK_PART                  // "101" ... enter KV section
-	TOK_PART_111              // "111" weird, seems linked to DLC items, we DO NOT touch that
+	TOK_SEP1            Token = iota // "00" hard separator (terminator?)
+	TOK_SEP2                         // "01" soft separator
+	TOK_VARINT                       // "100" ... nibble varint
+	TOK_VARBIT                       // "110" ... varbit
+	TOK_PART                         // "101" ... complex part block
+	TOK_UNSUPPORTED_111              // "111" is linked to DLC items, we DO NOT touch that
 )
 
 type Tokenizer struct {
@@ -28,7 +28,7 @@ func NewTokenizer(data []byte) *Tokenizer {
 }
 
 func (t *Tokenizer) DoneString() string {
-	splitted := t.br.StringBefore()
+	splitted := t.br.FullString()
 	for i := len(t.splitPositions) - 1; i >= 0; i-- {
 		pos := t.splitPositions[i]
 		splitted = splitted[:pos] + "  " + splitted[pos:]

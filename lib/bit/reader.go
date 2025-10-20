@@ -19,6 +19,18 @@ func (br *Reader) Read() (byte, bool) {
 	return bit, true
 }
 
+func (br *Reader) Read2() (byte, byte, bool) {
+	bit1, ok1 := br.Read()
+	if !ok1 {
+		return 0, 0, false
+	}
+	bit2, ok2 := br.Read()
+	if !ok2 {
+		return 0, 0, false
+	}
+	return bit1, bit2, true
+}
+
 func (br *Reader) ReadN(n int) (uint32, bool) {
 	if n <= 0 || n > 32 {
 		return 0, false
@@ -75,6 +87,18 @@ func (br *Reader) StringAfter() string {
 		bit, _ := br.Read()
 		result += string('0' + bit)
 	}
+	return result
+}
+
+func (br *Reader) FullString() string {
+	result := ""
+	oldPos := br.pos
+	br.Rewind(oldPos)
+	for i := 0; i < len(br.data)*8; i++ {
+		bit, _ := br.Read()
+		result += string('0' + bit)
+	}
+	br.pos = oldPos
 	return result
 }
 

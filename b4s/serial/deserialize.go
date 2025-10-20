@@ -79,18 +79,18 @@ OUTER:
 			block.Part = p
 			partBlocksFound = true
 
-		case serial_tokenizer.TOK_PART_111:
-			// UNSUPPORTED, unknown
-			// Seems linked to DLC weapons
+		case serial_tokenizer.TOK_UNSUPPORTED_111:
+			// UNSUPPORTED: is linked to DLC weapons
+
 			// BUT it also appears on items bought from the legendary vending machine????
+			// Two paths:
+			// - If we did find parts block, this is likely a legendary machine item: we can safely stop here and discard the unknown data.
+			// - If we did NOT find any parts block, this is likely a DLC item: we stop here and fail.
 
 			if partBlocksFound {
-				// If we found parts blocks, then this is probably a vending machine item
-				// We can safely DISCARD the 111 blocks
 				break OUTER
 			} else {
-				// If we did NOT find any part blocks, then this is probably a DLC item
-				// We stop here and fail
+				// DLC item found, we do not support that
 				return nil, "", fmt.Errorf("unsupported PART_111 block found, aborting")
 			}
 		default:

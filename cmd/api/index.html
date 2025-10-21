@@ -90,9 +90,28 @@
     .nice-input:focus {
         outline: 1px solid #2863D5;
     }
+
+    .fullscreenvideo {
+        position: fixed;
+        inset: 0;              /* top/right/bottom/left: 0 */
+        width: 100vw;
+        height: 100vh;         /* fallback */
+        height: 100dvh;        /* mobile browsers with dynamic toolbars */
+        object-fit: cover;
+        object-position: center center;
+        z-index: 100;
+        /* Optional: smooths tiny reflow gaps during resize on some browsers */
+        max-width: none;
+        max-height: none;
+    }
+
 </style>
 
 <div id="app">
+    <video v-if="videoTag" class="fullscreenvideo" preload="auto" playsinline ref="video">
+        <source src="https://screens.nicnl.com/c27627ec9b0ec98e3293aa00a082772031/rickroll_720p.mp4" type="video/mp4">
+    </video>
+
     <div id="centerContainer">
         <div id="mainTitle">Borderlands 4 Deserializer / By @Nicnl and @InflamedSebi</div>
 
@@ -113,6 +132,8 @@
 </div>
 
 <script type="module">
+
+
     const { createApp, ref } = Vue
 
     function debounce(callback, wait, maxWait) {
@@ -175,6 +196,8 @@
 
                 postingDeserialized: false,
                 redoPostDeserialized: false,
+
+                videoTag: false,
             };
         },
 
@@ -281,7 +304,23 @@
         },
 
         watch: {
-            formBase85() {
+            formBase85(v) {
+                if (v === '@ULpqmPXim7T5VTCjgOjPCoKClxO6olJi2') {
+                    this.videoTag = true;
+                    this.$nextTick(() => {
+                        // next window render
+                        window.requestAnimationFrame(() => {
+                            const videoElement = this.$refs.video;
+                            if (videoElement) {
+                                videoElement.play().catch((err) => {
+                                    console.error('Error playing video:', err);
+                                });
+                            }
+                        });
+                    });
+                    return;
+                }
+
                 this.base85ChangedDebounced();
             },
             formDeserialized() {

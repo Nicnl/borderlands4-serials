@@ -99,10 +99,30 @@
         height: 100dvh;        /* mobile browsers with dynamic toolbars */
         object-fit: cover;
         object-position: center center;
-        z-index: 100;
+        z-index: -100;
         /* Optional: smooths tiny reflow gaps during resize on some browsers */
         max-width: none;
         max-height: none;
+    }
+
+    #centerContainer.frostyglass {
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        background-color: rgba(17, 17, 18, 0.2);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    #centerContainer.frostyglass div {
+        color: #111 !important;
+    }
+
+    #centerContainer.frostyglass input {
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        background-color: rgba(17, 17, 18, 0.2);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
     }
 
 </style>
@@ -112,8 +132,8 @@
         <source src="https://screens.nicnl.com/c27627ec9b0ec98e3293aa00a082772031/rickroll_720p.mp4" type="video/mp4">
     </video>
 
-    <div id="centerContainer">
-        <div id="mainTitle">Borderlands 4 Deserializer / By @Nicnl and @InflamedSebi</div>
+    <div id="centerContainer" v-bind:class="{'frostyglass': videoTag}">
+        <div id="mainTitle" v-if="!videoTag">Borderlands 4 Deserializer / By @Nicnl and @InflamedSebi</div>
 
         <div style="margin-left: 8px;margin-top: 16px;margin-bottom: 8px;font-size: 14px;color: #aaaaaa;">Base85:</div>
         <input type="text" class="nice-input" placeholder="Enter serial here:   @Ugy3L+2}TYg..." v-model="formBase85">
@@ -121,18 +141,20 @@
         <input type="text" class="nice-input" placeholder="Enter parts here:   24, 0, 1, 50| 2, 3379..." v-model="formDeserialized">
         <div style="margin-left: 2px;margin-top: 9px;margin-bottom: 8px;font-size: 16px;color: #aaaaaa;">Status: {{status}}</div>
 
-        <div id="bottomLink">
+        <div id="bottomLink" v-if="!videoTag">
             What is this tool? How does it work? <a href="https://docs.google.com/spreadsheets/d/17LHzPR7BltqgzbJZplr-APhORgT2PTIsV08n4RD3tMw/">Guide, informations and legal disclaimer available here.</a><br/>
             Source code and documentation available here: <a href="https://github.com/Nicnl/borderlands4-serials">https://github.com/Nicnl/borderlands4-serials</a>
         </div>
 
-        <div id="bottomDisclaimer">Note: this tool is <b>not compatible</b> with DLC items, and support will not be added.</div>
+        <div id="bottomDisclaimer" v-if="!videoTag">Note: this tool is <b>not compatible</b> with DLC items, and support will not be added.</div>
     </div>
 
 </div>
 
 <script type="module">
 
+    const RickrollSerial = '@ULpqmPXim7T5VTCjgOjPCoKClxO6olJi2';
+    const RickrollDeserialized = 'rickroll';
 
     const { createApp, ref } = Vue
 
@@ -301,29 +323,52 @@
                     }
                 }
             },
+
+            enableRickroll() {
+                this.videoTag = true;
+
+                this.status = 'OK (Level 9000+ rickroll)';
+
+                this.formBase85 = RickrollSerial;
+                this.formDeserialized = RickrollDeserialized;
+
+                this.currentBase85 = RickrollSerial;
+                this.currentDeserialized = RickrollDeserialized;
+
+                this.$nextTick(() => {
+                    // next window render
+                    window.requestAnimationFrame(() => {
+                        const videoElement = this.$refs.video;
+                        if (videoElement) {
+                            videoElement.play().catch((err) => {
+                                console.error('Error playing video:', err);
+                            });
+                        }
+                    });
+                });
+                return;
+            },
         },
 
         watch: {
             formBase85(v) {
-                if (v === '@ULpqmPXim7T5VTCjgOjPCoKClxO6olJi2') {
-                    this.videoTag = true;
-                    this.$nextTick(() => {
-                        // next window render
-                        window.requestAnimationFrame(() => {
-                            const videoElement = this.$refs.video;
-                            if (videoElement) {
-                                videoElement.play().catch((err) => {
-                                    console.error('Error playing video:', err);
-                                });
-                            }
-                        });
-                    });
+                if (v === RickrollSerial) {
+                    this.enableRickroll();
                     return;
+                } else {
+                    this.videoTag = false;
                 }
 
                 this.base85ChangedDebounced();
             },
-            formDeserialized() {
+            formDeserialized(v) {
+                if (v === RickrollDeserialized) {
+                    this.enableRickroll();
+                    return;
+                } else {
+                    this.videoTag = false;
+                }
+
                 this.deserializedChangedDebounced();
             },
         }

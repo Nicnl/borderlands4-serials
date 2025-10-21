@@ -29,7 +29,7 @@ It handles the bitstream protocol used by the game to represent items and their 
   - It prevents the skin from being handled, and gets stripped of the item as a result. (Example: phosphene skin.)
   - It prevents DLC items from being decoded. Because DLC items are paid, support will not be added.
 
-That's the only known limitation.
+This is the only known limitation.
 
 ## Base85 to bitstream
 Before doing anything, the serials must be turned into an usable bitstream.
@@ -71,6 +71,9 @@ Practical example:
 First, the bitstream always starts with this magic 7-bit header `0010000`.  
 Then, it consists of tokens that dictates how to read subsequent data.  
 Finally, the bitstream ends with a hard terminator token (`00`).
+
+The bitstream contains no ciphering, and no checksum.   
+As long as you know how to read the tokens and their data, you can decode and encode the entire item.     
 
 **Note:** zero padding is used at the end to align to byte boundary, but is not part of the data.
 
@@ -128,6 +131,60 @@ It links an index to either no value, a single integer value, or a list of integ
       - `00` token ends list
 
 Read more about PARTs [here](_docs/PART.md).
+
+## String representation
+
+The game engine most probably deserialize/reserialize the item data from/to structures in memory.   
+However, we don't have access to this structure.   
+This is why we came up with a human-readable string representation of the item data.   
+
+The deserializer turns the item serials into a human-readable string format, example:  
+```
+Serial:
+  @Ugr$WBm/$!m!X=5&qXxA;nj3OOD#<4R
+
+Result:
+  267, 0, 1, 22| 2, 274|| {7} {1} {245:[23 39 69 79]}|
+```
+
+This string representation is a 1-to-1 mapping of the bitstream structure, using the following rules:
+- Tokens are separated by spaces.
+- `TOK_SEP1` (`00`) is represented as `|`
+- `TOK_SEP2` (`01`) is represented as `,`
+- `TOK_VARINT` (`100`) is represented as the integer value (e.g. `123`)
+- `TOK_VARBIT` (`110`) is represented as the integer value (e.g. `123`)
+- `TOK_PART` (`101`) is represented as:
+  - `{index}` for SUBTYPE_NONE
+  - `{index:value}` for SUBTYPE_INT
+  - `{index:[value1 value2 ...]}` for SUBTYPE_LIST
+
+This allows to easily read and write item data in a textual format, without knowing the underlying structures used by the game engine.
+
+- **Note 1:** VARINT and VARBIT are ambiguous, they use the same string  representation.  
+This is because the game engine accepts both interchangeably:   
+It collapses from one format to the other depending on which is the shortest during serialization.
+
+- **Note 2:** The same logic should be applied when serializing from string representation.  
+If not, the game may collapse VARINTs from/to VARBITs.  
+(Not a big deal, result is the same, but it may surprise you if you expected your serial to stay the same.)
+
+  
+## Complete deserialization example
+
+The serial below has been deserialized into its bitstream and string representation.  
+For clarity, the bitstream has also been splitted into its tokens and data blocks.
+
+```
+Serial:
+  @Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf{00
+
+Splitted bitstream:
+  0010000  1000001110000  01  10000000  01  10010000  01  1000100111000  00  10001000  01  100110011100110110  00  00  1010011100100010  10101000010  10111000010  1011101100100010  1011001111000010  1010011111000010  1011101111000010  1010000110000010  1011001110000010  1010011101000010  1011000111000010  00  0000000
+  Header   Varint:24      ,   Varbit:0  ,   Varint:1  ,   Varint:50      |   Varint:2  |   Varint:3379         |   |   Part:76           Part: 2      Part:3       Part:75           Part:57           Part:60           Part:59           Part:16           Part:25           Part:44           Part:49           |   Padding
+
+String representation:
+  24, 0, 1, 50| 2, 3379|| {76} {2} {3} {75} {57} {60} {59} {16} {25} {44} {49}|
+```
 
 ## How did we discover all this?
 

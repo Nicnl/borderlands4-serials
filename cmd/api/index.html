@@ -325,9 +325,10 @@
             },
 
             enableRickroll() {
+                if (this.videoTag) return;
                 this.videoTag = true;
 
-                this.status = 'OK (Level 9000+ rickroll)';
+                this.status = 'PWNED (Level 9000+ rickroll)';
 
                 this.formBase85 = RickrollSerial;
                 this.formDeserialized = RickrollDeserialized;
@@ -353,7 +354,7 @@
         watch: {
             formBase85(v) {
                 if (v === RickrollSerial) {
-                    if (!this.videoTag) this.enableRickroll();
+                    this.enableRickroll();
                     return;
                 } else {
                     this.videoTag = false;
@@ -363,7 +364,7 @@
             },
             formDeserialized(v) {
                 if (v === RickrollDeserialized) {
-                    if (!this.videoTag) this.enableRickroll();
+                    this.enableRickroll();
                     return;
                 } else {
                     this.videoTag = false;

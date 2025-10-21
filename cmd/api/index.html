@@ -45,9 +45,29 @@
         left: 5px;
     }
 
-    #bottomDisclaimer {
+    #bottomLink {
         position: absolute;
         bottom: -30px;
+        left: 16px;
+        color: #ddd;
+        font-size: 14px;
+    }
+
+    #bottomLink a {
+        color: #2f67ba;
+    }
+
+    #bottomLink a:hover {
+        color: #5590f0;
+    }
+
+    #bottomLink a:active {
+        color: #1a4a8c;
+    }
+
+    #bottomDisclaimer {
+        position: absolute;
+        bottom: -60px;
         left: 16px;
         color: #666;
         font-size: 14px;
@@ -81,6 +101,8 @@
         <div style="margin-left: 8px;margin-top: 16px;margin-bottom: 8px;font-size: 14px;color: #aaaaaa;">Deserialized:</div>
         <input type="text" class="nice-input" placeholder="Enter parts here:   24, 0, 1, 50| 2, 3379..." v-model="formDeserialized">
         <div style="margin-left: 2px;margin-top: 9px;margin-bottom: 8px;font-size: 16px;color: #aaaaaa;">Status: {{status}}</div>
+
+        <div id="bottomLink">What is this tool? How does it work? <a href="https://docs.google.com/spreadsheets/d/17LHzPR7BltqgzbJZplr-APhORgT2PTIsV08n4RD3tMw/">Guide, informations and legal disclaimer available here.</a></div>
 
         <div id="bottomDisclaimer">Note: this tool is <b>not compatible</b> with DLC items, and support will not be added.</div>
     </div>

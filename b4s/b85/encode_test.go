@@ -6,7 +6,6 @@ import (
 )
 
 func TestEncode(t *testing.T) {
-
 	for _, tt := range tests {
 		t.Run(tt.hex, func(t *testing.T) {
 			// Convert hex string to bytes

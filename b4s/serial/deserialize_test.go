@@ -714,6 +714,79 @@ func TestDeserializeProblematicSerials2(t *testing.T) {
 	}
 }
 
+func TestDeserializePhospheneSkin(t *testing.T) {
+	var tests = []struct {
+		serialNormal    string
+		serialPhosphene string
+	}{
+		{
+			// 111100001100011011000011000 000
+			"@UgdhV<Fme!Kq%_bvRG/))sC1~Bs7#GP%/V4i%/iV`?L+_",
+			"@UgdhV<Fme!Kq%_bvRG/))sC1~Bs7#GP%/V4i%/iV`?L<6`4Fd",
+		},
+		{
+			// 111100001100011011000011000
+			"@UgdhV<Fme!Kye7~(RG/*FsC1~Bs7ie*C#nwW4{8=_9I7V*",
+			"@UgdhV<Fme!Kye7~(RG/*FsC1~Bs7ie*C#nwW4{8=_9I7YcVQd%",
+		},
+		{
+			// 1111000011000110110000101100000000000
+			"@Ugd77*Fme!KY)?>XRG}8ts6-7H3W<t/YKfYO3WLgnI)zGw%7rS200",
+			"@Ugd77*Fme!KY)?>XRG}8ts6-7H3W<t/YKfYO3WLgnI)zGw%7rS2co-WR00",
+		},
+		{
+			// 11110000110001101100100110100000000000
+			"@UgggUGFme!K_(jl7R87>O3Kb7^4^<D<sX>)OjY7pjwL/~",
+			"@UgggUGFme!K_(jl7R87>O3Kb7^4^<D<sX>)OjY7pjwM0COO%?z",
+		},
+		{
+			// 11110000110001101100000110100000
+			"@Ugydj=2}TYgT#^p$Llx>!jY`yzp?s*9sF/pisFkQq?Ln17jY920r9%zj00",
+			"@Ugydj=2}TYgT#^p$Llx>!jY`yzp?s*9sF/pisFkQq?Ln17jY920r9%zj01sn>1p",
+		},
+		{
+			// 111100001100011011000111110000000
+			"@Ugy3L+2}TYgOx*?=RG/)46V(s35A~@ss5z)xsB#D",
+			"@Ugy3L+2}TYgOx*?=RG/)46V(s35A~@ss5z)xsB(yhvGD-",
+		},
+		{
+			// 11110000110001101100100110100000000
+			"@UgggUGFme!KB5%-5R87>O8da!ysCcM)sC%eR4XPCC6{;5k",
+			"@UgggUGFme!KB5%-5R87>O8da!ysCcM)sC%eR4XPCC6{;8FVQjJh",
+		},
+		{
+			// 111100001100011011000011000 0000000
+			"@UgdhV<Fme##(tBtfs!)kahpLIX)ELwqR4LRcR4r6ER8Ir",
+			"@UgdhV<Fme##(tBtfs!)kahpLIX)ELwqR4LRcR4r6ER8Pdi*f0P",
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			{
+				data, err := b85.Decode(tt.serialNormal)
+				assert.NoError(t, err)
+
+				blocks, bits, err := Deserialize(data)
+				assert.NoError(t, err)
+				fmt.Println("Result:", blocks.String())
+				fmt.Println("Bits:", bits)
+			}
+
+			{
+				data, err := b85.Decode(tt.serialPhosphene)
+				assert.NoError(t, err)
+
+				blocks, bits, err := Deserialize(data)
+				assert.NoError(t, err)
+				fmt.Println("Result:", blocks.String())
+				fmt.Println("Bits:", bits)
+			}
+
+		})
+	}
+}
+
 func TestDeserializeCompareBuybacks(t *testing.T) {
 	var tests = []struct {
 		name           string

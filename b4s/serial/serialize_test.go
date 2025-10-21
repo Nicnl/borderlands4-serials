@@ -124,6 +124,16 @@ func TestSerializeFromString(t *testing.T) {
 			"@Ugy3L+2}TYg%$yC%i7Es",
 			"24, 0, 1, 50| 2, 3379|| {76} {2}|",
 		},
+		{
+			"test debug 2",
+			"@UgdhV<Fme!Kq%_bvRG/))sC1~Bs7#GP%/V4i%/iV`?L+_",
+			"8, 0, 1, 50| 2, 1570|| {53} {2} {3} {4} {52} {74} {12} {17} {25} {32} {41} {47} {77}|",
+		},
+		{
+			"test debug 3",
+			"@UgdhV<Fme##(tBtfs!)kahpLIX)ELwqR4LRcR4r6ER8Ir",
+			"8, 0, 1, 50| 2, 495|| {53} {2} {4} {52} {74} {11} {17} {27} {34} {35} {42} {48} {78}|",
+		},
 	}
 
 	for _, tt := range tests {

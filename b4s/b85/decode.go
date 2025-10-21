@@ -5,7 +5,10 @@ import (
 	"fmt"
 )
 
-const b85Charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{/}~"
+const (
+	b85Charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{/}~"
+	b85Padding = '~'
+)
 
 var reverseLookup [256]byte
 
@@ -25,21 +28,25 @@ func Decode(serial string) ([]byte, error) {
 	}
 	serial = serial[2:]
 
-	result := make([]byte, 0)
-	idx := 0
-	size := len(serial)
+	var (
+		result = make([]byte, 0, (len(serial)*4/5)+4) // Preallocate with some extra space
+		idx    = 0
+		size   = len(serial)
+	)
 
 	for idx < size {
-		var workingU32 uint32 = 0
-		charCount := 0
+		var (
+			v         = uint32(0)
+			charCount = 0
+		)
 
 		// Collect up to 5 valid Base85 characters
 		for idx < size && charCount < 5 {
 			charCode := serial[idx]
 			idx++
 
-			if reverseLookup[charCode] < 0x56 {
-				workingU32 = workingU32*85 + uint32(reverseLookup[charCode])
+			if reverseLookup[charCode] <= 85 {
+				v = v*85 + uint32(reverseLookup[charCode])
 				charCount++
 			}
 		}
@@ -52,7 +59,7 @@ func Decode(serial string) ([]byte, error) {
 		if charCount < 5 {
 			padding := 5 - charCount
 			for i := 0; i < padding; i++ {
-				workingU32 = workingU32*85 + 0x7e // '~' value
+				v = v*85 + b85Padding
 			}
 		}
 
@@ -63,20 +70,20 @@ func Decode(serial string) ([]byte, error) {
 		}
 
 		if byteCount >= 1 {
-			result = append(result, byte((workingU32>>24)&0xFF))
+			result = append(result, byte((v>>24)&0xFF))
 		}
 		if byteCount >= 2 {
-			result = append(result, byte((workingU32>>16)&0xFF))
+			result = append(result, byte((v>>16)&0xFF))
 		}
 		if byteCount >= 3 {
-			result = append(result, byte((workingU32>>8)&0xFF))
+			result = append(result, byte((v>>8)&0xFF))
 		}
 		if byteCount >= 4 {
-			result = append(result, byte((workingU32>>0)&0xFF))
+			result = append(result, byte((v>>0)&0xFF))
 		}
 	}
 
-	// Reverse the bits in each byte
+	// Mirror the bits in each byte
 	// 76543210 -> 01234567
 	for i := range result {
 		// Using a lookup table for performance

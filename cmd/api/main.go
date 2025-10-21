@@ -69,11 +69,9 @@ func CORSMiddleware(c *gin.Context) {
 const README_JSON = `
 Hey you, peeking at the JSON!
 
-We hope you have fun reverse engineering the serials, it'll will give you at least some of the fun and struggles we had decoding it.
-We really cant stop anyone from reverse engineer our tool and just publish it, and we don't want to either.
-However, we will release our notes eventually, when the tool is done or someone else also manages to decode the serial correctly.
-
-There is no need to gatekeep this forever, but for now it is quite a good feeling to be one of the few who did solve this riddle 😉
+No need to peek anymore 😉
+The complete source code and documentation is available here on Github: 
+https://github.com/Nicnl/borderlands4-serials
 
 With love,
 - Nicnl & InflamedSebi

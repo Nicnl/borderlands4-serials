@@ -353,7 +353,7 @@
         watch: {
             formBase85(v) {
                 if (v === RickrollSerial) {
-                    this.enableRickroll();
+                    if (!this.videoTag) this.enableRickroll();
                     return;
                 } else {
                     this.videoTag = false;
@@ -363,7 +363,7 @@
             },
             formDeserialized(v) {
                 if (v === RickrollDeserialized) {
-                    this.enableRickroll();
+                    if (!this.videoTag) this.enableRickroll();
                     return;
                 } else {
                     this.videoTag = false;

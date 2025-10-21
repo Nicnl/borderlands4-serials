@@ -2,7 +2,17 @@
 
 A Go library for encoding and decoding Borderlands 4 item serial codes.  
 It also has a web-based API and UI for easy access.   
-A live demo is available [here](https://borderlands4-deserializer.nicnl.com/).
+A live demo is available here: [borderlands4-deserializer.nicnl.com](https://borderlands4-deserializer.nicnl.com/)
+
+
+## Legal disclaimer
+
+This project and its contributors are not affiliated, associated, authorized, endorsed by,
+or in any way officially connected with Gearbox Software, 2K Games, Inc.,
+or any of their subsidiaries or affiliates.
+The names "Borderlands," "Gearbox," "2K," as well as any related names, marks, emblems,
+and images are registered trademarks of their respective owners.
+
 
 ## Overview
 
@@ -15,6 +25,7 @@ It handles the bitstream protocol used by the game to represent items and their 
 - **Serialize** item data back into binary format
 - **String representation** for human-readable item codes
 - **Parse from string** to reconstruct items from text format
+- **High performance** deserialization/serialization is under 1ms, around 200μs on average.
 
 ## Supported Features
 

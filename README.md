@@ -1,6 +1,8 @@
 # Borderlands 4 Serials
 
-A Go library for encoding and decoding Borderlands 4 item serial codes.
+A Go library for encoding and decoding Borderlands 4 item serial codes.  
+It also has a web-based API and UI for easy access.   
+A live demo is available [here](https://borderlands4-deserializer.nicnl.com/).
 
 ## Overview
 

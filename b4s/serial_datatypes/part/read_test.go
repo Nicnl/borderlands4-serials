@@ -60,6 +60,42 @@ var testsGroups = []struct {
 	},
 
 	{
+		name: "Examples from the docs",
+		tests: []test{
+			{
+				bits: "0011100100  0:10",
+				expected: Part{
+					Index:   76,
+					SubType: SUBTYPE_NONE,
+				},
+			},
+			{
+				bits: "0110111000  0:10",
+				expected: Part{
+					Index:   54,
+					SubType: SUBTYPE_NONE,
+				},
+			},
+			{
+				bits: "0011100100    1     00100     000",
+				expected: Part{
+					Index:   76,
+					SubType: SUBTYPE_INT,
+					Value:   4,
+				},
+			},
+			{
+				bits: "0110111000    0:01   01     100:11000   100:01000   100:10000   00",
+				expected: Part{
+					Index:   54,
+					SubType: SUBTYPE_LIST,
+					Values:  []uint32{3, 2, 1},
+				},
+			},
+		},
+	},
+
+	{
 		name: "Type simple, two blocks",
 		tests: []test{
 			{

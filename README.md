@@ -4,7 +4,7 @@ A Go library for encoding and decoding Borderlands 4 item serial codes.
 
 ## Overview
 
-This library provides functionality to parse, manipulate, and serialize Borderlands 4 weapon/item codes.  
+This library provides functionality to deserialize, manipulate, and reserialize Borderlands 4 weapon/item codes.  
 It handles the bitstream protocol used by the game to represent items and their parts.
 
 ## Features

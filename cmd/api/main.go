@@ -196,7 +196,13 @@ func main() {
 		item, err := codex.Deserialize(jsonReq.SerialB85)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Failed to deserialize:", jsonReq.SerialB85, "=>", err.Error())
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+			jsonErr := gin.H{"error": err.Error()}
+			if item != nil && item.Bits != "" {
+				jsonErr["bitstream"] = item.Bits
+			}
+
+			c.JSON(http.StatusBadRequest, jsonErr)
 			return
 		}
 

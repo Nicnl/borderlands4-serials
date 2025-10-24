@@ -19,7 +19,11 @@ func Deserialize(base85 string) (*Item, error) {
 
 	blocks, bits, err := serial.Deserialize(data)
 	if err != nil {
-		return nil, err
+		return &Item{
+			B85:    base85,
+			Bits:   bits,
+			Serial: blocks,
+		}, err
 	}
 
 	return &Item{

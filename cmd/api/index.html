@@ -320,6 +320,7 @@
                 }
                 this.postingBase85 = true;
 
+                let result;
                 try {
                     const response = await fetch('/api/v1/deserialize', {
                         method: 'POST',
@@ -328,12 +329,12 @@
                             serial_b85: this.formBase85,
                         }),
                     });
-                    const result = await response.json();
+                    result = await response.json();
+                    console.log(result);
                     if (!response.ok) {
                         throw new Error(result.error || `Response status: ${response.status}`);
                     }
 
-                    console.log(result);
                     this.status = 'OK' + (result.additional_data ? (' (' + result.additional_data + ')') : '');
 
                     this.currentBase85 = this.formBase85;
@@ -347,7 +348,7 @@
                     this.currentBase85 = '';
                     this.currentDeserialized = '';
                     this.formDeserialized = '';
-                    this.bitstream = '';
+                    this.bitstream = result && result.bitstream ? result.bitstream : '';
                 } finally {
                     this.postingBase85 = false;
                     if (this.redoPostBase85) {

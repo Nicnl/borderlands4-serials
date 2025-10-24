@@ -5,7 +5,7 @@ import (
 	"borderlands_4_serials/lib/helpers"
 )
 
-func Write(br *bit.Writer, value uint32) {
+func Write(bw *bit.Writer, value uint32) {
 	// Figure out how many bits we need to represent 'value'
 	nBits := helpers.IntBitsSize(value, 0, helpers.IntPow(2, VARBIT_LENGTH_BLOCK_SIZE)-1)
 	//fmt.Println("nBits =", nBits, "for value =", value)
@@ -13,13 +13,13 @@ func Write(br *bit.Writer, value uint32) {
 	// Write length
 	lengthBits := nBits
 	for range VARBIT_LENGTH_BLOCK_SIZE {
-		br.WriteBit(byte(lengthBits) & 0b1)
+		bw.WriteBit(byte(lengthBits) & 0b1)
 		lengthBits >>= 1
 	}
 
 	// Write value bits
 	for i := 0; i < nBits; i++ {
-		br.WriteBit(byte(value) & 0b1)
+		bw.WriteBit(byte(value) & 0b1)
 		value >>= 1
 	}
 }

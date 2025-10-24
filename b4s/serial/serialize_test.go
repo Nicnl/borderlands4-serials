@@ -256,3 +256,10 @@ func TestSerializePartsRoundtrip(t *testing.T) {
 		})
 	}
 }
+
+func TestSerializeSkins(t *testing.T) {
+	for _, tt := range skinTests {
+		t.Run(tt.name, func(t *testing.T) {
+		})
+	}
+}

@@ -5,12 +5,14 @@ import (
 	"borderlands_4_serials/b4s/serial_tokenizer"
 	"crypto/sha1"
 	"fmt"
+	"strings"
 )
 
 type Block struct {
-	Token serial_tokenizer.Token
-	Value uint32
-	Part  part.Part
+	Token    serial_tokenizer.Token
+	Value    uint32
+	ValueStr string
+	Part     part.Part
 }
 
 type Serial []Block
@@ -39,16 +41,20 @@ func (s Serial) String() string {
 				output += " "
 			}
 			output += fmt.Sprintf("%d", b.Value)
-		case serial_tokenizer.TOK_UNSUPPORTED_111:
-			if i > 0 {
-				output += " "
-			}
-			output += fmt.Sprintf("<111>")
 		case serial_tokenizer.TOK_PART:
 			if i > 0 {
 				output += " "
 			}
 			output += b.Part.String()
+		case serial_tokenizer.TOK_STRING:
+			if i > 0 {
+				output += " "
+			}
+
+			b.ValueStr = strings.ReplaceAll(b.ValueStr, "\\", "\\\\")
+			b.ValueStr = strings.ReplaceAll(b.ValueStr, "\"", "\\\"")
+
+			output += "\"" + b.ValueStr + "\""
 		default:
 			output += fmt.Sprintf(" <UNKNOWN_TOKEN:%d>", b.Token)
 		}

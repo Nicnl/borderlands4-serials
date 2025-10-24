@@ -128,66 +128,34 @@ func bestTypeForValue(v uint32) serial_tokenizer.Token {
 }
 
 func (s *Serial) FromString(str string) error {
-	for {
-		before := str
+	var blocks []Block
+	i := 0
 
-		str = strings.ReplaceAll(str, "} ", "}")
-		str = strings.ReplaceAll(str, " {", "{")
-		str = strings.ReplaceAll(str, ", ", ",")
-		str = strings.ReplaceAll(str, "| ", "|")
-		str = strings.ReplaceAll(str, " |", "|")
+	for i < len(str) {
+		char := str[i]
 
-		if before == str {
-			break
-		}
-	}
-	// str = "24,0,1,50|2,3379||{76}{2}{3}{75}{57}{60}{59}{16}{25}{44}{49:4}{54:[1 2 3]}|"
+		switch {
+		case char == ' ' || char == '\t' || char == '\n' || char == '\r':
+			// Skip whitespace
+			i++
+		case char == '|':
+			blocks = append(blocks, Block{Token: serial_tokenizer.TOK_SEP1})
+			i++
+		case char == ',':
+			blocks = append(blocks, Block{Token: serial_tokenizer.TOK_SEP2})
+			i++
+		case char == '{':
+			// Find the matching '}'
+			end := strings.IndexRune(str[i:], '}')
+			if end == -1 {
+				return fmt.Errorf("unmatched '{' at position %d", i)
+			}
+			end += i // Adjust index to be relative to the start of the string
 
-	var (
-		from   = 0
-		to     = 1
-		blocks = make([]Block, 0, 50)
-	)
-	for {
-		if to >= len(str) {
-			break
-		}
+			partStr := str[i : end+1]
+			i = end + 1
 
-		buffer := str[from:to]
-		char := str[to]
-		//fmt.Printf("buffer='%s'   //   char='%s'\n", buffer, string(char))
-
-		switch char {
-		case ',', '|', '{':
-			from = to
-			if buffer == "" {
-				// Nothing to do
-			} else if v, ok := isNumbers(buffer); ok {
-				blocks = append(blocks, Block{
-					Token: bestTypeForValue(v),
-					Value: v,
-				})
-				//fmt.Println("    Add block:", blocks[len(blocks)-1])
-			} else if v, ok := isPartSimple(buffer); ok {
-				blocks = append(blocks, Block{
-					Token: serial_tokenizer.TOK_PART,
-					Part: part.Part{
-						Index:   v,
-						SubType: part.SUBTYPE_NONE,
-					},
-				})
-				//fmt.Println("    Add block:", blocks[len(blocks)-1])
-			} else if index, v, ok := isPartSubtypeInt(buffer); ok {
-				blocks = append(blocks, Block{
-					Token: serial_tokenizer.TOK_PART,
-					Part: part.Part{
-						Index:   index,
-						SubType: part.SUBTYPE_INT,
-						Value:   v,
-					},
-				})
-				//fmt.Println("    Add block:", blocks[len(blocks)-1])
-			} else if index, list, ok := isPartSubtypeList(buffer); ok {
+			if index, list, ok := isPartSubtypeList(partStr); ok {
 				blocks = append(blocks, Block{
 					Token: serial_tokenizer.TOK_PART,
 					Part: part.Part{
@@ -196,40 +164,74 @@ func (s *Serial) FromString(str string) error {
 						Values:  list,
 					},
 				})
-				//fmt.Println("    Add block:", blocks[len(blocks)-1])
+			} else if index, v, ok := isPartSubtypeInt(partStr); ok {
+				blocks = append(blocks, Block{
+					Token: serial_tokenizer.TOK_PART,
+					Part: part.Part{
+						Index:   index,
+						SubType: part.SUBTYPE_INT,
+						Value:   v,
+					},
+				})
+			} else if v, ok := isPartSimple(partStr); ok {
+				blocks = append(blocks, Block{
+					Token: serial_tokenizer.TOK_PART,
+					Part: part.Part{
+						Index:   v,
+						SubType: part.SUBTYPE_NONE,
+					},
+				})
 			} else {
-				return fmt.Errorf("invalid integer: '%s'", buffer)
+				return fmt.Errorf("invalid part format: '%s'", partStr)
 			}
-		}
+		case char >= '0' && char <= '9':
+			// Find the end of the number
+			start := i
+			for i < len(str) && str[i] >= '0' && str[i] <= '9' {
+				i++
+			}
+			numStr := str[start:i]
 
-		switch char {
-		case '|':
-			from++
-			blocks = append(blocks, Block{Token: serial_tokenizer.TOK_SEP1})
-			//fmt.Println("    Add block:", blocks[len(blocks)-1])
-		case ',':
-			from++
-			blocks = append(blocks, Block{Token: serial_tokenizer.TOK_SEP2})
-			//fmt.Println("    Add block:", blocks[len(blocks)-1])
-		}
+			v, err := strconv.ParseUint(numStr, 10, 32)
+			if err != nil {
+				// This should not happen given the loop condition
+				return fmt.Errorf("invalid number: '%s'", numStr)
+			}
+			blocks = append(blocks, Block{
+				Token: bestTypeForValue(uint32(v)),
+				Value: uint32(v),
+			})
 
-		if char >= '0' && char <= '9' {
-			// Just a number, continue
-		} else if char == '{' || char == '}' {
-			// Just started a part, continue
-		} else if char == ' ' {
-			// Spaces are okay
-		} else if char == ':' || char == '[' || char == ']' || char == ',' || char == '|' {
-			// Also okay inside parts
-		} else {
-			return fmt.Errorf("invalid character: '%s' at pos %d", string(char), to)
-		}
+		case char == '"':
+			// Find the closing quote
+			end := i + 1
+			for end < len(str) && str[end] != '"' {
+				// Handle escaped quotes
+				if str[end] == '\\' && end+1 < len(str) && str[end+1] == '"' {
+					end += 2
+					continue
+				}
+				end++
+			}
+			if end >= len(str) {
+				return fmt.Errorf("unmatched '\"' at position %d", i)
+			}
+			strContent := str[i+1 : end]
+			i = end + 1
 
-		to++
+			// Unescape quotes and backslashes
+			strContent = strings.ReplaceAll(strContent, "\\\"", "\"")
+			strContent = strings.ReplaceAll(strContent, "\\\\", "\\")
+
+			blocks = append(blocks, Block{
+				Token:    serial_tokenizer.TOK_STRING,
+				ValueStr: strContent,
+			})
+		default:
+			return fmt.Errorf("invalid character: '%c' at position %d", char, i)
+		}
 	}
 
-	//fmt.Println("FINAL:", s.String())
 	*s = blocks
-
 	return nil
 }

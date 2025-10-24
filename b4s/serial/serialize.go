@@ -1,6 +1,7 @@
 package serial
 
 import (
+	"borderlands_4_serials/b4s/serial_datatypes/b4string"
 	"borderlands_4_serials/b4s/serial_datatypes/part"
 	"borderlands_4_serials/b4s/serial_datatypes/varbit"
 	"borderlands_4_serials/b4s/serial_datatypes/varint"
@@ -30,11 +31,9 @@ func Serialize(s Serial) []byte {
 		case serial_tokenizer.TOK_PART:
 			bw.WriteBits(1, 0, 1)
 			part.Write(bw, block.Part)
-		case serial_tokenizer.TOK_UNSUPPORTED_111:
-			// Unsupported, linked to DLC item.
-			// We explicitly DO NOT handle this case.
-			// We respect 2K and Gearbox money boundaries: we don't touch paid stuff.
-			break
+		case serial_tokenizer.TOK_STRING:
+			bw.WriteBits(1, 1, 1)
+			b4string.Write(bw, block.ValueStr)
 		}
 	}
 

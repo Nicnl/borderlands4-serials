@@ -36,14 +36,6 @@ It handles the bitstream protocol used by the game to represent items and their 
     - Integer subtype (index + single value)
     - List subtype (index + array of values)
 
-## Limitations
-
-- Major type "111" is not supported:
-  - It prevents the skin from being handled, and gets stripped of the item as a result. (Example: phosphene skin.)
-  - It prevents DLC items from being decoded. Because DLC items are paid, support will not be added.
-
-This is the only known limitation.
-
 ## Base85 to bitstream
 Before doing anything, the serials must be turned into an usable bitstream.
 
@@ -100,8 +92,7 @@ This is possible because the binary prefixes are unique.
 - **`100`** (3 bits) - `TOK_VARINT` - Followed by a nibble-based variable integer, string representation `123`
 - **`110`** (3 bits) - `TOK_VARBIT` - Followed by a length-prefixed variable integer, string representation `123`
 - **`101`** (3 bits) - `TOK_PART` - Followed by a complex part structure, string representation `{54}` or `{54:3}` or `{54:[3 2 1]}`
-- **`111`** (3 bits) - `TOK_UNSUPPORTED_111` - Unknown data block, found on specific items. (DLC items + phosphene skin)  
-  **Support will not be added for type 111.**
+- **`111`** (3 bits) - `TOK_STRING` - Followed by a length-prefixed 7-bit ASCII string
 
 ### Data Encoding
 
@@ -145,6 +136,12 @@ It links an index to either no value, a single integer value, or a list of integ
 
 Read more about PARTs [here](_docs/PART.md).
 
+#### STRING (after `111` token)
+This is a length-prefixed string.   
+
+- **Length**: VARINT (**without** its `100` token)  
+- **Data**: sequence of 7-bit ASCII characters (LSB-first)
+
 ## String representation
 
 The game engine most probably deserialize/reserialize the item data from/to structures in memory.   
@@ -170,6 +167,7 @@ This string representation is a 1-to-1 mapping of the bitstream structure, using
   - `{index}` for SUBTYPE_NONE
   - `{index:value}` for SUBTYPE_INT
   - `{index:[value1 value2 ...]}` for SUBTYPE_LIST
+- `TOK_STRING` (`111`) is represented as: `"hello world"`
 
 This allows to easily read and write item data in a textual format, without knowing the underlying structures used by the game engine.
 
@@ -223,3 +221,4 @@ You can read our journal [here](_docs/JOURNAL.md).
 - @Nicnl for his variable-length token discovery.
 - @Nicnl for his 101 PART structure discovery.
 - @InflamedSebi for writing down the journal.
+- @Cr4nkSt4r for his string discovery.

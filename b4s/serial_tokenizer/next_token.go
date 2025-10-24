@@ -41,7 +41,7 @@ func (t *Tokenizer) NextToken() (Token, error) {
 	case 0b101:
 		return TOK_PART, nil
 	case 0b111:
-		return TOK_UNSUPPORTED_111, nil
+		return TOK_STRING, nil
 	}
 
 	// If we are here, it means our rules didn't match any valid token

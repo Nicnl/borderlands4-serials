@@ -1,6 +1,7 @@
 package serial
 
 import (
+	"borderlands_4_serials/b4s/serial_datatypes/b4string"
 	"borderlands_4_serials/b4s/serial_datatypes/part"
 	"borderlands_4_serials/b4s/serial_datatypes/varbit"
 	"borderlands_4_serials/b4s/serial_datatypes/varint"
@@ -23,13 +24,8 @@ func Deserialize(data []byte) (Serial, string, error) {
 
 		// Keep track of the trailing terminators for sanitization later
 		trailingTerminators = 0
-
-		// Did we find part blocks? (Type 101)
-		// This is to distinguish DLC items (which ONLY contains the type 111 blocks) from items bought through the legendary vending machine.
-		partBlocksFound = false
 	)
 
-OUTER:
 	for {
 		token, err := t.NextToken()
 		if err == io.EOF {
@@ -77,22 +73,14 @@ OUTER:
 			}
 
 			block.Part = p
-			partBlocksFound = true
 
-		case serial_tokenizer.TOK_UNSUPPORTED_111:
-			// UNSUPPORTED: is linked to DLC weapons
-
-			// BUT it also appears on items bought from the legendary vending machine????
-			// Two paths:
-			// - If we did find parts block, this is likely a legendary machine item: we can safely stop here and discard the unknown data.
-			// - If we did NOT find any parts block, this is likely a DLC item: we stop here and fail.
-
-			if partBlocksFound {
-				break OUTER
-			} else {
-				// DLC item found, we do not support that
-				return nil, t.DoneString(), fmt.Errorf("unsupported PART_111 block found, aborting")
+		case serial_tokenizer.TOK_STRING:
+			str, err := b4string.Read(br)
+			if err != nil {
+				return nil, t.DoneString(), err
 			}
+
+			block.ValueStr = str
 		default:
 			return nil, t.DoneString(), fmt.Errorf("unknown token %d", token)
 		}

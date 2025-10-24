@@ -2,6 +2,9 @@ package serial
 
 import (
 	"borderlands_4_serials/b4s/b85"
+	"borderlands_4_serials/lib/bit"
+	"borderlands_4_serials/lib/byte_mirror"
+	"borderlands_4_serials/lib/helpers"
 	"fmt"
 	"strings"
 	"testing"
@@ -9,6 +12,48 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestMesCouilles(t *testing.T) {
+	binary := "0010001100000100100011111101100000101001010111010110001111110111011011000011111111010000110101011011111010011011101001111100111010011011101100100111000011010011110011111111101011001110010110100111110011100101111001011101101100001110100111101001111001111100111100101111110110111011"
+
+	bytes := helpers.BinToBytes(binary)
+	br := bit.NewReader(bytes)
+
+	for i := 0; i < len(binary)/7; i++ {
+		val, ok := br.ReadN(7)
+		if !ok {
+			fmt.Println("Failed to read bits")
+			return
+		}
+
+		val = byte_mirror.GenericMirror(val, 7)
+
+		// to ascii character
+		fmt.Printf("%c", val)
+	}
+
+}
+
+func TestMesCouilles2(t *testing.T) {
+	binary := "0010001100000100100011111101100000101001010111010000011110000110100111001011111111010100011100001101001110100111101001100110111111101000011010001101111101011001110010110100111110011100101111001011101101100001110100111101001111001111100111100101111110110111011"
+
+	bytes := helpers.BinToBytes(binary)
+	br := bit.NewReader(bytes)
+
+	for i := 0; i < len(binary)/7; i++ {
+		val, ok := br.ReadN(7)
+		if !ok {
+			fmt.Println("Failed to read bits")
+			return
+		}
+
+		val = byte_mirror.GenericMirror(val, 7)
+
+		// to ascii character
+		fmt.Printf("%c", val)
+	}
+
+}
 
 func TestDeserializeItemSet1(t *testing.T) {
 	var tests = []struct {
@@ -146,14 +191,63 @@ func TestDeserializeItemSet1(t *testing.T) {
 		{
 			"moxx 1",
 			"@Uge8Usm/*1K!b~@T2!pSK9`(MRphLZnMu&VCtx^C",
-			"",
-			"0010000  11010010001100001  01  10000000  01  10010000  01  1000100111000  00  1110100001100110010111011001000000100010000110000011111010111000001011110001010111101111101101110010000010111000010101111011111000101100010111000010011111011101000101101010100101000000000",
+			"268, 0, 1, 50| \"ft\", 1| 2, 3704|| {7} {247:77} {3} {247:[26 239 170 5]}|",
+			"0010000  11010010001100001  01  10000000  01  10010000  01  1000100111000  00  1110100001100110010111  01  10010000  00  10001000  01  100000111110101110  00  00  10111100010  101111011111011011100100000  10111000010  1011110111110001  01  1000101110000  1001111101110  1000101101010  10010100  00  00  00  0",
 		},
 		{
 			"moxx 2",
 			"@Ugr$`Rm/*1K!b~@T2(#sZ9`(MRph3Nl#=Gnicv1i",
-			"",
-			"0010000  11010010110101001  01  10000000  01  10010000  01  1000100111000  00  1110100001100110010111011001000000100010000110011011010011110000001011110001010111101111101101110010000010110000010101111011111000101100011110111010011011101001000000111100100101000000000",
+			"299, 0, 1, 50| \"ft\", 1| 2, 1835|| {7} {247:77} {1} {247:[238 91 112 5]}|",
+			"0010000  11010010110101001  01  10000000  01  10010000  01  1000100111000  00  1110100001100110010111  01  10010000  00  10001000  01  100110110100111100  00  00  10111100010  101111011111011011100100000  10110000010  1011110111110001  01  1000111101110  1001101110100  1000000111100  10010100  00  00  00  0",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data, err := b85.Decode(tt.serial)
+			assert.NoError(t, err)
+
+			start := time.Now()
+			blocks, bits, err := Deserialize(data)
+			end := time.Now()
+			fmt.Printf("Deserialization took %v\n", end.Sub(start))
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expected, blocks.String())
+			assert.Equal(t, tt.bitstream, bits)
+			fmt.Println("Name:", tt.name)
+			fmt.Println("Serial:", tt.serial)
+			fmt.Println("Result:", blocks.String())
+			fmt.Println("Bitstream:", bits)
+			fmt.Println()
+			fmt.Println()
+		})
+	}
+}
+
+func TestDeserializeItemWithString(t *testing.T) {
+	var tests = []struct {
+		name      string
+		serial    string
+		expected  string
+		bitstream string
+	}{
+		{
+			"1",
+			"@Ugw$Yw5hh0gkD?i5ey2^>_}zwoVYM&2d@j4mVR`;*PRq;pw/rfp7Immb4H@o3Gsyf-n=W`*PXCI-a(S8kg~`6=w7h(O%h$z3b?Of46si>J7U~>o2nPT",
+			"21, 0, 2, 537|| \"MAL_SM.comp_05_legendary_firework\" {2} {5} {3} {6} {1:12} \"MAL_SM.part_barrel_02_firework\" {72} {14} {27} {35} {34} {43} {51} {1:48}|",
+			"0010000  1001010110000  01  10000000  01  10001000  01  100100111000101000  00  00  1111000101000101100110000010011001111110111001011011001011101011000111111011101101100001111111101000011010101101111101001101110100111110011101001101110110010011100001101001111001111111110101100111001011010011110100111110111111101101001111101011  10101000010  10110100010  10111000010  10101100010  10110000100110000  1110111110000101100110000010011001111110111001011011001011101000001111000011010011100101111111101010001110000110100111010011110100110011011111110100001100100110111110101100111001011010011110100111110111111101101001111101011  1010001100100010  10101110010  1011101110000010  1011100101000010  1010100101000010  1011101101000010  1011100111000010  1011000010000111000000  00  00  00  0",
+		},
+		{
+			"2",
+			"@Uge8jxm/%P$!X^K3ImB=I`Foa^-C=V1dk&M&Wx8wpZo/K@+Lv8Em)+#BJpZN3!/r)IJ)fuF?h3WOH{f)L-}3YKEHAsm<ns3%CZEf67d$Mdf8pUg`yD2K>+W>CUjEYMVfVb9p3l>7ck83UBmn>",
+			"278, 0, 1, 30| 2, 510|| \"borg_grenade_gadget.comp_05_legendary_transmission\" {2} {245:23} \"borg_grenade_gadget.part_payload_unique_transmission\" {245:[72 1]}|",
+			"0010000  11010010011010001  01  10000000  01  10010000  01  1000111110000  00  10001000  01  11010010011111111  00  00  111010011100001000111111011010011111100111111101111001101001111010011011101110000110010011101001111111011110011100001100100111110011101001100101110111010110001111110111011011000011111111010000110101011011111010011011101001111100111010011011101100100111000011010011110011111111101001011101001111000011011101111001111011011100101111001111100111100101111110110111011  10101000010  101101011111011110110000000  11100101110000100011111101101001111110011111110111100110100111101001101110111000011001001110100111111101111001110000110010011111001110100110010111011101000001111000011010011100101111111101000011110000111001111001101111110111000011001001111111011010111011101110010111000111101011110100111111101001011101001111000011011101111001111011011100101111001111100111100101111110110111011  1011010111110001  01  1000001100100  10010000  00  00  00  00  00  0",
+		},
+		{
+			"3",
+			"@Ugfs(8Fme!KG*)mdh(Y2vD0PkBZTJ^f`?AaDvYQ;1=fCE(d`?fd;qvl)o_@O<RH6#K3SyA>4N6_`u$=xChvo7z`wNSG&1w0Zo^HeC<@r4Qc2}uMU1/<073vi#7it&k9cm<MB?1",
+			"13, 0, 1, 50| 2, 2698|| \"DAD_AR.comp_05_legendary_firstimpression\" {1} {4} {2} \"DAD_AR.part_barrel_01_firstimpression\" {10} {9} {11} {25} {36} {39} {44} {45} {55} {65} {69}|",
+			"0010000  10010110  01  10000000  01  10010000  01  1000100111000  00  10001000  01  100010110001101010  00  00  11100011010000010001100000100100011111101100000101001010111010110001111110111011011000011111111010000110101011011111010011011101001111100111010011011101100100111000011010011110011111111101011001110010110100111110011100101111001011101101100001110100111101001111001111100111100101111110110111011  10110000010  10100100010  10101000010  11110101010000010001100000100100011111101100000101001010111010000011110000110100111001011111111010100011100001101001110100111101001100110111111101000011010001101111101011001110010110100111110011100101111001011101101100001110100111101001111001111100111100101111110110111011  10101010010  10110010010  10111010010  1011001110000010  1010010101000010  1011110101000010  1010011101000010  1011011101000010  1011110111000010  1011000100100010  1011010100100010  00  00  0",
 		},
 	}
 
@@ -206,68 +300,82 @@ func TestDeserializeBench(t *testing.T) {
 	fmt.Println("Average for 4000 deserializations:", avg)
 }
 
-func TestDeserializeCompareSkins(t *testing.T) {
-	var tests = []struct {
-		name   string
-		serial string
-	}{
-		{
-			"ORIGINAL L50 Lurking Cuca",
-			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFnx",
-		},
-		{
-			"Skin: Solar Flair",
-			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vGE1",
-		},
-		{
-			"Skin: Carcade Shooter",
-			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vB?G",
-		},
-		{
-			"Skin: Itty Bitty Kitty Committee",
-			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vB3r",
-		},
-		{
-			"Skin: With the grain",
-			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vGD}",
-		},
-		{
-			"Skin: The System",
-			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vAG2",
-		},
-		{
-			"Skin: Devourer",
-			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_v9Sd",
-		},
-		{
-			"Skin: Soused",
-			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_v5^G",
-		},
-		{
-			"Skin: Bird of Prey",
-			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_v55r",
-		},
-		{
-			"Skin: Eternal Defender",
-			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vH1i",
-		},
-		{
-			"Skin: Weirdo",
-			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vGD`",
-		},
-		{
-			"Skin: Smiley",
-			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vFQW",
-		},
-	}
+var skinTests = []struct {
+	name         string
+	serial       string
+	deserialized string
+}{
+	{
+		"ORIGINAL L50 Lurking Cuca",
+		"@UgbV{rFme!KI4sa#RG}W#sX3@xsFnx",
+		`3, 0, 1, 50| 2, 1292|| {95} {2} {7} {14} {25} {42} {70}|`,
+	},
+	{
+		"Skin: Solar Flair",
+		"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vGE1",
+		`3, 0, 1, 50| 2, 1292|| {95} {2} {7} {14} {25} {42} {70}| "c", 110|`,
+	},
+	{
+		"Skin: Carcade Shooter",
+		"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vB?G",
+		`3, 0, 1, 50| 2, 1292|| {95} {2} {7} {14} {25} {42} {70}| "c", 105|`,
+	},
+	{
+		"Skin: Itty Bitty Kitty Committee",
+		"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vB3r",
+		`3, 0, 1, 50| 2, 1292|| {95} {2} {7} {14} {25} {42} {70}| "c", 104|`,
+	},
+	{
+		"Skin: With the grain",
+		"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vGD}",
+		`3, 0, 1, 50| 2, 1292|| {95} {2} {7} {14} {25} {42} {70}| "c", 94|`,
+	},
+	{
+		"Skin: The System",
+		"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vAG2",
+		`3, 0, 1, 50| 2, 1292|| {95} {2} {7} {14} {25} {42} {70}| "c", 87|`,
+	},
+	{
+		"Skin: Devourer",
+		"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_v9Sd",
+		`3, 0, 1, 50| 2, 1292|| {95} {2} {7} {14} {25} {42} {70}| "c", 86|`,
+	},
+	{
+		"Skin: Soused",
+		"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_v5^G",
+		`3, 0, 1, 50| 2, 1292|| {95} {2} {7} {14} {25} {42} {70}| "c", 82|`,
+	},
+	{
+		"Skin: Bird of Prey",
+		"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_v55r",
+		`3, 0, 1, 50| 2, 1292|| {95} {2} {7} {14} {25} {42} {70}| "c", 81|`,
+	},
+	{
+		"Skin: Eternal Defender",
+		"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vH1i",
+		`3, 0, 1, 50| 2, 1292|| {95} {2} {7} {14} {25} {42} {70}| "c", 79|`,
+	},
+	{
+		"Skin: Weirdo",
+		"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vGD`",
+		`3, 0, 1, 50| 2, 1292|| {95} {2} {7} {14} {25} {42} {70}| "c", 78|`,
+	},
+	{
+		"Skin: Smiley",
+		"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vFQW",
+		`3, 0, 1, 50| 2, 1292|| {95} {2} {7} {14} {25} {42} {70}| "c", 77|`,
+	},
+}
 
-	for _, tt := range tests {
+func TestDeserializeSkins(t *testing.T) {
+	for _, tt := range skinTests {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := b85.Decode(tt.serial)
 			assert.NoError(t, err)
 
 			blocks, bits, err := Deserialize(data)
 			assert.NoError(t, err)
+			assert.Equal(t, tt.deserialized, blocks.String())
 			fmt.Println("Name:", tt.name)
 			fmt.Println("Serial:", tt.serial)
 			fmt.Println("Result:", blocks.String())

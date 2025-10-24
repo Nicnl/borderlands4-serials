@@ -233,6 +233,50 @@ func TestSerializePartsStringRoundtrip(t *testing.T) {
 			"Retributive Devourer",
 			"@Uge8;)m/)}}!sxA_MZGU4Xi$ZEAI&bYFAo3",
 		},
+		{
+			"Skin: Solar Flair",
+			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vGE1",
+		},
+		{
+			"Skin: Carcade Shooter",
+			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vB?G",
+		},
+		{
+			"Skin: Itty Bitty Kitty Committee",
+			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vB3r",
+		},
+		{
+			"Skin: With the grain",
+			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vGD}",
+		},
+		{
+			"Skin: The System",
+			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vAG2",
+		},
+		{
+			"Skin: Devourer",
+			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_v9Sd",
+		},
+		{
+			"Skin: Soused",
+			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_v5^G",
+		},
+		{
+			"Skin: Bird of Prey",
+			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_v55r",
+		},
+		{
+			"Skin: Eternal Defender",
+			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vH1i",
+		},
+		{
+			"Skin: Weirdo",
+			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vGD`",
+		},
+		{
+			"Skin: Smiley",
+			"@UgbV{rFme!KI4sa#RG}W#sX3@xsFsL_vFQW",
+		},
 	}
 
 	for _, tt := range tests {
@@ -290,4 +334,27 @@ func TestImportStringCrash2(t *testing.T) {
 	err := s.FromString("291, 0, 1, 50| 9, 1| 10, 1| 2, 1375|| {5} {8} {245:[}|")
 	assert.Error(t, err)
 	fmt.Println("Error:", err.Error())
+}
+
+func TestImportStringSpecialChars(t *testing.T) {
+	baseDeserialized := `"my name is \"The Boss\" and I use \\ in paths"`
+
+	var s Serial
+	err := s.FromString(baseDeserialized)
+	assert.NoError(t, err)
+	fmt.Println("Parts:", s.String())
+	assert.Equal(t, `my name is "The Boss" and I use \ in paths`, s[0].ValueStr)
+
+	// Reserialize
+	serializedData := Serialize(s)
+	reserializedB85 := b85.Encode(serializedData)
+	assert.Equal(t, "@Uglo~xgWTbE8I+!bL{xMcBz({3B2d^(1/>oDc^Sk7rQINSn2w$U", reserializedB85)
+
+	// Deserialize again to check
+	data, err := b85.Decode(reserializedB85)
+	assert.NoError(t, err)
+
+	serial, _, err := Deserialize(data)
+	assert.NoError(t, err)
+	assert.Equal(t, `my name is "The Boss" and I use \ in paths`, serial[0].ValueStr)
 }

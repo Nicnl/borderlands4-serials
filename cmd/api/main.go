@@ -66,17 +66,6 @@ func CORSMiddleware(c *gin.Context) {
 	c.Next()
 }
 
-const README_JSON = `
-Hey you, peeking at the JSON!
-
-No need to peek anymore 😉
-The complete source code and documentation is available here on Github: 
-https://github.com/Nicnl/borderlands4-serials
-
-With love,
-- Nicnl & InflamedSebi
-`
-
 func main() {
 	r := gin.Default()
 
@@ -216,7 +205,7 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{
 			"deserialized":    item.Serial.String(),
 			"additional_data": additionalDataFunc(item),
-			"readme":          README_JSON,
+			"bitstream":       item.Bits,
 		})
 	})
 
@@ -268,7 +257,7 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{
 			"serial_b85":      item.B85,
 			"additional_data": additionalDataFunc(item),
-			"readme":          README_JSON,
+			"bitstream":       item.Bits,
 		})
 	})
 

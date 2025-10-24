@@ -37,6 +37,25 @@
         border-radius: 12px;
         padding-left: 12px;
         padding-right: 12px;
+        overflow: visible; /* allow positioned children to be visible outside the card */
+    }
+
+    /* At the bottom of the center container*/
+    #bitstreamPre {
+        position: absolute;
+        top: 10px;
+        left: calc(50% - 425px);
+        width: 850px;
+        height: calc(50% - 100px - 90px);
+        overflow: auto;
+
+        /*style*/
+        background-color: #111;
+        color: #aaa;
+        border: 1px solid #333;
+        border-radius: 6px;
+        padding: 8px;
+        white-space: pre-wrap;
     }
 
     #mainTitle {
@@ -139,7 +158,14 @@
         <input type="text" class="nice-input" placeholder="Enter serial here:   @Ugy3L+2}TYg..." v-model="formBase85">
         <div style="margin-left: 8px;margin-top: 16px;margin-bottom: 8px;font-size: 14px;color: #aaaaaa;">Deserialized:</div>
         <input type="text" class="nice-input" placeholder="Enter parts here:   24, 0, 1, 50| 2, 3379..." v-model="formDeserialized">
-        <div style="margin-left: 2px;margin-top: 9px;margin-bottom: 8px;font-size: 16px;color: #aaaaaa;">Status: {{status}}</div>
+        <div style="margin-left: 2px;margin-top: 9px;margin-bottom: 8px;font-size: 16px;color: #aaaaaa;">
+            Status: {{status}}
+
+            <div style="float: right;">
+                <input type="checkbox" name="show_bitstream" id="show_bitstream" v-model="bitstreamVisible"/>
+                <label for="show_bitstream">Show bitstream</label>
+            </div>
+        </div>
 
         <div id="bottomLink" v-if="!videoTag">
             What is this tool? How does it work? <a href="https://docs.google.com/spreadsheets/d/17LHzPR7BltqgzbJZplr-APhORgT2PTIsV08n4RD3tMw/">Guide, informations and legal disclaimer available here.</a><br/>
@@ -148,6 +174,8 @@
 
         <div id="bottomDisclaimer" v-if="!videoTag">Note: this tool is <b>not compatible</b> with DLC items, and support will not be added.</div>
     </div>
+
+    <pre id="bitstreamPre" v-if="!videoTag && bitstreamVisible">{{ bitstream }}</pre>
 
 </div>
 
@@ -220,6 +248,9 @@
                 redoPostDeserialized: false,
 
                 videoTag: false,
+
+                bitstreamVisible: false,
+                bitstream: '',
             };
         },
 
@@ -265,6 +296,7 @@
                     this.currentBase85 = this.formBase85;
                     this.currentDeserialized = result.deserialized;
                     this.formDeserialized = result.deserialized;
+                    this.bitstream = result.bitstream;
                 } catch (error) {
                     console.error(error.message);
                     this.status = 'Error: invalid serial';
@@ -272,6 +304,7 @@
                     this.currentBase85 = '';
                     this.currentDeserialized = '';
                     this.formDeserialized = '';
+                    this.bitstream = '';
                 } finally {
                     this.postingBase85 = false;
                     if (this.redoPostBase85) {
@@ -308,6 +341,7 @@
                     this.currentDeserialized = this.formDeserialized;
                     this.currentBase85 = result.serial_b85;
                     this.formBase85 = result.serial_b85;
+                    this.bitstream = result.bitstream;
                 } catch (error) {
                     console.error(error.message);
                     this.status = 'Error: invalid deserialized';
@@ -315,6 +349,7 @@
                     this.currentDeserialized = '';
                     this.currentBase85 = '';
                     this.formBase85 = '';
+                    this.bitstream = '';
                 } finally {
                     this.postingDeserialized = false;
                     if (this.redoPostDeserialized) {

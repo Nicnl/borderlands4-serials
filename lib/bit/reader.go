@@ -91,15 +91,16 @@ func (br *Reader) StringAfter() string {
 }
 
 func (br *Reader) FullString() string {
-	result := ""
+	result := make([]byte, len(br.data)*8, len(br.data)*8)
+
 	oldPos := br.pos
 	br.Rewind(oldPos)
 	for i := 0; i < len(br.data)*8; i++ {
 		bit, _ := br.Read()
-		result += string('0' + bit)
+		result[i] = '0' + bit
 	}
 	br.pos = oldPos
-	return result
+	return string(result)
 }
 
 func (br *Reader) Len() int {

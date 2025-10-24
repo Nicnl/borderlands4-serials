@@ -255,15 +255,58 @@
         },
 
         methods: {
+            resetForm() {
+                if (
+                    this.status === 'Ready' &&
+                    this.currentBase85 === '' &&
+                    this.currentDeserialized === '' &&
+                    this.formDeserialized === '' &&
+                    this.formBase85 === '' &&
+                    this.bitstream === ''
+                ) {
+                    console.log('Form already reset, skipping');
+                    return;
+                }
+
+                console.log('Resetting form');
+
+                this.status = 'Ready';
+                this.currentBase85 = '';
+                this.currentDeserialized = '';
+                this.formDeserialized = '';
+                this.formBase85 = '';
+                this.bitstream = '';
+            },
+
             base85Changed() {
+                if (this.formBase85 === '' && this.formDeserialized === '') {
+                    this.resetForm();
+                    return;
+                }
+
                 if (this.currentBase85 !== this.formBase85) {
+                    if (this.formBase85 === '') {
+                        this.resetForm();
+                        return;
+                    }
+
                     console.log('formBase85 changed');
                     this.postDeserialize();
                 }
             },
 
             deserializedChanged() {
+                if (this.formBase85 === '' && this.formDeserialized === '') {
+                    this.resetForm();
+                    return;
+                }
+
                 if (this.currentDeserialized !== this.formDeserialized) {
+                    if (this.formDeserialized === '') {
+                        this.resetForm();
+                        return;
+                    }
+
                     console.log('formDeserialized changed');
                     this.postReserialize();
                 }
@@ -285,11 +328,11 @@
                             serial_b85: this.formBase85,
                         }),
                     });
+                    const result = await response.json();
                     if (!response.ok) {
-                        throw new Error(`Response status: ${response.status}`);
+                        throw new Error(result.error || `Response status: ${response.status}`);
                     }
 
-                    const result = await response.json();
                     console.log(result);
                     this.status = 'OK' + (result.additional_data ? (' (' + result.additional_data + ')') : '');
 
@@ -299,7 +342,7 @@
                     this.bitstream = result.bitstream;
                 } catch (error) {
                     console.error(error.message);
-                    this.status = 'Error: invalid serial';
+                    this.status = 'Error: ' + error.message;
 
                     this.currentBase85 = '';
                     this.currentDeserialized = '';
@@ -330,11 +373,11 @@
                             deserialized: this.formDeserialized,
                         }),
                     });
+                    const result = await response.json();
                     if (!response.ok) {
-                        throw new Error(`Response status: ${response.status}`);
+                        throw new Error(result.error || `Response status: ${response.status}`);
                     }
 
-                    const result = await response.json();
                     console.log(result);
                     this.status = 'OK' + (result.additional_data ? (' (' + result.additional_data + ')') : '');
 
@@ -344,7 +387,7 @@
                     this.bitstream = result.bitstream;
                 } catch (error) {
                     console.error(error.message);
-                    this.status = 'Error: invalid deserialized';
+                    this.status = 'Error: ' + error.message;
 
                     this.currentDeserialized = '';
                     this.currentBase85 = '';
@@ -391,20 +434,18 @@
                 if (v === RickrollSerial) {
                     this.enableRickroll();
                     return;
-                } else {
-                    this.videoTag = false;
                 }
 
+                this.videoTag = false;
                 this.base85ChangedDebounced();
             },
             formDeserialized(v) {
                 if (v === RickrollDeserialized) {
                     this.enableRickroll();
                     return;
-                } else {
-                    this.videoTag = false;
                 }
 
+                this.videoTag = false;
                 this.deserializedChangedDebounced();
             },
         }

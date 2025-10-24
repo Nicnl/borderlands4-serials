@@ -84,8 +84,8 @@ func main() {
 		if err != nil {
 			currentBase85 = ""
 			currentParts = ""
-			//currentStatus = "ERROR: " + err.Error()
-			currentStatus = "ERROR: Invalid serial"
+			currentStatus = "ERROR: " + err.Error()
+			//currentStatus = "ERROR: Invalid serial"
 			currentItem = codex.Item{}
 			currentStatusError = true
 			return

@@ -14,7 +14,7 @@ func Deserialize(data []byte) (Serial, string, error) {
 
 	// Expect the magic header as the first bits
 	if err := t.Expect("magic header", 0, 0, 1, 0, 0, 0, 0); err != nil {
-		return nil, "", err
+		return nil, t.DoneString(), err
 	}
 
 	var (
@@ -35,7 +35,7 @@ OUTER:
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return nil, "", err
+			return nil, t.DoneString(), err
 		}
 
 		block := Block{
@@ -59,21 +59,21 @@ OUTER:
 		case serial_tokenizer.TOK_VARINT:
 			v, err := varint.Read(br)
 			if err != nil {
-				return nil, "", err
+				return nil, t.DoneString(), err
 			}
 			block.Value = v
 
 		case serial_tokenizer.TOK_VARBIT:
 			v, err := varbit.Read(br)
 			if err != nil {
-				return nil, "", err
+				return nil, t.DoneString(), err
 			}
 			block.Value = v
 
 		case serial_tokenizer.TOK_PART:
 			p, err := part.Read(t)
 			if err != nil {
-				return nil, "", err
+				return nil, t.DoneString(), err
 			}
 
 			block.Part = p
@@ -91,10 +91,10 @@ OUTER:
 				break OUTER
 			} else {
 				// DLC item found, we do not support that
-				return nil, "", fmt.Errorf("unsupported PART_111 block found, aborting")
+				return nil, t.DoneString(), fmt.Errorf("unsupported PART_111 block found, aborting")
 			}
 		default:
-			return nil, "", fmt.Errorf("unknown token %d", token)
+			return nil, t.DoneString(), fmt.Errorf("unknown token %d", token)
 		}
 
 		blocks = append(blocks, block)
@@ -102,9 +102,8 @@ OUTER:
 
 	// Sanitization: we probably read the zero-padding as terminators.
 	// Only one terminator is needed, remove the extra ones
-	for trailingTerminators > 1 {
-		blocks = blocks[:len(blocks)-1]
-		trailingTerminators--
+	if trailingTerminators > 1 {
+		blocks = blocks[:len(blocks)-(trailingTerminators-1)]
 	}
 
 	return blocks, t.DoneString(), nil

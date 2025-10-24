@@ -2,6 +2,7 @@ package serial_tokenizer
 
 import (
 	"borderlands_4_serials/lib/bit"
+	"strings"
 )
 
 type Token byte
@@ -28,12 +29,23 @@ func NewTokenizer(data []byte) *Tokenizer {
 }
 
 func (t *Tokenizer) DoneString() string {
-	splitted := t.br.FullString()
-	for i := len(t.splitPositions) - 1; i >= 0; i-- {
-		pos := t.splitPositions[i]
-		splitted = splitted[:pos] + "  " + splitted[pos:]
+	original := t.br.FullString()
+	if len(t.splitPositions) == 0 {
+		return original
 	}
-	return splitted
+
+	var sb strings.Builder
+	sb.Grow(len(original) + len(t.splitPositions)*2)
+
+	lastPos := 0
+	for _, pos := range t.splitPositions {
+		sb.WriteString(original[lastPos:pos])
+		sb.WriteString("  ")
+		lastPos = pos
+	}
+	sb.WriteString(original[lastPos:])
+
+	return sb.String()
 }
 
 func (t *Tokenizer) BitReader() *bit.Reader {

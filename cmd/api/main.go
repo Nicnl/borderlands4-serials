@@ -196,7 +196,7 @@ func main() {
 		item, err := codex.Deserialize(jsonReq.SerialB85)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Failed to deserialize:", jsonReq.SerialB85, "=>", err.Error())
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid serial"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
@@ -238,7 +238,7 @@ func main() {
 		err := s.FromString(jsonReq.Deserialized)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Failed to import:", jsonReq.Deserialized, "=>", err.Error())
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid deserialized data"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 

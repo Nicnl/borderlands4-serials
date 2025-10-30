@@ -66,6 +66,18 @@ func CORSMiddleware(c *gin.Context) {
 	c.Next()
 }
 
+func MaxPostSizeMiddleware(maxSize int64) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, maxSize)
+		c.Next()
+	}
+}
+
+const (
+	MAX_POST_SIZE      = 256 * 1024       // 256 KB
+	MAX_POST_SIZE_BULK = 30 * 1024 * 1024 // 30 MB
+)
+
 func main() {
 	r := gin.Default()
 
@@ -74,7 +86,7 @@ func main() {
 	r.OPTIONS("/api/v1/reserialize", CORSMiddleware)
 	r.OPTIONS("/api/v1/serialize_bulk", CORSMiddleware)
 
-	r.POST("/api/v1/deserialize_bulk", CORSMiddleware, func(c *gin.Context) {
+	r.POST("/api/v1/deserialize_bulk", CORSMiddleware, MaxPostSizeMiddleware(MAX_POST_SIZE_BULK), func(c *gin.Context) {
 		var jsonReq []string
 		if err := c.BindJSON(&jsonReq); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
@@ -138,7 +150,7 @@ func main() {
 		c.Render(http.StatusOK, render.IndentedJSON{Data: results})
 	})
 
-	r.POST("/api/v1/serialize_bulk", CORSMiddleware, func(c *gin.Context) {
+	r.POST("/api/v1/serialize_bulk", CORSMiddleware, MaxPostSizeMiddleware(MAX_POST_SIZE_BULK), func(c *gin.Context) {
 		var jsonReq []string
 		if err := c.BindJSON(&jsonReq); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
@@ -181,7 +193,7 @@ func main() {
 		c.Render(http.StatusOK, render.IndentedJSON{Data: output})
 	})
 
-	r.POST("/api/v1/deserialize", CORSMiddleware, func(c *gin.Context) {
+	r.POST("/api/v1/deserialize", CORSMiddleware, MaxPostSizeMiddleware(MAX_POST_SIZE), func(c *gin.Context) {
 		var jsonReq struct {
 			SerialB85 string `json:"serial_b85"`
 		}
@@ -215,7 +227,7 @@ func main() {
 		})
 	})
 
-	r.POST("/api/v1/reserialize", CORSMiddleware, func(c *gin.Context) {
+	r.POST("/api/v1/reserialize", CORSMiddleware, MaxPostSizeMiddleware(MAX_POST_SIZE), func(c *gin.Context) {
 		var jsonReq struct {
 			Deserialized string `json:"deserialized"`
 		}

@@ -93,6 +93,11 @@ func main() {
 			return
 		}
 
+		fmt.Println("# Deserialize Bulk:")
+		for _, serialB85 := range jsonReq {
+			fmt.Println(" - From: ", serialB85)
+		}
+
 		results := make(map[string]gin.H, len(jsonReq))
 		for _, serialB85 := range jsonReq {
 			item, err := codex.Deserialize(serialB85)
@@ -144,6 +149,8 @@ func main() {
 				result["deserialized_parts"] = deserializedParts
 
 				results[serialB85] = result
+
+				fmt.Println(" - To:   ", item.Serial.String())
 			}
 		}
 
@@ -155,6 +162,11 @@ func main() {
 		if err := c.BindJSON(&jsonReq); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
 			return
+		}
+
+		fmt.Println("# Serialize Bulk:")
+		for _, serialB85 := range jsonReq {
+			fmt.Println(" - From: ", serialB85)
 		}
 
 		output := make([]string, 0, len(jsonReq))
@@ -188,6 +200,8 @@ func main() {
 			b85Serial := b85.Encode(data)
 
 			output[i] = b85Serial
+
+			fmt.Fprintln(os.Stderr, " - To:   ", b85Serial)
 		}
 
 		c.Render(http.StatusOK, render.IndentedJSON{Data: output})

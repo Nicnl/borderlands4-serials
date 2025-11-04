@@ -11,7 +11,7 @@ ADD . .
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -v -o /borderlands_4_serials ./cmd/api
 
 
-FROM scratch
+FROM scratch AS api
 COPY --from=builder /borderlands_4_serials /borderlands_4_serials
 EXPOSE 8080
 CMD ["/borderlands_4_serials"]

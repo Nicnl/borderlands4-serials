@@ -1,0 +1,7 @@
+services:
+  app:
+    image: ghcr.io/nicnl/borderlands4-serials:latest
+    container_name: borderlands-serials
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

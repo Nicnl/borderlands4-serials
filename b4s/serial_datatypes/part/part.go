@@ -1,6 +1,9 @@
 package part
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type PartSubType uint32
 
@@ -24,15 +27,17 @@ func (p *Part) String() string {
 	case SUBTYPE_INT:
 		return fmt.Sprintf("{%d:%d}", p.Index, p.Value)
 	case SUBTYPE_LIST:
-		output := fmt.Sprintf("{%d:[", p.Index)
+		var output strings.Builder
+		output.WriteString(fmt.Sprintf("{%d:[", p.Index))
+
 		for i, v := range p.Values {
 			if i != 0 {
-				output += " "
+				output.WriteByte(' ')
 			}
-			output += fmt.Sprintf("%d", v)
+			output.WriteString(fmt.Sprintf("%d", v))
 		}
-		output += "]}"
-		return output
+		output.WriteString("]}")
+		return output.String()
 	default:
 		return fmt.Sprintf("{ERR_UNKNOWN_PART:%d}", p.SubType)
 	}

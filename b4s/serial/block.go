@@ -22,45 +22,48 @@ func (s Serial) String() string {
 	// (don't forget the subtype list too)
 	// + add a test for that
 
-	output := ""
+	var output strings.Builder
+	output.Grow(len(s) * 10)
 
 	for i, b := range s {
 
 		switch b.Token {
 		case serial_tokenizer.TOK_SEP1:
-			output += "|"
+			output.WriteByte('|')
 		case serial_tokenizer.TOK_SEP2:
-			output += ","
+			output.WriteByte(',')
 		case serial_tokenizer.TOK_VARINT:
 			if i > 0 {
-				output += " "
+				output.WriteByte(' ')
 			}
-			output += fmt.Sprintf("%d", b.Value)
+			output.WriteString(fmt.Sprintf("%d", b.Value))
 		case serial_tokenizer.TOK_VARBIT:
 			if i > 0 {
-				output += " "
+				output.WriteByte(' ')
 			}
-			output += fmt.Sprintf("%d", b.Value)
+			output.WriteString(fmt.Sprintf("%d", b.Value))
 		case serial_tokenizer.TOK_PART:
 			if i > 0 {
-				output += " "
+				output.WriteByte(' ')
 			}
-			output += b.Part.String()
+			output.WriteString(b.Part.String())
 		case serial_tokenizer.TOK_STRING:
 			if i > 0 {
-				output += " "
+				output.WriteByte(' ')
 			}
 
 			b.ValueStr = strings.ReplaceAll(b.ValueStr, "\\", "\\\\")
 			b.ValueStr = strings.ReplaceAll(b.ValueStr, "\"", "\\\"")
 
-			output += "\"" + b.ValueStr + "\""
+			output.WriteByte('"')
+			output.WriteString(b.ValueStr)
+			output.WriteByte('"')
 		default:
-			output += fmt.Sprintf(" <UNKNOWN_TOKEN:%d>", b.Token)
+			output.WriteString(fmt.Sprintf(" <UNKNOWN_TOKEN:%d>", b.Token))
 		}
 	}
 
-	return output
+	return output.String()
 }
 
 func (s *Serial) Hash() string {

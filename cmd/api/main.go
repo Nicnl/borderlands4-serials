@@ -76,8 +76,8 @@ func MaxPostSizeMiddleware(maxSize int64) gin.HandlerFunc {
 }
 
 const (
-	MAX_POST_SIZE      = 256 * 1024       // 256 KB
-	MAX_POST_SIZE_BULK = 30 * 1024 * 1024 // 30 MB
+	MAX_POST_SIZE      = 1024 * 1024       // 1024 KB
+	MAX_POST_SIZE_BULK = 100 * 1024 * 1024 // 100 MB
 )
 
 func main() {

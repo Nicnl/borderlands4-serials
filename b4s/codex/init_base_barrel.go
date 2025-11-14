@@ -62,7 +62,7 @@ func init() {
 			panic(err)
 		}
 
-		item, err := Deserialize(barrel.Serial)
+		item, err := Deserialize(barrel.Serial, true)
 		if err != nil {
 			panic(err)
 		}

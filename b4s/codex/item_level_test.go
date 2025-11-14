@@ -90,7 +90,7 @@ func TestFindLevel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("L%d_%s", tt.expectedLevel, tt.name), func(t *testing.T) {
-			item, err := Deserialize(tt.b85)
+			item, err := Deserialize(tt.b85, true)
 			assert.NoError(t, err)
 
 			level, found := item.Level()

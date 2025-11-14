@@ -72,7 +72,7 @@ func TestFindPartAtPos_NoSplit(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			item, err := Deserialize(tt.b85)
+			item, err := Deserialize(tt.b85, true)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.deserialized, item.Serial.String())
 

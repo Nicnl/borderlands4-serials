@@ -48,6 +48,13 @@ func (t *Tokenizer) DoneString() string {
 	return sb.String()
 }
 
+func (t *Tokenizer) DoneStringIfTrue(condition bool) string {
+	if !condition {
+		return ""
+	}
+	return t.DoneString()
+}
+
 func (t *Tokenizer) BitReader() *bit.Reader {
 	return t.br
 }

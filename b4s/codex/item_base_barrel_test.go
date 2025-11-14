@@ -8,7 +8,7 @@ import (
 )
 
 func TestItemFindBaseBarrel(t *testing.T) {
-	item, err := Deserialize("@UgzR8/2}TYgOx+18jVjck67{G`WolA$P_a<CP`gm;Q1cJ")
+	item, err := Deserialize("@UgzR8/2}TYgOx+18jVjck67{G`WolA$P_a<CP`gm;Q1cJ", true)
 	assert.NoError(t, err)
 
 	infos, found := item.BaseBarrel()

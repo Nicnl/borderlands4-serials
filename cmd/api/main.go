@@ -111,7 +111,7 @@ func main() {
 
 		results := make(map[string]gin.H, len(jsonReq))
 		for _, serialB85 := range jsonReq {
-			item, err := codex.Deserialize(serialB85)
+			item, err := codex.Deserialize(serialB85, false)
 			if err != nil {
 				results[serialB85] = gin.H{
 					"success": false,
@@ -234,7 +234,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, "# Deserialize:")
 		fmt.Fprintln(os.Stderr, " - From: ", jsonReq.SerialB85)
 
-		item, err := codex.Deserialize(jsonReq.SerialB85)
+		item, err := codex.Deserialize(jsonReq.SerialB85, true)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Failed to deserialize:", jsonReq.SerialB85, "=>", err.Error())
 
@@ -292,7 +292,7 @@ func main() {
 		data := serial.Serialize(s)
 		b85Serial := b85.Encode(data)
 
-		item, err := codex.Deserialize(b85Serial)
+		item, err := codex.Deserialize(b85Serial, true)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Failed to re-deserialize:", b85Serial, "=>", err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": "failed to re-deserialize data"})

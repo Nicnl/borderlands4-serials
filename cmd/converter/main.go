@@ -82,7 +82,7 @@ func main() {
 
 		defer deferUpdateData(false, true)
 
-		item, err := codex.Deserialize(serialB85)
+		item, err := codex.Deserialize(serialB85, true)
 		if err != nil {
 			currentBase85 = ""
 			currentParts = ""

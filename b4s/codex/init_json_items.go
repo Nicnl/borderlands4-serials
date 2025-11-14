@@ -52,7 +52,7 @@ func init() {
 
 		//fmt.Println("Decoding", item.Name, item.Serial)
 
-		item, err := Deserialize(jsonItem.Serial)
+		item, err := Deserialize(jsonItem.Serial, true)
 		if err != nil {
 			//fmt.Fprint(os.Stderr, "Serial decode error:", err)
 			//nbFail++

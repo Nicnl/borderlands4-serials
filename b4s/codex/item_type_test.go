@@ -8,7 +8,7 @@ import (
 )
 
 func TestFindItemType(t *testing.T) {
-	item, err := Deserialize("@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf{00")
+	item, err := Deserialize("@Ugy3L+2}TYg%$yC%i7M2gZldO)@}cgb!l34$a-qf{00", true)
 	assert.NoError(t, err)
 
 	itemType, found := item.Type()

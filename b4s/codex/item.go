@@ -11,13 +11,22 @@ type Item struct {
 	Serial serial.Serial
 }
 
-func Deserialize(base85 string) (*Item, error) {
+func Deserialize(base85 string, populateBitstream bool) (*Item, error) {
 	data, err := b85.Decode(base85)
 	if err != nil {
 		return nil, err
 	}
 
-	blocks, bits, err := serial.Deserialize(data)
+	var (
+		blocks serial.Serial
+		bits   string
+	)
+
+	if populateBitstream {
+		blocks, bits, err = serial.Deserialize(data)
+	} else {
+		blocks, _, err = serial.DeserializeWithoutBitstream(data)
+	}
 	if err != nil {
 		return &Item{
 			B85:    base85,

@@ -845,7 +845,7 @@ func TestDeserializeProblematicSerials2(t *testing.T) {
 		},
 		{
 			"Ballistic Bonn-91 (weapon)",
-			"@Uga`vnFme!Kq<v6nRG}8tsG&oVnu!XD8i/_J7}Pw}9aJgQDby^~IMg`=\"",
+			"@Uga`vnFme!Kq<v6nRG}8tsG&oVnu!XD8i/_J7}Pw}9aJgQDby^~IMg`=",
 			"2, 0, 1, 50| 2, 3938|| {98} {2} {5} {6} {1:14} {8} {73} {64} {65} {9} {17} {57} {27} {34} {35} {41} {49} {51}|",
 		},
 		{
@@ -866,7 +866,7 @@ func TestDeserializeProblematicSerials2(t *testing.T) {
 		{
 			"discord gun 2",
 			"@UgbV{rFme!Kc0JHoRG/*Fs6;g?Eb1I89cmqFQ)5tdP=8Q;P_t0KP$Ll!V}k<",
-			"3, 0, 1, 50| 2, 1883|| {81} {2} {3} {5} {4} {6} {80} {51} {52} {53} {13} {17} {26} {31} {30} {41} {47} {65}|",
+			"3, 0, 1, 50| 2, 1883|| {81} {2} {3} {5} {4} {6} {80} {51} {52} {53} {13} {17} {26} {31} {30} {41} {47} {65}| \"c\", 24|",
 		},
 		{
 			"discord gun 3",
@@ -886,12 +886,12 @@ func TestDeserializeProblematicSerials2(t *testing.T) {
 		{
 			"discord serial from black market",
 			"@Ugydj=2}TYgT+$BRLlx>!iE7l4p){zHsFA3ds4%EKs8Xm=s9dODh=;Mc0s",
-			"25, 0, 1, 50| 2, 474|| {59} {2} {3} {4} {6} {1:12} {20} {66} {65} {73} {16} {29} {34} {33} {44} {47}|",
+			"25, 0, 1, 50| 2, 474|| {59} {2} {3} {4} {6} {1:12} {20} {66} {65} {73} {16} {29} {34} {33} {44} {47}| \"c\", 39|",
 		},
 		{
 			"discord serial cleared",
 			"@Ugydj=2}TYgT+$BRLlx>!iE7l4p){zHsFA3ds4%EKs8Xm=s9dODh=;Mc0s",
-			"25, 0, 1, 50| 2, 474|| {59} {2} {3} {4} {6} {1:12} {20} {66} {65} {73} {16} {29} {34} {33} {44} {47}|",
+			"25, 0, 1, 50| 2, 474|| {59} {2} {3} {4} {6} {1:12} {20} {66} {65} {73} {16} {29} {34} {33} {44} {47}| \"c\", 39|",
 		},
 		{
 			"discord serial NO SCOPE",
@@ -951,6 +951,7 @@ func TestDeserializeProblematicSerials2(t *testing.T) {
 			assert.NoError(t, err)
 			fmt.Println("Result:", blocks.String())
 			fmt.Println("Bits:", bits)
+			assert.Equal(t, tt.expected, blocks.String())
 		})
 	}
 }

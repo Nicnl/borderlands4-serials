@@ -11,11 +11,19 @@ import (
 )
 
 func Deserialize(data []byte) (Serial, string, error) {
+	return deserialize(data, true)
+}
+
+func DeserializeWithoutBitstream(data []byte) (Serial, string, error) {
+	return deserialize(data, false)
+}
+
+func deserialize(data []byte, populateBitstream bool) (Serial, string, error) {
 	t := serial_tokenizer.NewTokenizer(data)
 
 	// Expect the magic header as the first bits
 	if err := t.Expect("magic header", 0, 0, 1, 0, 0, 0, 0); err != nil {
-		return nil, t.DoneString(), err
+		return nil, t.DoneStringIfTrue(populateBitstream), err
 	}
 
 	var (
@@ -31,7 +39,7 @@ func Deserialize(data []byte) (Serial, string, error) {
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return nil, t.DoneString(), err
+			return nil, t.DoneStringIfTrue(populateBitstream), err
 		}
 
 		block := Block{
@@ -55,21 +63,21 @@ func Deserialize(data []byte) (Serial, string, error) {
 		case serial_tokenizer.TOK_VARINT:
 			v, err := varint.Read(br)
 			if err != nil {
-				return nil, t.DoneString(), err
+				return nil, t.DoneStringIfTrue(populateBitstream), err
 			}
 			block.Value = v
 
 		case serial_tokenizer.TOK_VARBIT:
 			v, err := varbit.Read(br)
 			if err != nil {
-				return nil, t.DoneString(), err
+				return nil, t.DoneStringIfTrue(populateBitstream), err
 			}
 			block.Value = v
 
 		case serial_tokenizer.TOK_PART:
 			p, err := part.Read(t)
 			if err != nil {
-				return nil, t.DoneString(), err
+				return nil, t.DoneStringIfTrue(populateBitstream), err
 			}
 
 			block.Part = p
@@ -77,12 +85,12 @@ func Deserialize(data []byte) (Serial, string, error) {
 		case serial_tokenizer.TOK_STRING:
 			str, err := b4string.Read(br)
 			if err != nil {
-				return nil, t.DoneString(), err
+				return nil, t.DoneStringIfTrue(populateBitstream), err
 			}
 
 			block.ValueStr = str
 		default:
-			return nil, t.DoneString(), fmt.Errorf("unknown token %d", token)
+			return nil, t.DoneStringIfTrue(populateBitstream), fmt.Errorf("unknown token %d", token)
 		}
 
 		blocks = append(blocks, block)
@@ -94,5 +102,5 @@ func Deserialize(data []byte) (Serial, string, error) {
 		blocks = blocks[:len(blocks)-(trailingTerminators-1)]
 	}
 
-	return blocks, t.DoneString(), nil
+	return blocks, t.DoneStringIfTrue(populateBitstream), nil
 }

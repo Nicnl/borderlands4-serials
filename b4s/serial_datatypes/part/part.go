@@ -2,6 +2,7 @@ package part
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -23,9 +24,9 @@ type Part struct {
 func (p *Part) String() string {
 	switch p.SubType {
 	case SUBTYPE_NONE:
-		return fmt.Sprintf("{%d}", p.Index)
+		return "{" + strconv.Itoa(int(p.Index)) + "}"
 	case SUBTYPE_INT:
-		return fmt.Sprintf("{%d:%d}", p.Index, p.Value)
+		return "{" + strconv.Itoa(int(p.Index)) + ":" + strconv.Itoa(int(p.Value)) + "}"
 	case SUBTYPE_LIST:
 		var output strings.Builder
 		output.WriteString(fmt.Sprintf("{%d:[", p.Index))

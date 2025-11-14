@@ -5,6 +5,7 @@ import (
 	"borderlands_4_serials/b4s/serial_tokenizer"
 	"crypto/sha1"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -36,12 +37,12 @@ func (s Serial) String() string {
 			if i > 0 {
 				output.WriteByte(' ')
 			}
-			output.WriteString(fmt.Sprintf("%d", b.Value))
+			output.WriteString(strconv.Itoa(int(b.Value)))
 		case serial_tokenizer.TOK_VARBIT:
 			if i > 0 {
 				output.WriteByte(' ')
 			}
-			output.WriteString(fmt.Sprintf("%d", b.Value))
+			output.WriteString(strconv.Itoa(int(b.Value)))
 		case serial_tokenizer.TOK_PART:
 			if i > 0 {
 				output.WriteByte(' ')

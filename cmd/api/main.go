@@ -6,7 +6,9 @@ import (
 	"borderlands_4_serials/b4s/serial"
 	_ "embed"
 	"fmt"
+	"log"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"strings"
 
@@ -79,6 +81,12 @@ const (
 )
 
 func main() {
+	if os.Getenv("ENABLE_PPROF") != "1" {
+		go func() {
+			log.Println(http.ListenAndServe("localhost:6060", nil))
+		}()
+	}
+
 	r := gin.Default()
 
 	r.OPTIONS("/api/v1/deserialize_bulk", CORSMiddleware)

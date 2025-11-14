@@ -4,12 +4,15 @@ import (
 	"borderlands_4_serials/b4s/b85"
 	"borderlands_4_serials/b4s/codex"
 	"borderlands_4_serials/b4s/serial"
+	"borderlands_4_serials/b4s/serial_datatypes/part"
+	"borderlands_4_serials/b4s/serial_tokenizer"
 	_ "embed"
 	"fmt"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -141,16 +144,20 @@ func main() {
 				}
 
 				deserializedParts := make([]string, 0, len(item.Serial))
-				{
-					pos := 0
-					for {
-						part := item.FindPartAtPos(pos, true)
-						if part == nil {
-							break
-						}
+				for _, block := range item.Serial {
+					if block.Token != serial_tokenizer.TOK_PART {
+						continue
+					}
 
-						deserializedParts = append(deserializedParts, part.String())
-						pos++
+					switch block.Part.SubType {
+					case part.SUBTYPE_NONE:
+						deserializedParts = append(deserializedParts, "{"+strconv.Itoa(int(block.Part.Index))+"}")
+					case part.SUBTYPE_INT:
+						deserializedParts = append(deserializedParts, "{"+strconv.Itoa(int(block.Part.Index))+":"+strconv.Itoa(int(block.Part.Value))+"}")
+					case part.SUBTYPE_LIST:
+						for _, v := range block.Part.Values {
+							deserializedParts = append(deserializedParts, "{"+strconv.Itoa(int(block.Part.Index))+":"+strconv.Itoa(int(v))+"}")
+						}
 					}
 				}
 

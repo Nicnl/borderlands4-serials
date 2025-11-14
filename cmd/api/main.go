@@ -81,7 +81,7 @@ const (
 )
 
 func main() {
-	if os.Getenv("ENABLE_PPROF") != "1" {
+	if os.Getenv("ENABLE_PPROF") == "1" {
 		go func() {
 			log.Println(http.ListenAndServe("localhost:6060", nil))
 		}()

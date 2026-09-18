@@ -9,11 +9,22 @@ The varbit32 encodes integers up to 32-bits into a length-prefixed bitstream.
 - Is followed by a variable amount of bits =&gt; payload.
     - Payload is ordered LSB-first.
 
+### Example 1
+
 ```
 Type   Length   Data
 vvv    vvvvv    vvv
-110    11000    101
-                ^^^
-           =bin:101
-           =int:5
+110    11000    011
+       =3       ^^^
+                =int:6
+```
+
+### Example 2
+
+```
+Type   Length   Data
+vvv    vvvvv    vvvvvvvvvv
+110    01010    0000000001
+       =10      ^^^^^^^^^^
+                =int:512
 ```

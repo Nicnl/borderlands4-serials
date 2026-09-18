@@ -79,14 +79,14 @@ Result: `{76:4}`
 
 ### Example 3: List subtype (SUBTYPE_LIST)
 ```
-Type  Index         List: Start  Elem 1      Elem 1      Elem 3      End
-vvv   vvvvvvvvvv    vvv   vv     vvvvvvvvv   vvvvvvvvv   vvvvvvvvv
-101   0110111000    001   01     100 11000   100 01000   100 10000   00
-      ^^^^^^^^^^                     ^^^^^       ^^^^^       ^^^^^
+Type  Index         List: Start  Elem 1      Elem 2      Elem 3            End
+vvv   vvvvvvvvvv    vvv   vv     vvvvvvvvv   vvvvvvvvv   vvvvvvvvvvvvvvv   vv
+101   0110111000    001   01     100 01010   100 11110   100 00101 10000   00
+      ^^^^^^^^^^                     ^^^^^       ^^^^^       ^^^^^^^^^^^
       =varint:54                     varint      varint      varint
-                                     =3          =2          =3
+                                     =10         =15         =20
 ```
-Result: `{54:[3 2 1]}`
+Result: `{54:[10 15 20]}`
 
 ## String Representation
 
